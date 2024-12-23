@@ -62,6 +62,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5F419C182D19C72D00D1D862 /* Exceptions for "Mugejungsim" folder in "MugejungsimTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = 5FAD6F1C2D17129F00EE3B9C /* MugejungsimTests */;
+		};
+		5F419C192D19C72D00D1D862 /* Exceptions for "Mugejungsim" folder in "MugejungsimUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = 5FAD6F262D17129F00EE3B9C /* MugejungsimUITests */;
+		};
 		5FAD6F2F2D17129F00EE3B9C /* Exceptions for "Mugejungsim" folder in "Mugejungsim" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -76,6 +90,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				5FAD6F2F2D17129F00EE3B9C /* Exceptions for "Mugejungsim" folder in "Mugejungsim" target */,
+				5F419C182D19C72D00D1D862 /* Exceptions for "Mugejungsim" folder in "MugejungsimTests" target */,
+				5F419C192D19C72D00D1D862 /* Exceptions for "Mugejungsim" folder in "MugejungsimUITests" target */,
 			);
 			path = Mugejungsim;
 			sourceTree = "<group>";
@@ -339,7 +355,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J83GVMLK7N;
+				DEVELOPMENT_TEAM = NBKQCU426T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -367,7 +383,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = J83GVMLK7N;
+				DEVELOPMENT_TEAM = NBKQCU426T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
