@@ -72,4 +72,8 @@ class NetworkManager {
             }
         }.resume() // 요청 시자악!
     }
+    
+    
+    
+    // Multipart data 전송을 위한 코드 필요
 }
