@@ -11,9 +11,10 @@ class MainViewController : UIViewController {
     
     let titleLabel : UILabel = {
         let label = UILabel()
-        label.text = "Mugejungsim"
+        label.text = "여행기를 남겨보세요!"
         label.font = .h1
         label.textColor = .black
+        label.backgroundColor = .lightGray
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -29,8 +30,11 @@ class MainViewController : UIViewController {
     
     func setConstraint(){
         NSLayoutConstraint.activate([
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            titleLabel.topAnchor.constraint(equalTo:view.topAnchor, constant: 100),
+            titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 23),
+            titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23),
+            titleLabel.heightAnchor.constraint(equalToConstant: 124),
+            
         ])
     }
 }
