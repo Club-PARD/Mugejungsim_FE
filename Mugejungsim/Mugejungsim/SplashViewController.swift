@@ -46,7 +46,7 @@ class SplashViewController: UIViewController {
         
         // 2초 후 메인 화면으로 이동
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            let mainVC = FirstPage() // MainViewController는 메인 화면으로 대체해야 합니다.
+            let mainVC = MainViewController()
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
             self.present(mainVC, animated: true, completion: nil)
