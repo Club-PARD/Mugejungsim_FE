@@ -17,7 +17,7 @@ class SplashViewController: UIViewController {
         
         // 로고 이미지 추가
         let logoImageView = UIImageView()
-        logoImageView.image = UIImage(named: "snow") // 'snowflakeLogo'는 Assets에 추가한 로고 이름입니다.
+        logoImageView.image = UIImage(named: "snow")
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoImageView)
