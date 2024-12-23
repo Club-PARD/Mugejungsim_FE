@@ -7,12 +7,12 @@
 
 import UIKit
 
-class MainViewController : UIViewController {
+class MainViewController: UIViewController {
     
-    let titleLabel : UILabel = {
+    let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "여행기를 남겨보세요!"
-        label.font = .h1
+        label.font = .systemFont(ofSize: 24, weight: .bold)
         label.textColor = .black
         label.backgroundColor = .lightGray
         label.textAlignment = .center
@@ -20,21 +20,52 @@ class MainViewController : UIViewController {
         return label
     }()
     
+    let MyPageButton: UIButton = {
+        let mine = UIButton()
+        mine.translatesAutoresizingMaskIntoConstraints = false
+        mine.layer.cornerRadius = 25
+        mine.clipsToBounds = true
+        mine.backgroundColor = UIColor.lightGray
+        mine.setImage(UIImage(systemName: "person.circle"), for: .normal)
+        mine.tintColor = .white
+        return mine
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .white
+        
+        // UI 요소 추가
         view.addSubview(titleLabel)
-        setConstraint()
+        view.addSubview(MyPageButton)
+        
+        setConstraintsWithAutolayout()
     }
     
-    func setConstraint(){
+    func setConstraintsWithAutolayout() {
+        // Title Label Constraints
+        let titleLabelTopConstraint = titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 130)
+        let titleLabelLeadingConstraint = titleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor)
+        let titleLabelTrailingConstraint = titleLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor)
+        let titleLabelHeightConstraint = titleLabel.heightAnchor.constraint(equalToConstant: 124)
+        
+        // MyPage Button Constraints
+        let buttonTopConstraint = MyPageButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16)
+        let buttonTrailingConstraint = MyPageButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
+        let buttonWidthConstraint = MyPageButton.widthAnchor.constraint(equalToConstant: 50)
+        let buttonHeightConstraint = MyPageButton.heightAnchor.constraint(equalToConstant: 50)
+        
+        // Activate all constraints
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo:view.topAnchor, constant: 100),
-            titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 23),
-            titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23),
-            titleLabel.heightAnchor.constraint(equalToConstant: 124),
-            
+            titleLabelTopConstraint,
+            titleLabelLeadingConstraint,
+            titleLabelTrailingConstraint,
+            titleLabelHeightConstraint,
+            buttonTopConstraint,
+            buttonTrailingConstraint,
+            buttonWidthConstraint,
+            buttonHeightConstraint
         ])
     }
 }
