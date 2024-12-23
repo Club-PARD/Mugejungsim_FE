@@ -11,6 +11,17 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // UILabel 초기화
+            let label = UILabel(frame: CGRect(x: 20, y: 100, width: 200, height: 50))
+            label.text = "Hello, World!"
+            
+            // 커스텀 폰트 설정
+            if let customFont = UIFont(name: "Pretendard-Black", size: 16) {
+                label.font = customFont
+            } else {
+                print("Pretendard-Black 폰트를 찾을 수 없습니다.")
+            }
+            
         
         // 배경 색상 설정
         view.backgroundColor = UIColor.systemBlue
