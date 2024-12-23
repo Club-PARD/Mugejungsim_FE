@@ -19,7 +19,7 @@ class ViewController: UIViewController {
         let welcomeLabel = UILabel()
         welcomeLabel.text = "Welcome to Snowball App!"
         welcomeLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        welcomeLabel.textColor = UIColor.white
+//        welcomeLabel.textColor = UIColor.white
         welcomeLabel.textAlignment = .center
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(welcomeLabel)

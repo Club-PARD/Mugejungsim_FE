@@ -29,7 +29,6 @@ extension UIFont {
     // - Returns: 지정된 스타일과 크기로 생성된 UIFont, 실패 시 시스템 기본 폰트를 반환
     static func font(_ style: FontName, ofSize size: CGFloat) -> UIFont {
         guard let customFont = UIFont(name: style.rawValue, size: size) else {
-            print("⚠️ 폰트를 로드할 수 없습니다: \(style.rawValue). 시스템 폰트를 반환합니다.")
             return UIFont.systemFont(ofSize: size)
         }
         return customFont
