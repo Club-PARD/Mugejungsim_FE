@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "moments.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -9,7 +10,6 @@
       "scale" : "2x"
     },
     {
-      "filename" : "kakao_login_medium_wide.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
