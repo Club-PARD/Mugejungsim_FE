@@ -51,9 +51,13 @@
     </dict>
 
     <!-- 카메라 및 갤러리 사용 권한 설명 -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>갤러리 접근 권한이 필요합니다.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>카메라 접근 권한이 필요합니다.</string>
     <key>NSCameraUsageDescription</key>
     <string>앱에서 사진을 촬영하기 위해 카메라를 사용합니다.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>사진 업로드를 위해 갤러리 접근 권한이 필요합니다.</string>
+    <string>사진 갤러리에서 이미지를 선택하기 위해 접근 권한이 필요합니다.</string>
 </dict>
 </plist>
