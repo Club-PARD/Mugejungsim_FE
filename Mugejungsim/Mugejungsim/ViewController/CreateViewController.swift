@@ -181,18 +181,10 @@ class CreateViewController: UIViewController {
     }
     
     @objc func backTapped() {
-        let alertController = UIAlertController(title: nil, message: "여행기 작성을 그만두시겠어요?", preferredStyle: .alert)
-        
-        let cancelAction = UIAlertAction(title: "그만두기", style: .destructive) { _ in
-            self.dismiss(animated: true, completion: nil)
-        }
-        
-        let continueAction = UIAlertAction(title: "이어쓰기", style: .default, handler: nil)
-        
-        alertController.addAction(cancelAction)
-        alertController.addAction(continueAction)
-        
-        present(alertController, animated: true, completion: nil)
+        let stopWritingVC = StopWritingViewController()
+        stopWritingVC.modalTransitionStyle = .crossDissolve
+        stopWritingVC.modalPresentationStyle = .overFullScreen
+        self.present(stopWritingVC, animated: true, completion: nil)
     }
     
     @objc func saveTapped() {
