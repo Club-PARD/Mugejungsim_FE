@@ -9,6 +9,8 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    var username: String?
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "여행기를 남겨보세요!"
@@ -39,6 +41,13 @@ class MainViewController: UIViewController {
         // UI 요소 추가
         view.addSubview(titleLabel)
         view.addSubview(MyPageButton)
+        
+        // 닉네임과 메시지 설정
+            if let username = username {
+                titleLabel.text = "\(username)님, 여행기를 남겨보세요!"
+            } else {
+                titleLabel.text = "여행기를 남겨보세요!"
+            }
         
         setConstraintsWithAutolayout()
     }
