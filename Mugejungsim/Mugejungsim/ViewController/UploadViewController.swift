@@ -146,7 +146,13 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     }
     
     @objc private func goBack() {
-        navigationController?.popViewController(animated: true)
+        if let navigationController = navigationController {
+            // 네비게이션 컨트롤러를 사용하는 경우
+            navigationController.popViewController(animated: true)
+        } else {
+            // 모달로 표시된 경우
+            dismiss(animated: true, completion: nil)
+        }
     }
     
     @objc func openGallery() {
@@ -169,6 +175,11 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         imagePicker.sourceType = .camera
         imagePicker.delegate = self
         present(imagePicker, animated: true)
+    }
+    
+    @objc func nextButtonTapped() {
+        let uploadViewController = UploadViewController()
+        navigationController?.pushViewController(uploadViewController, animated: true)
     }
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
