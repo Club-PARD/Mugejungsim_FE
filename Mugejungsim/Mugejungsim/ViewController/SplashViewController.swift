@@ -22,8 +22,9 @@ class SplashViewController: UIViewController {
         
         // 2초 후 메인 화면으로 이동
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//            let mainVC = OBViewController1()
 //            let mainVC = MainViewController()
-//            let mainVC = LoginViewController()
+            let mainVC = LoginViewController()
 //            let mainVC = ObjeCreationViewController()
 //            let mainVC = LoadingViewController()
 //            let mainVC = ResultViewController()
