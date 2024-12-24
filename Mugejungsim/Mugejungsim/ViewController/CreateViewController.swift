@@ -119,14 +119,15 @@ class CreateViewController: UIViewController {
     }()
     
     let nextButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("다음", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemBlue
-        button.layer.cornerRadius = 25
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+            let button = UIButton(type: .system)
+            button.setTitle("다음", for: .normal)
+            button.setTitleColor(.white, for: .normal)
+            button.backgroundColor = .systemBlue
+            button.layer.cornerRadius = 25
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+            return button
+        }()
     
     // MARK: - View Life Cycle
     override func viewDidLoad() {
@@ -198,6 +199,49 @@ class CreateViewController: UIViewController {
     @objc func saveTapped() {
         print("임시저장 버튼 클릭됨")
     }
+    
+    // MARK: - Actions
+        @objc func nextButtonTapped() {
+            // Check if the title is filled
+            guard let titleText = titleTextField.text, !titleText.isEmpty else {
+                showAlert(message: "여행 기록 제목을 입력하세요.")
+                return
+            }
+
+            // Check if the start date fields are filled
+            let startDateFields = startDateStackView.arrangedSubviews.compactMap { $0 as? UITextField }
+            guard startDateFields.allSatisfy({ !$0.text!.isEmpty }) else {
+                showAlert(message: "시작 날짜를 모두 입력하세요.")
+                return
+            }
+
+            // Check if the end date fields are filled
+            let endDateFields = endDateStackView.arrangedSubviews.compactMap { $0 as? UITextField }
+            guard endDateFields.allSatisfy({ !$0.text!.isEmpty }) else {
+                showAlert(message: "종료 날짜를 모두 입력하세요.")
+                return
+            }
+
+            // Check if the location is filled
+            guard let locationText = locationTextField.text, !locationText.isEmpty else {
+                showAlert(message: "여행지를 입력하세요.")
+                return
+            }
+
+            let uploadViewController = UploadViewController()
+                uploadViewController.modalPresentationStyle = .fullScreen // 전체 화면 표시
+                uploadViewController.modalTransitionStyle = .crossDissolve // 전환 애니메이션
+                present(uploadViewController, animated: true, completion: nil)
+        }
+    
+    // Helper method to show alert
+        func showAlert(message: String) {
+            let alertController = UIAlertController(title: "입력 필요", message: message, preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+            alertController.addAction(okAction)
+            present(alertController, animated: true, completion: nil)
+        }
+    
     
     // MARK: - Setup UI
     private func setupUI() {

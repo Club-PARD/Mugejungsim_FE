@@ -1,10 +1,3 @@
-//
-//  SplashViewController.swift
-//  Mugejungsim
-//
-//  Created by 현승훈 on 12/23/24.
-//
-
 import UIKit
 
 class SplashViewController: UIViewController {
@@ -12,32 +5,24 @@ class SplashViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // 배경 색상 설정
-        view.backgroundColor = UIColor.white
+        // 배경 이미지 추가
+        let backgroundImageView = UIImageView()
+        backgroundImageView.image = UIImage(named: "moments") // moments 이미지 사용
+        backgroundImageView.contentMode = .scaleAspectFill // 이미지가 화면에 맞도록 설정
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(backgroundImageView)
         
-        // 로고 이미지 추가
-        let logoImageView = UIImageView()
-        logoImageView.image = UIImage(named: "moments")
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logoImageView)
-        
-        // 로고와 텍스트 레이아웃 설정
+        // 배경 이미지 제약조건 설정
         NSLayoutConstraint.activate([
-            // 로고 배치
-            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            logoImageView.widthAnchor.constraint(equalToConstant: 220),
-            logoImageView.heightAnchor.constraint(equalToConstant: 220),
+            backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         
         // 2초 후 메인 화면으로 이동
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            // let mainVC = MainViewController()
-//            let mainVC = LoginViewController()
-//            let mainVC = ObjeCreationViewController()
-//            let mainVC = LoadingViewController()
-            let mainVC = ResultViewController()
+            let mainVC = CreateViewController()
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
             self.present(mainVC, animated: true, completion: nil)
