@@ -10,10 +10,10 @@ import KakaoSDKUser
 
 class LoginViewController: UIViewController {
     private let loginButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton(type: .custom)
         
         // 이미지 설정 (렌더링 모드 확인 및 디버깅)
-        if let image = UIImage(named: "kakao_login_medium_wide")?.withRenderingMode(.alwaysOriginal) {
+        if let image = UIImage(named: "kakao")?.withRenderingMode(.alwaysOriginal) {
             button.setImage(image, for: .normal)
         } else {
             print("이미지 'kakao_login_medium_wide'를 로드할 수 없습니다. 파일 이름을 확인하세요.")
