@@ -1,10 +1,3 @@
-//
-//  PhotoData.swift
-//  ImageCollectionForm
-//
-//  Created by 도현학 on 12/22/24.
-//
-
 import Foundation
 
 struct PhotoData: Codable {
