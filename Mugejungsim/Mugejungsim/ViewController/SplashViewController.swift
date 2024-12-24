@@ -48,7 +48,8 @@ class SplashViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
 //            let mainVC = MainViewController()
 //            let mainVC = LoginViewController()
-            let mainVC = ObjeCreationViewController()
+//            let mainVC = ObjeCreationViewController()
+            let mainVC = LoadingViewController()
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
             self.present(mainVC, animated: true, completion: nil)
