@@ -9,15 +9,41 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private var thumbnailCollectionView: UICollectionView!
     private var textField: UITextField!
     private var currentIndex: Int = 0 // 현재 선택된 이미지 인덱스
-    private var originalViewFrame: CGRect? // 키보드 이동을 위한 원래 프레임
+
+    private let separator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    private let backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Back", for: .normal)
+        button.tintColor = .gray
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(goBack), for: .touchUpInside)
+        return button
+    }()
+
+    private let saveButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Save", for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = .gray
+        button.layer.cornerRadius = 5
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(saveAndExit), for: .touchUpInside) // saveAndExit 연결
+        return button
+    }()
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         texts = Array(repeating: "", count: images.count) // 텍스트 배열 초기화
         view.backgroundColor = .white
+        setupNavigationBar()
         setupUI()
-        setupKeyboardObservers()
     }
 
     deinit {
@@ -26,22 +52,27 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
     // MARK: - UI Setup
     private func setupUI() {
+        setupSeparator()
         setupMainImageView()
         setupTextInputField()
         setupThumbnailCollectionView()
-        setupSaveButton()
+        setupBackAndSaveButtons()
+    }
+
+    private func setupNavigationBar() {
+        navigationItem.title = "Story Editor"
     }
 
     private func setupMainImageView() {
         mainImageView = UIImageView()
         mainImageView.contentMode = .scaleAspectFit
         mainImageView.translatesAutoresizingMaskIntoConstraints = false
-        mainImageView.image = images.first
+        mainImageView.image = images.first ?? UIImage() // 배열이 비어있을 경우 대비
         view.addSubview(mainImageView)
 
         NSLayoutConstraint.activate([
             mainImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            mainImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            mainImageView.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 20),
             mainImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
             mainImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5)
         ])
@@ -50,8 +81,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private func setupTextInputField() {
         textField = UITextField()
         textField.borderStyle = .roundedRect
-        textField.placeholder = "이미지에 대한 텍스트를 입력하세요."
-        textField.text = texts[currentIndex]
+        textField.placeholder = "Enter text for this image"
+        textField.text = texts.first ?? ""
         textField.delegate = self
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.addTarget(self, action: #selector(updateText(_:)), for: .editingChanged)
@@ -87,50 +118,55 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         ])
     }
 
-    private func setupSaveButton() {
-        let saveButton = UIBarButtonItem(title: "저장", style: .plain, target: self, action: #selector(saveAndExit))
-        navigationItem.rightBarButtonItem = saveButton
+    private func setupSeparator() {
+        view.addSubview(separator)
+        NSLayoutConstraint.activate([
+            separator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            separator.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            separator.heightAnchor.constraint(equalToConstant: 1)
+        ])
     }
 
-    // MARK: - Keyboard Handling
-    private func setupKeyboardObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
+    private func setupBackAndSaveButtons() {
+        view.addSubview(backButton)
+        view.addSubview(saveButton)
 
-    @objc private func keyboardWillShow(_ notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        NSLayoutConstraint.activate([
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            backButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
 
-        if originalViewFrame == nil {
-            originalViewFrame = view.frame
-        }
-
-        let keyboardHeight = keyboardFrame.height
-        let overlap = textField.frame.maxY - (view.frame.height - keyboardHeight)
-
-        if overlap > 0 {
-            UIView.animate(withDuration: 0.3) {
-                self.view.frame.origin.y = -overlap - 20
-            }
-        }
-    }
-
-    @objc private func keyboardWillHide(_ notification: Notification) {
-        if let originalFrame = originalViewFrame {
-            UIView.animate(withDuration: 0.3) {
-                self.view.frame = originalFrame
-            }
-        }
+            saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            saveButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
+        ])
     }
 
     // MARK: - Actions
+    @objc private func goBack() {
+        navigationController?.popViewController(animated: true)
+    }
+
+    @objc private func saveTemporarily() {
+        print("Temporary save complete!")
+    }
+
     @objc private func updateText(_ textField: UITextField) {
         texts[currentIndex] = textField.text ?? ""
     }
 
     @objc private func saveAndExit() {
-        print("저장된 텍스트: \(texts)") // 저장 로직 추가 가능
-        navigationController?.popViewController(animated: true)
+        var photoDataList: [PhotoData] = []
+        for (index, image) in images.enumerated() {
+            if let imagePath = DataManager.shared.saveImage(image) {
+                let photoData = PhotoData(imagePath: imagePath, text: texts[index])
+                photoDataList.append(photoData)
+            }
+        }
+        DataManager.shared.addNewData(photoData: photoDataList)
+
+        // 이동
+        let savedPhotosVC = SavedPhotosViewController()
+        navigationController?.pushViewController(savedPhotosVC, animated: true)
     }
 
     // MARK: - UICollectionViewDataSource
@@ -155,31 +191,5 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
-    }
-}
-
-// MARK: - ThumbnailCell
-class ThumbnailCell: UICollectionViewCell {
-    let imageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFill
-        iv.clipsToBounds = true
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
-    }()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        contentView.addSubview(imageView)
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-        ])
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

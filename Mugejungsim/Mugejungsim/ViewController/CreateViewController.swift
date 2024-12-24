@@ -1,9 +1,3 @@
-//
-//  CreateViewController.swift
-//  Mugejungsim
-//
-
-
 import UIKit
 
 class CreateViewController: UIViewController {
