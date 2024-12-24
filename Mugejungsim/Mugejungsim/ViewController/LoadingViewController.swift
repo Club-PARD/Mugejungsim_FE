@@ -21,7 +21,7 @@ class LoadingViewController: UIViewController {
     
     // 로딩 중 이미지
     private let loadingImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "snow")) // "snow"는 프로젝트의 이미지 파일 이름
+        let imageView = UIImageView(image: UIImage(named: "moments")) // "snow"는 프로젝트의 이미지 파일 이름
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
