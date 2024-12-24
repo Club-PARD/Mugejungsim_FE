@@ -185,8 +185,11 @@ class CreateViewController: UIViewController {
         let alertController = UIAlertController(title: nil, message: "여행기 작성을 그만두시겠어요?", preferredStyle: .alert)
         
         let cancelAction = UIAlertAction(title: "그만두기", style: .destructive) { _ in
-            self.dismiss(animated: true, completion: nil)
-        }
+                let mainViewController = MainViewController()
+                mainViewController.modalPresentationStyle = .fullScreen
+                mainViewController.modalTransitionStyle = .crossDissolve
+                self.present(mainViewController, animated: true, completion: nil)
+            }
         
         let continueAction = UIAlertAction(title: "이어쓰기", style: .default, handler: nil)
         
