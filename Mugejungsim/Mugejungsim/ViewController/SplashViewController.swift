@@ -49,7 +49,8 @@ class SplashViewController: UIViewController {
 //            let mainVC = MainViewController()
 //            let mainVC = LoginViewController()
 //            let mainVC = ObjeCreationViewController()
-            let mainVC = LoadingViewController()
+//            let mainVC = LoadingViewController()
+            let mainVC = ResultViewController()
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
             self.present(mainVC, animated: true, completion: nil)
