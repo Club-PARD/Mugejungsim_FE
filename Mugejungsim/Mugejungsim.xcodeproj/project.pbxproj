@@ -360,6 +360,8 @@
 				DEVELOPMENT_TEAM = NBKQCU426T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "앱에서 사진을 촬영하기 위해 카메라를 사용합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진 갤러리에서 이미지를 선택하기 위해 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -388,6 +390,8 @@
 				DEVELOPMENT_TEAM = NBKQCU426T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "앱에서 사진을 촬영하기 위해 카메라를 사용합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진 갤러리에서 이미지를 선택하기 위해 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

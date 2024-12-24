@@ -13,7 +13,7 @@ import KakaoSDKCommon
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        KakaoSDK.initSDK(appKey: "NATIVE_KEY")
+        KakaoSDK.initSDK(appKey: "db92cb7060bc1ea53b8b629ba61c75e9")
         return true
     }
     // URL Scheme으로 앱이 열렸을 때 처리
