@@ -6,7 +6,6 @@ class SavedPhotosViewController: UIViewController, UITableViewDelegate, UITableV
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
         savedData = DataManager.shared.loadData()
         setupTableView()
     }
@@ -16,6 +15,7 @@ class SavedPhotosViewController: UIViewController, UITableViewDelegate, UITableV
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(SavedPhotoCell.self, forCellReuseIdentifier: "SavedPhotoCell")
+        tableView.backgroundColor = .white
         view.addSubview(tableView)
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(toggleEditingMode))
