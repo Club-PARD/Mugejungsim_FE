@@ -77,13 +77,14 @@ class ObjeCreationViewController: UIViewController {
     // MARK: - 네비게이션 바 설정
     private func setupCustomNavigationBar() {
         let navBar = UIView()
-        navBar.backgroundColor = .white
+        navBar.backgroundColor = .clear
         navBar.translatesAutoresizingMaskIntoConstraints = false
         
         let separator = UIView()
         separator.backgroundColor = .lightGray
         separator.translatesAutoresizingMaskIntoConstraints = false
         
+        // closeButton -> 취소 확인 모달창으로 이동 ㅠㅣㄹ요
         let closeButton = UIButton(type: .system)
         closeButton.setImage(UIImage(named: "X_Button"), for: .normal)
         closeButton.tintColor = .black
@@ -111,7 +112,10 @@ class ObjeCreationViewController: UIViewController {
     }
     
     @objc private func didTapCloseButton() {
-        dismiss(animated: true, completion: nil)
+        let stopSelectingVC = StopSelectingViewController()
+        stopSelectingVC.modalTransitionStyle = .crossDissolve
+        stopSelectingVC.modalPresentationStyle = .overFullScreen
+        self.present(stopSelectingVC, animated: true, completion: nil)
     }
     
     // MARK: - UI 설정
@@ -172,7 +176,7 @@ class ObjeCreationViewController: UIViewController {
         button.setTitle(title, for: .normal)
         button.accessibilityIdentifier = value
         button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = .white
+        button.backgroundColor = .clear
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.black.cgColor
         button.layer.cornerRadius = 10
@@ -188,7 +192,7 @@ class ObjeCreationViewController: UIViewController {
         
         if selectedItems.contains(value) {
             selectedItems.removeAll { $0 == value }
-            sender.backgroundColor = .white
+            sender.backgroundColor = .clear
         } else {
             guard selectedItems.count < 2 else { return }
             selectedItems.append(value)
