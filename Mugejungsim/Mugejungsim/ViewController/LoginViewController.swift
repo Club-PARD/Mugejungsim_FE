@@ -84,7 +84,7 @@ class LoginViewController: UIViewController {
     private func showMainViewController(with nickname: String) {
         // MainViewController 인스턴스 생성
         let mainViewController = MainViewController()
-        mainViewController.username = nickname
+        //mainViewController.username = nickname
         
         // 화면 전환 (네비게이션 컨트롤러가 있을 경우 push, 없으면 present)
         if let navigationController = self.navigationController {
