@@ -9,7 +9,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>{key}</string>
+				<string>NATIVE_KEY</string>
 			</array>
 		</dict>
 	</array>
