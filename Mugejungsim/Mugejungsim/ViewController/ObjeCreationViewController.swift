@@ -84,7 +84,7 @@ class ObjeCreationViewController: UIViewController {
         separator.backgroundColor = .lightGray
         separator.translatesAutoresizingMaskIntoConstraints = false
         
-        // closeButton -> 취소 확인 모달창으로 이동 ㅠㅣㄹ요
+        // closeButton -> 취소 확인 모달창으로 이동 필요
         let closeButton = UIButton(type: .system)
         closeButton.setImage(UIImage(named: "X_Button"), for: .normal)
         closeButton.tintColor = .black
