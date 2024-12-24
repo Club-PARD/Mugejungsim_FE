@@ -17,14 +17,14 @@ class SplashViewController: UIViewController {
         
         // 로고 이미지 추가
         let logoImageView = UIImageView()
-        logoImageView.image = UIImage(named: "snow")
+        logoImageView.image = UIImage(named: "newjeans")
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoImageView)
         
         // 앱 이름 텍스트 추가
         let appNameLabel = UILabel()
-        appNameLabel.text = "Snowball App"
+        appNameLabel.text = "Moments"
         appNameLabel.font = UIFont.systemFont(ofSize: 24, weight: .semibold)
         appNameLabel.textColor = UIColor.black
         appNameLabel.textAlignment = .center
