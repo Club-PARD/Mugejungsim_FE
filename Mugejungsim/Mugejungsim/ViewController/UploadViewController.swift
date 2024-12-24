@@ -157,9 +157,9 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     
     @objc func openGallery() {
         var config = PHPickerConfiguration()
-        config.selectionLimit = 10
-        config.filter = .images
-        
+        config.selectionLimit = 25 // 최대 선택 가능 이미지 수
+        config.filter = .images // 이미지만 필터링
+
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
         present(picker, animated: true)
@@ -183,9 +183,10 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     }
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        dismiss(animated: true)
-        var selectedImages: [UIImage] = []
-        
+        dismiss(animated: true) // 피커 종료
+        var selectedImages: [UIImage] = [] // 선택한 이미지 저장
+
+        // 선택한 이미지를 로드
         for result in results {
             if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
                 result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
@@ -193,7 +194,8 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
                         DispatchQueue.main.async {
                             selectedImages.append(image)
                             if selectedImages.count == results.count {
-                                self?.showPhotoEditor(with: selectedImages)
+                                // 모든 이미지를 로드한 후 StoryEditorViewController로 이동
+                                self?.navigateToStoryEditor(with: selectedImages)
                             }
                         }
                     }
@@ -207,9 +209,14 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
             print("No images selected!")
             return
         }
-        let editorVC = StoryEditorViewController()
-        editorVC.images = images
-        navigationController?.pushViewController(editorVC, animated: true)
+    }
+    
+    // StoryEditorViewController로 이동하는 메서드
+    private func navigateToStoryEditor(with images: [UIImage]) {
+        let storyEditorVC = StoryEditorViewController()
+        storyEditorVC.images = images // 선택된 이미지 전달
+        storyEditorVC.modalPresentationStyle = .fullScreen // 전체 화면으로 표시
+        present(storyEditorVC, animated: true, completion: nil)
     }
     
     private func showAlert(title: String, message: String) {
