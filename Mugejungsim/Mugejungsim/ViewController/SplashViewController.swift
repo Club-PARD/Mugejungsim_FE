@@ -29,8 +29,9 @@ class SplashViewController: UIViewController {
 //            let mainVC = ResultViewController()
 //            let mainVC = UploadViewController()
 //            let mainVC = MyRecordsViewController()
-            let mainVC = CreateViewController()
+//            let mainVC = CreateViewController()
 //            let mainVC = SavedPhotosViewController()
+            let mainVC = SaveAndEditViewController()
 
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
