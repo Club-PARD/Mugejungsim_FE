@@ -16,7 +16,7 @@ class CheckObjeImageViewController: UIViewController {
         label.text = "유리병 편지에 담긴 나만의 여행\n추억 컬러를 확인해 보세요!"
         label.numberOfLines = 2
         label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
-        label.font = UIFont(name: "Pretendard-Bold", size: 16)
+        label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
