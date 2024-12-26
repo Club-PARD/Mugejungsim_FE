@@ -20,6 +20,7 @@ class ResultViewController: UIViewController {
         let label = UILabel()
         // 나중에 기능 적용 시 username과 country text 넣어야 됨
         label.text = "OOO 님의\nOOO 여행 추억입니다."
+        label.textColor = .black
         label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
@@ -32,7 +33,8 @@ class ResultViewController: UIViewController {
         let label = UILabel()
         label.text = "오브제를 터치하고\n움직여 보세요!"
         label.numberOfLines = 2
-        label.textColor = .black
+        label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
+        
         label.font = UIFont(name: "Pretendard-Bold", size: 16)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -133,12 +135,16 @@ class ResultViewController: UIViewController {
         print("성공!")
         
         // 페이지 이동 필요
+        let CheckObjeImageVC = CheckObjeImageViewController()
+        CheckObjeImageVC.modalPresentationStyle = .fullScreen
+        self.present(CheckObjeImageVC, animated: true, completion: nil)
+        print("CheckObjeImageViewController로 이동 성공")
     }
     
     // USDZPreviewViewController로 이동
     @objc func openUSDZPreviewController() {
         let USDZPreviewVC = USDZPreviewViewController() // USDZModal 페이지 호출
         USDZPreviewVC.modalPresentationStyle = .fullScreen
-        present(USDZPreviewVC, animated: true, completion: nil)
+        present(USDZPreviewVC, animated: false, completion: nil)
     }
 }
