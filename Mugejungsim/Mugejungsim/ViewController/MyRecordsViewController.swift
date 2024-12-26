@@ -17,13 +17,30 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
 
     // 기록/컬렉션 스위치
     let segmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["기록", "컬렉션"])
+        let control = UISegmentedControl(items: ["나의 여행", "나의 오브제"])
         control.selectedSegmentIndex = 0
-        control.backgroundColor = .lightGray
-        control.selectedSegmentTintColor = .systemPink
+        control.backgroundColor = .white // 기본 배경색 흰색
+        control.selectedSegmentTintColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0) // #6E6EDE 색상
+        
+        // "나의 여행" 텍스트 스타일
+        let normalAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.black,
+            .font: UIFont.systemFont(ofSize: 14, weight: .medium)
+        ]
+        
+        // "나의 오브제" 텍스트 스타일
+        let selectedAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 14, weight: .medium)
+        ]
+        
+        control.setTitleTextAttributes(normalAttributes, for: .normal) // 비활성화 상태
+        control.setTitleTextAttributes(selectedAttributes, for: .selected) // 활성화 상태
+        
         control.translatesAutoresizingMaskIntoConstraints = false
         return control
     }()
+
 
     // 스크롤 가능한 ScrollView
     let scrollView: UIScrollView = {
@@ -48,7 +65,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     // 우측 하단 핑크 버튼
     let floatingButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .systemPink
+        button.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0) // #6E6EDE 색상
         button.setTitle("＋", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 30)
@@ -56,6 +73,8 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+
+
     
     let MyPageButton: UIButton = {
         let mine = UIButton()
@@ -97,8 +116,8 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             segmentedControl.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 40),
-            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 120),
+            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -120),
             segmentedControl.heightAnchor.constraint(equalToConstant: 40),
             
             scrollView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 16),
