@@ -1,6 +1,6 @@
 import UIKit
 
-class CreateViewController: UIViewController {
+class CreateViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - UI Elements
     let titleLabel: UILabel = {
@@ -125,12 +125,48 @@ class CreateViewController: UIViewController {
     
     // MARK: - View Life Cycle
     override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        setupUI()
-        addDoneButtonToAllInputs()
-        setupNavigationBar()
-    }
+            super.viewDidLoad()
+            view.backgroundColor = .white
+            setupUI()
+            addDoneButtonToAllInputs()
+            setupNavigationBar()
+            setTextFieldDelegates()
+        }
+    
+    // 텍스트 필드의 delegate 설정
+        private func setTextFieldDelegates() {
+            let allTextFields = [titleTextField] +
+                startDateStackView.arrangedSubviews.compactMap { $0 as? UITextField } +
+                endDateStackView.arrangedSubviews.compactMap { $0 as? UITextField } +
+                [locationTextField]
+            
+            for textField in allTextFields {
+                textField.delegate = self
+            }
+        }
+    
+    // UITextFieldDelegate 메서드
+        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            // 모든 텍스트 필드 배열 생성
+            let allTextFields = [titleTextField] +
+                startDateStackView.arrangedSubviews.compactMap { $0 as? UITextField } +
+                endDateStackView.arrangedSubviews.compactMap { $0 as? UITextField } +
+                [locationTextField]
+            
+            // 현재 텍스트 필드의 인덱스를 확인
+            if let currentIndex = allTextFields.firstIndex(of: textField) {
+                let nextIndex = currentIndex + 1
+                
+                // 다음 텍스트 필드가 있으면 포커스를 이동
+                if nextIndex < allTextFields.count {
+                    allTextFields[nextIndex].becomeFirstResponder()
+                } else {
+                    // 마지막 텍스트 필드라면 키보드 닫기
+                    textField.resignFirstResponder()
+                }
+            }
+            return true
+        }
     
     // MARK: - Add Done Button to Inputs
     func addDoneButtonToAllInputs() {
