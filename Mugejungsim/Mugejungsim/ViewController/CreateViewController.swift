@@ -1,10 +1,3 @@
-//
-//  CreateViewController.swift
-//  Mugejungsim
-//
-//  Created by 도현학 on 12/24/24.
-//
-
 import UIKit
 
 class CreateViewController: UIViewController, UITextFieldDelegate {
