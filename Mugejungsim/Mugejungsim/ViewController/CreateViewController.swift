@@ -1,19 +1,21 @@
 //
-//  ObjeCreationViewController.swift
+//  CreateViewController.swift
 //  Mugejungsim
 //
 //  Created by 도현학 on 12/24/24.
 //
 
-/*
- - 여행 일자에 대한 required, 즉 유효성 검사 필요함
- - 이것을 print로 확인하는 작업 요구 (체크 코드 추가)
- */
 
 import UIKit
 
-class CreateViewController: UIViewController {
+class CreateViewController: UIViewController, UITextFieldDelegate {
     
+    var startDateYear: String?
+    var startDateMonth: String?
+    var startDateDay: String?
+    var endDateYear: String?
+    var endDateMonth: String?
+    var endDateDay: String?
     
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -100,6 +102,7 @@ class CreateViewController: UIViewController {
         button.layer.cornerRadius = 8
         button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -107,11 +110,17 @@ class CreateViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        
+        configureTextFieldDelegates(in: startDateStackView)
+        configureTextFieldDelegates(in: endDateStackView)
+        titleTextField.delegate = self
+        locationTextField.delegate = self
+        
         setupCustomNavigationBar()
         setupUI()
         setupCompanionButtons()
         setupObservers()
-        setupNextButtonAction()
+        
     }
     
     private func setupCustomNavigationBar() {
@@ -142,7 +151,7 @@ class CreateViewController: UIViewController {
         saveButton.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
         saveButton.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
-
+        
         
         view.addSubview(navBar)
         navBar.addSubview(separator)
@@ -159,7 +168,7 @@ class CreateViewController: UIViewController {
             separator.bottomAnchor.constraint(equalTo: navBar.bottomAnchor),
             separator.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             separator.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
-            separator.heightAnchor.constraint(equalToConstant: 1),
+            separator.heightAnchor.constraint(equalToConstant: 0.3),
             
             titleLabel.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             titleLabel.centerXAnchor.constraint(equalTo: navBar.centerXAnchor),
@@ -186,7 +195,6 @@ class CreateViewController: UIViewController {
         // 이것에 대한 구체적인 논의 필요
         //
     }
-    
     
     private func setupUI() {
         view.addSubview(titleLabel)
@@ -264,31 +272,24 @@ class CreateViewController: UIViewController {
             companionButtons.append(button)
             view.addSubview(button)
             
-            // Layout Constraints
             NSLayoutConstraint.activate([
                 button.widthAnchor.constraint(equalToConstant: 76),
                 button.heightAnchor.constraint(equalToConstant: 37)
             ])
             
             if index < 4 {
-                // 첫 번째 줄 버튼
                 if previousButton == nil {
-                    // 첫 번째 버튼
                     button.topAnchor.constraint(equalTo: companionLabel.bottomAnchor, constant: 14).isActive = true
                     button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24).isActive = true
                 } else {
-                    // 이전 버튼의 오른쪽에 배치
                     button.topAnchor.constraint(equalTo: previousButton!.topAnchor).isActive = true
                     button.leadingAnchor.constraint(equalTo: previousButton!.trailingAnchor, constant: 8).isActive = true
                 }
             } else {
-                // 두 번째 줄 버튼
                 if index == 4 {
-                    // 첫 번째 버튼(두 번째 줄)
                     button.topAnchor.constraint(equalTo: companionButtons[0].bottomAnchor, constant: 8).isActive = true
                     button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24).isActive = true
                 } else {
-                    // 이전 버튼의 오른쪽에 배치
                     button.topAnchor.constraint(equalTo: companionButtons[4].topAnchor).isActive = true
                     button.leadingAnchor.constraint(equalTo: companionButtons[index - 1].trailingAnchor, constant: 8).isActive = true
                 }
@@ -389,6 +390,7 @@ class CreateViewController: UIViewController {
         textField.font = UIFont(name: "Pretendard-Regular", size: 20)
         textField.borderStyle = .none
         textField.textAlignment = .center
+        textField.keyboardType = .numberPad
         
         let underline = UIView()
         underline.backgroundColor = .lightGray
@@ -409,53 +411,183 @@ class CreateViewController: UIViewController {
         }
     }
     
+    /// `모든 텍스트 안에 delegate 설정
+    private func configureTextFieldDelegates(in stackView: UIStackView) {
+        for subview in stackView.arrangedSubviews {
+            if let innerStackView = subview as? UIStackView {
+                configureTextFieldDelegates(in: innerStackView)
+            } else if let textField = subview as? UITextField {
+                textField.delegate = self
+                textField.addTarget(self, action: #selector(textFieldEditingChanged(_:)), for: .editingChanged)
+                
+                // 키보드 액세서리 추가
+                let toolbar = UIToolbar()
+                toolbar.sizeToFit()
+                
+                let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(doneButtonTapped))
+                            
+                let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+                toolbar.setItems([flexibleSpace, doneButton], animated: false)
+                            
+                textField.inputAccessoryView = toolbar
+            }
+        }
+    }
+    
+
+    @objc private func doneButtonTapped() {
+        view.endEditing(true) // 키보드 닫기
+    }
+
+    private func getAllTextFields() -> [UITextField] {
+        var allTextFields: [UITextField] = []
+        allTextFields.append(titleTextField)
+        collectTextFields(from: startDateStackView, into: &allTextFields)
+        collectTextFields(from: endDateStackView, into: &allTextFields)
+        allTextFields.append(locationTextField)
+        return allTextFields
+    }
+    
+    // date text가 입력되는지 확인하는 디버깅 function
+    @objc private func textFieldEditingChanged(_ textField: UITextField) {
+        guard let text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+              let placeholder = textField.placeholder else { return }
+        
+        // textField가 특정 stackView의 자손인지 확인
+        func isTextFieldInViewHierarchy(_ textField: UITextField, parentView: UIView) -> Bool {
+            var currentView: UIView? = textField
+            while let superview = currentView?.superview {
+                if superview == parentView {
+                    return true
+                }
+                currentView = superview
+            }
+            return false
+        }
+        switch placeholder {
+        case "YYYY":
+            if isTextFieldInViewHierarchy(textField, parentView: startDateStackView) {
+                startDateYear = text
+            } else if isTextFieldInViewHierarchy(textField, parentView: endDateStackView) {
+                endDateYear = text
+            }
+        case "MM":
+            if isTextFieldInViewHierarchy(textField, parentView: startDateStackView) {
+                startDateMonth = text
+            } else if isTextFieldInViewHierarchy(textField, parentView: endDateStackView) {
+                endDateMonth = text
+            }
+        case "DD":
+            if isTextFieldInViewHierarchy(textField, parentView: startDateStackView) {
+                startDateDay = text
+            } else if isTextFieldInViewHierarchy(textField, parentView: endDateStackView) {
+                endDateDay = text
+            }
+        default: break
+        }
+        
+        print("시작일자: \(startDateYear ?? "없음")-\(startDateMonth ?? "없음")-\(startDateDay ?? "없음")")
+        print("종료일자: \(endDateYear ?? "없음")-\(endDateMonth ?? "없음")-\(endDateDay ?? "없음")")
+        
+        // 유효성 검사 실행
+        validateInputs()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // 모든 텍스트 필드 순서대로 배열화
+        var allTextFields: [UITextField] = []
+        
+        // 텍스트 필드 탐색
+        allTextFields.append(titleTextField)
+        collectTextFields(from: startDateStackView, into: &allTextFields)
+        collectTextFields(from: endDateStackView, into: &allTextFields)
+        allTextFields.append(locationTextField)
+        
+        // 현재 텍스트 필드의 인덱스를 찾고 다음 텍스트 필드로 이동
+        if let currentIndex = allTextFields.firstIndex(of: textField) {
+            if currentIndex < allTextFields.count - 1 {
+                let nextTextField = allTextFields[currentIndex + 1]
+                nextTextField.becomeFirstResponder()
+            } else {
+                textField.resignFirstResponder()
+            }
+        }
+        return true
+    }
+    
+    /// `UIStackView` 안의 모든 텍스트 필드를 탐색하여 배열에 추가
+    private func collectTextFields(from stackView: UIStackView, into textFields: inout [UITextField]) {
+        for subview in stackView.arrangedSubviews {
+            if let innerStackView = subview as? UIStackView {
+                collectTextFields(from: innerStackView, into: &textFields)
+            } else if let textField = subview as? UITextField {
+                textFields.append(textField)
+            }
+        }
+    }
+    /// Validate Check Function
     @objc func validateInputs() {
         let isTitleFilled = !(titleTextField.text?.isEmpty ?? true)
         let isLocationFilled = !(locationTextField.text?.isEmpty ?? true)
         let isCompanionSelected = selectedCompanion != nil
+        let isStartDateValid = isValidDate(year: startDateYear ?? "0000", month: startDateMonth ?? "00", day: startDateDay ?? "00")
+        let isEndDateValid = isValidDate(year: endDateYear ?? "0000", month: endDateMonth ?? "00", day: endDateDay ?? "00")
+            
+        let isAllValid = isTitleFilled && isLocationFilled && isCompanionSelected && isStartDateValid && isEndDateValid
         
-        nextButton.isEnabled = isTitleFilled && isLocationFilled && isCompanionSelected
-        nextButton.backgroundColor = nextButton.isEnabled ? UIColor(red: 0.459, green: 0.451, blue: 0.765, alpha: 1) : UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
-        nextButton.setTitleColor(nextButton.isEnabled ? .white : .black, for: .normal)
+        nextButton.isEnabled = isAllValid
+        nextButton.backgroundColor = isAllValid ? UIColor(red: 0.459, green: 0.451, blue: 0.765, alpha: 1) : UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
+        nextButton.setTitleColor(isAllValid ? .white : .black, for: .normal)
     }
     
-    func setupNextButtonAction() {
-        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+    private func isValidDateField(_ text: String, type: String) -> Bool {
+        switch type {
+        case "YYYY":
+            return text.count == 4 && Int(text) != nil
+        case "MM":
+            if let month = Int(text) {
+                return month >= 1 && month <= 12
+            }
+            return false
+        case "DD":
+            if let day = Int(text) {
+                return day >= 1 && day <= 31
+            }
+            return false
+        default:
+            return false
+        }
     }
     
     @objc func nextButtonTapped() {
-        let uploadViewController = UploadViewController()
-            uploadViewController.modalPresentationStyle = .fullScreen // 전체 화면 표시
-            uploadViewController.modalTransitionStyle = .crossDissolve // 전환 애니메이션
-            present(uploadViewController, animated: true, completion: nil)
+        let title = titleTextField.text ?? "없음"
+        let companion = selectedCompanion?.title(for: .normal) ?? "없음"
+        let startDate = "\(startDateYear ?? "0000")-\(startDateMonth ?? "00")-\(startDateDay ?? "00")"
+        let endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
+        let location = locationTextField.text ?? "없음"
         
-//        let title = titleTextField.text ?? "없음"
-//        let companion = selectedCompanion?.title(for: .normal) ?? "없음"
-//        let startDate = getDate(from: startDateStackView)
-//        let endDate = getDate(from: endDateStackView)
-//        let location = locationTextField.text ?? "없음"
-//        
-//        print("제목: \(title)")
-//        print("누구와: \(companion)")
-//        print("시작일자: \(startDate)")
-//        print("종료일자: \(endDate)")
-//        print("장소: \(location)")
+        print("제목: \(title)")
+        print("누구와: \(companion)")
+        print("시작일자: \(startDate)")
+        print("종료일자: \(endDate)")
+        print("장소: \(location)")
+        
+        let uploadViewController = UploadViewController()
+        uploadViewController.modalPresentationStyle = .fullScreen // 전체 화면 표시
+        uploadViewController.modalTransitionStyle = .crossDissolve // 전환 애니메이션
+        present(uploadViewController, animated: true, completion: nil)
     }
     
-    private func getDate(from stackView: UIStackView) -> String {
-        // 각 스택 뷰 내의 서브 스택 뷰 접근
-        guard let yearStack = stackView.arrangedSubviews[0] as? UIStackView,
-              let monthStack = stackView.arrangedSubviews[1] as? UIStackView,
-              let dayStack = stackView.arrangedSubviews[2] as? UIStackView,
-              let yearField = yearStack.arrangedSubviews[0] as? UITextField,
-              let monthField = monthStack.arrangedSubviews[0] as? UITextField,
-              let dayField = dayStack.arrangedSubviews[0] as? UITextField,
-              let year = yearField.text, !year.isEmpty,
-              let month = monthField.text, !month.isEmpty,
-              let day = dayField.text, !day.isEmpty else {
-            return "날짜 미입력"
-        }
-        // 날짜 조합 및 반환
-        return "\(year)-\(String(format: "%02d", Int(month) ?? 0))-\(String(format: "%02d", Int(day) ?? 0))"
+    private func isValidDate(year: String, month: String, day: String) -> Bool {
+        guard let yearInt = Int(year), yearInt >= 1000, yearInt <= 9999 else { return false }
+        guard let monthInt = Int(month), monthInt >= 1, monthInt <= 12 else { return false }
+        guard let dayInt = Int(day), dayInt >= 1 else { return false }
+        let daysInMonth: [Int: Int] = [
+            1: 31, 2: (yearInt % 4 == 0 && (yearInt % 100 != 0 || yearInt % 400 == 0)) ? 29 : 28,
+            3: 31, 4: 30, 5: 31, 6: 30,
+            7: 31, 8: 31, 9: 30, 10: 31,
+            11: 30, 12: 31
+        ]
+        return dayInt <= (daysInMonth[monthInt] ?? 0)
     }
 }

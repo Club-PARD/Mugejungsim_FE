@@ -1,5 +1,6 @@
 
 import Foundation
+import UIKit
 
 // 서버와 통신할 때 사용되는 기본 사용자 모델이에요!
 struct User: Codable {
