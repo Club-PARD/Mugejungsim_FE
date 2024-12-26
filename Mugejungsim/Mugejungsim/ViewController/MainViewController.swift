@@ -1,141 +1,104 @@
-//
-//  MainViewController.swift
-//  Mugejungsim
-//
-//  Created by 도현학 on 12/23/24.
-//
-
 import UIKit
 
 class MainViewController: UIViewController {
-    
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "여행기를 남겨보세요!" // 기본 텍스트
-        label.font = .systemFont(ofSize: 24, weight: .bold) // 텍스트 크기와 두께 설정
-        label.textColor = .black // 텍스트 색상
-        label.backgroundColor = .lightGray // 배경색
-        label.textAlignment = .center // 텍스트 가운데 정렬
-        label.layer.cornerRadius = 8 // 둥근 모서리 설정
-        label.clipsToBounds = true // 둥근 모서리 적용
-        label.translatesAutoresizingMaskIntoConstraints = false // 오토레이아웃 사용
-        return label
-    }()
 
-    
-    let MyPageButton: UIButton = {
-        let mine = UIButton()
-        mine.translatesAutoresizingMaskIntoConstraints = false
-        mine.layer.cornerRadius = 25
-        mine.clipsToBounds = true
-        mine.backgroundColor = UIColor.lightGray
-        mine.setImage(UIImage(systemName: "person.circle"), for: .normal)
-        mine.tintColor = .white
-        return mine
-    }()
-    
-    let imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit // 이미지 비율 유지하며 조정
-        imageView.image = UIImage(systemName: "photo") // 기본 이미지 (아이콘)
-        imageView.backgroundColor = .lightGray // 배경색
-        imageView.layer.cornerRadius = 12 // 둥근 모서리
-        imageView.clipsToBounds = true
-        return imageView
-    }()
-    
-    let CreateRecord: UIButton = {
-        let create = UIButton()
-        create.translatesAutoresizingMaskIntoConstraints = false // 오토레이아웃
-        create.layer.cornerRadius = 10
-        create.backgroundColor = .systemBlue
-        create.setTitle("새 기록 만들기", for: .normal)
-        create.setTitleColor(.white, for: .normal)
-        create.titleLabel?.font = .systemFont(ofSize: 18, weight: .medium)
-        return create
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .white
         
-        // UI 요소 추가 (같은 부모 뷰에 추가해야 함)
-        view.addSubview(titleLabel)
-        view.addSubview(MyPageButton)
-        view.addSubview(imageView) // 반드시 동일한 부모 뷰에 추가
-        view.addSubview(CreateRecord) // 버튼 추가
+        // 타이틀 라벨 생성
+        let titleLabel: UILabel = {
+            let label = UILabel()
+            label.text = "무게중심 님의 \n여행기를 남겨보세요!"
+            label.font = .systemFont(ofSize: 25, weight: .bold)
+            label.textColor = .black
+            label.textAlignment = .center
+            label.numberOfLines = 0
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
         
-        setConstraints()
-        addDoneButtonToAllInputs()
-        // 버튼 액션 설정
-        CreateRecord.addTarget(self, action: #selector(createRecordTapped), for: .touchUpInside)
-    }
-    func addDoneButtonToAllInputs() {
-        // 툴바 생성
-        let toolbar = UIToolbar()
-        toolbar.sizeToFit()
-        
-        // 완료 버튼 생성
-        let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(doneButtonTapped))
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbar.setItems([flexSpace, doneButton], animated: false)
-        
-        // 텍스트 필드와 텍스트 뷰에 툴바 추가
-        for subview in view.subviews {
-            if let textField = subview as? UITextField {
-                textField.inputAccessoryView = toolbar
-            } else if let textView = subview as? UITextView {
-                textView.inputAccessoryView = toolbar
-            }
-        }
-    }
+        let imageView: UIView = {
+            let view = UIView()
+            view.backgroundColor = .lightGray
+            view.layer.cornerRadius = 10
+            view.clipsToBounds = true
+            view.translatesAutoresizingMaskIntoConstraints = false
+            
+            let placeholderLabel = UILabel()
+            placeholderLabel.text = "로고 이미지\nor\n3D 이미지"
+            placeholderLabel.font = .systemFont(ofSize: 25, weight: .regular)
+            placeholderLabel.textColor = .black
+            placeholderLabel.textAlignment = .center
+            placeholderLabel.numberOfLines = 0
+            placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            view.addSubview(placeholderLabel)
+            
+            // 중앙 정렬 오토레이아웃
+            NSLayoutConstraint.activate([
+                placeholderLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                placeholderLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            ])
+            
+            return view
+        }()
 
-    @objc func doneButtonTapped() {
-        // 키보드 닫기
-        view.endEditing(true)
-    }
-    func setConstraints() {
-        // Auto Layout Constraints 설정
+        // 버튼 생성
+        let button: UIButton = {
+            let button = UIButton(type: .system)
+            button.setTitleColor(.white, for: .normal)
+            button.backgroundColor = UIColor(red: 117/255, green: 115/255, blue: 195/255, alpha: 1) // #7573C3
+            button.layer.cornerRadius = 8
+            button.clipsToBounds = true
+            button.translatesAutoresizingMaskIntoConstraints = false
+
+            // 텍스트 스타일 설정
+            let attributedText = NSMutableAttributedString(
+                string: "여행 기록 만들기",
+                attributes: [
+                    .font: UIFont(name: "Pretendard-SemiBold", size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .semibold),
+                    .kern: -0.3 // 자간 설정
+                ]
+            )
+            button.setAttributedTitle(attributedText, for: .normal)
+            return button
+        }()
+        
+        // 버튼 클릭 이벤트 추가
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        
+        // 뷰에 추가
+        view.addSubview(titleLabel)
+        view.addSubview(imageView)
+        view.addSubview(button)
+        
+        // 오토레이아웃 설정
         NSLayoutConstraint.activate([
-            // Title TextField Constraints
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 110),
-            titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            titleLabel.heightAnchor.constraint(equalToConstant: 50),
+            // 타이틀 라벨
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 218),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            // MyPage Button Constraints
-            MyPageButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            MyPageButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            MyPageButton.widthAnchor.constraint(equalToConstant: 50),
-            MyPageButton.heightAnchor.constraint(equalToConstant: 50),
+            // 이미지 영역
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 237),
+            imageView.heightAnchor.constraint(equalToConstant: 237),
             
-            // ImageView Constraints
-            imageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 30), // 텍스트 필드 아래
-            imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            imageView.heightAnchor.constraint(equalToConstant: 200), // 고정된 높이
-            
-            // CreateRecord Button Constraints
-            CreateRecord.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20), // 이미지 바로 아래
-            CreateRecord.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            CreateRecord.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            CreateRecord.heightAnchor.constraint(equalToConstant: 50)
+            // 버튼
+            button.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 60),
+            button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            button.widthAnchor.constraint(equalToConstant: 327),
+            button.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
-    @objc func createRecordTapped() {
-        // CreateViewController로 화면 전환
-        let createVC = CreateViewController()
-        createVC.modalPresentationStyle = .fullScreen
-        present(createVC, animated: true, completion: nil)
-    }
-}
-
-class NewCreateViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
+    // 버튼 클릭 이벤트 처리
+    @objc private func buttonTapped() {
+        let createViewController = CreateViewController()
+        createViewController.modalPresentationStyle = .fullScreen // 화면 전체로 표시 (선택 사항)
+        present(createViewController, animated: true, completion: nil)
     }
 }
