@@ -22,14 +22,18 @@ class ObjeCreationViewController: UIViewController {
         ("value10", "🍃 힐링되는 여행이었어요")
     ]
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    private let stackView = UIStackView()
+    
     // 제목 라벨
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "한줄 남기기로 오브제를 만들어보세요"
+        label.text = "한줄 남기기로 오브제를 만들어\n어행을 추억해 보세요!"
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textColor = .black
         label.textAlignment = .center
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -37,9 +41,9 @@ class ObjeCreationViewController: UIViewController {
     // 서브텍스트 라벨
     private let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "최대 2개 선택"
-        label.font = UIFont(name: "Pretendard-SemiBold", size: 10)
-        label.textColor = .gray
+        label.text = "최대 2개까지 선택할 수 있어요. (0 / 2)"
+        label.font = UIFont(name: "Pretendard-Medium", size: 12)
+        label.textColor = UIColor(red: 0.459, green: 0.451, blue: 0.765, alpha: 1)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -49,19 +53,24 @@ class ObjeCreationViewController: UIViewController {
     private var selectedItems: [String] = [] {
         didSet {
             updateCreateButtonState()
+            subtitleLabel.text = "최대 2개까지 선택할 수 있어요. (\(selectedItems.count) / 2)"
         }
     }
     
-    // UI 요소
-    private let scrollView = UIScrollView()
-    private let stackView = UIStackView()
     private let createButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("오브제 만들기", for: .normal)
-        button.backgroundColor = UIColor(hex: "#D9D9D9")
-        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
         button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = UIColor(hex: "#D9D9D9")
+        button.layer.cornerRadius = 8
+        button.layer.shadowPath = UIBezierPath(roundedRect: button.bounds, cornerRadius: 8).cgPath
+        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        button.layer.shadowOpacity = 1
+        button.layer.shadowRadius = 1
+        button.layer.shadowOffset = CGSize(width: 0.5, height: 0.5)
+        button.layer.masksToBounds = false
         return button
     }()
     
@@ -72,9 +81,14 @@ class ObjeCreationViewController: UIViewController {
         setupCustomNavigationBar()
         setupUI()
         setupConstraints() // 제약조건 함수 호출
+        
+        // creatButton에 초기 그림자 고정
+        DispatchQueue.main.async {
+            self.createButton.layer.shadowPath = UIBezierPath(roundedRect: self.createButton.bounds, cornerRadius: 8).cgPath
+        }
     }
     
-    // MARK: - 네비게이션 바 설정
+    // MARK: - 네비게이션 바
     private func setupCustomNavigationBar() {
         let navBar = UIView()
         navBar.backgroundColor = .clear
@@ -118,71 +132,83 @@ class ObjeCreationViewController: UIViewController {
         self.present(stopSelectingVC, animated: true, completion: nil)
     }
     
-    // MARK: - UI 설정
+    // MARK: - Set UI
     private func setupUI() {
-        // 스크롤 뷰와 스택 뷰 설정
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceHorizontal = false
         scrollView.showsHorizontalScrollIndicator = false
+        
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(subtitleLabel)
+        
         stackView.axis = .vertical
-        stackView.spacing = 8
+        stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
         scrollView.addSubview(stackView)
         
-        // 텍스트 추가
-        stackView.addArrangedSubview(titleLabel)
-        stackView.addArrangedSubview(subtitleLabel)
-        
-        // 항목 버튼 추가
         for (value, title) in items {
             let button = createItemButton(value: value, title: title)
             stackView.addArrangedSubview(button)
         }
-        
-        // 하단 "오브제 만들기" 버튼 추가
+    
         view.addSubview(createButton)
         createButton.addTarget(self, action: #selector(didTapCreateButton), for: .touchUpInside)
     }
     
-    // MARK: - 제약조건 설정
+    // MARK: - 제약조건
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // 스크롤 뷰
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             scrollView.bottomAnchor.constraint(equalTo: createButton.topAnchor, constant: -20),
             
-            // 스택 뷰
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+
+            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 9),
+            subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+
+            stackView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 16),
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            // "오브제 만들기" 버튼
             createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            createButton.heightAnchor.constraint(equalToConstant: 50)
+            createButton.heightAnchor.constraint(equalToConstant: 52)
         ])
     }
     
-    // MARK: - 항목 버튼 생성
+    // MARK: - 항목 버튼 생성 : 항목에 대한 버튼 구현 위한 함수, 버튼 탭 함수
     private func createItemButton(value: String, title: String) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
         button.accessibilityIdentifier = value
         button.setTitleColor(.black, for: .normal)
         button.backgroundColor = .clear
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.black.cgColor
-        button.layer.cornerRadius = 10
+        button.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
+        button.layer.cornerRadius = 4
         button.translatesAutoresizingMaskIntoConstraints = false
-        
-        button.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 39).isActive = true
         button.addTarget(self, action: #selector(didTapItemButton(_:)), for: .touchUpInside)
         return button
     }
@@ -192,25 +218,62 @@ class ObjeCreationViewController: UIViewController {
         
         if selectedItems.contains(value) {
             selectedItems.removeAll { $0 == value }
-            sender.backgroundColor = .clear
+            sender.backgroundColor = .white
+            sender.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
         } else {
             guard selectedItems.count < 2 else { return }
             selectedItems.append(value)
-            sender.backgroundColor = UIColor(hex: "#CFFFDD")
+            sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
+            sender.layer.borderColor = UIColor(red: 0.43, green: 0.43, blue: 0.87, alpha: 1).cgColor
         }
     }
     
+    // MARK: - 오브제 만들기 버튼 관련 함수 : 상태 확인 함수, 버튼 탭 함수
     private func updateCreateButtonState() {
         if selectedItems.count == 2 {
             createButton.isEnabled = true
-            createButton.backgroundColor = UIColor(hex: "#19FF5E")
+            createButton.titleLabel?.font = UIFont(name: "Pretendard-Bold", size: 16)
+            createButton.setTitleColor(.white, for: .normal)
+            let gradientLayer = CAGradientLayer()
+            gradientLayer.colors = [
+                UIColor(red: 0.44, green: 0.43, blue: 0.7, alpha: 1).cgColor,
+                UIColor(red: 0.78, green: 0.55, blue: 0.75, alpha: 1).cgColor
+            ]
+            gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.5)
+            gradientLayer.endPoint = CGPoint(x: 1.0, y: 0.5)
+            gradientLayer.frame = createButton.bounds
+            gradientLayer.cornerRadius = 8
+            createButton.layer.insertSublayer(gradientLayer, at: 0)
         } else {
             createButton.isEnabled = false
+            createButton.titleLabel?.textColor = UIColor(red: 0.67, green: 0.67, blue: 0.67, alpha: 1)
+            createButton.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
+            // Layer 제거
+            createButton.layer.sublayers?.forEach {
+                if $0 is CAGradientLayer {
+                    $0.removeFromSuperlayer()
+                }
+            }
             createButton.backgroundColor = UIColor(hex: "#D9D9D9")
         }
+        createButton.layer.shadowPath = UIBezierPath(roundedRect: createButton.bounds, cornerRadius: 8).cgPath
+        createButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        createButton.layer.shadowOpacity = 1
+        createButton.layer.shadowRadius = 1
+        createButton.layer.shadowOffset = CGSize(width: 0.5, height: 0.5)
+        createButton.layer.masksToBounds = false
     }
     
     @objc private func didTapCreateButton() {
         print("선택된 값: \(selectedItems)")
+        goToNextPage()
+    }
+    
+    private func goToNextPage() {
+        let resultVC = LoadingViewController() // 이동할 ViewController 인스턴스 생성
+        resultVC.modalTransitionStyle = .crossDissolve // 화면 전환 스타일 설정 (페이드 효과)
+        resultVC.modalPresentationStyle = .fullScreen
+        self.present(resultVC, animated: true, completion: nil)
+        print("ResultVC로 이동 성공")
     }
 }
