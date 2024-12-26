@@ -12,7 +12,9 @@ class LoadingViewController: UIViewController {
     // "오브제 만드는 중" 라벨
     private let loadingLabel: UILabel = {
         let label = UILabel()
-        label.text = "오브제 만드는 중"
+        label.text = "나만의 오브제를\n만드는 중이에요!"
+        label.numberOfLines = 2
+        label.textColor = .black
         label.font = UIFont(name: "Pretendard-SemiBold", size: 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
