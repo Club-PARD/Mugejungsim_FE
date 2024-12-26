@@ -14,11 +14,30 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         return label
     }()
     
+    private let outButton: UIButton = {
+        let button = UIButton(type: .custom)
+        if let originalImage = UIImage(named: "out")?.withRenderingMode(.alwaysOriginal) {
+            button.setImage(originalImage, for: .normal)
+        }
+        button.addTarget(self, action: #selector(handleOutButton), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private let galleryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .lightGray
+        button.backgroundColor = #colorLiteral(red: 0.956299603, green: 0.9574014544, blue: 0.9907849431, alpha: 1) // 기본 배경색
         button.layer.cornerRadius = 10
+        if let originalImage = UIImage(named: "gallery")?.withRenderingMode(.alwaysTemplate) {
+            button.setImage(originalImage, for: .normal)
+        }
+        button.tintColor = #colorLiteral(red: 0.462745098, green: 0.4509803922, blue: 0.7647058824, alpha: 1) // 기본 이미지 색상 (#7573C3)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentHorizontalAlignment = .center
+        button.contentVerticalAlignment = .center
         button.addTarget(self, action: #selector(openGallery), for: .touchUpInside)
+        button.addTarget(self, action: #selector(buttonTouchDown(_:)), for: .touchDown)
+        button.addTarget(self, action: #selector(buttonTouchUp(_:)), for: [.touchUpInside, .touchCancel, .touchDragExit])
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -26,7 +45,7 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     private let galleryLabel: UILabel = {
         let label = UILabel()
         label.text = "갤러리 업로드"
-        label.font = UIFont.systemFont(ofSize: 25, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.textColor = .black
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -35,9 +54,18 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     
     private let cameraButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .lightGray
+        button.backgroundColor = #colorLiteral(red: 0.956299603, green: 0.9574014544, blue: 0.9907849431, alpha: 1) // 기본 배경색
         button.layer.cornerRadius = 10
+        if let originalImage = UIImage(named: "camera")?.withRenderingMode(.alwaysTemplate) {
+            button.setImage(originalImage, for: .normal)
+        }
+        button.tintColor = #colorLiteral(red: 0.462745098, green: 0.4509803922, blue: 0.7647058824, alpha: 1) // 기본 이미지 색상 (#7573C3)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentHorizontalAlignment = .center
+        button.contentVerticalAlignment = .center
         button.addTarget(self, action: #selector(openCamera), for: .touchUpInside)
+        button.addTarget(self, action: #selector(buttonTouchDown(_:)), for: .touchDown)
+        button.addTarget(self, action: #selector(buttonTouchUp(_:)), for: [.touchUpInside, .touchCancel, .touchDragExit])
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -45,114 +73,73 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     private let cameraLabel: UILabel = {
         let label = UILabel()
         label.text = "카메라 촬영"
-        label.font = UIFont.systemFont(ofSize: 25, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.textColor = .black
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let saveButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("임시저장", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 10, weight: .regular)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .gray
-        button.layer.cornerRadius = 5
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let backButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "out"), for: .normal)
-        button.tintColor = .gray
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(goBack), for: .touchUpInside)
-        return button
-    }()
-    
-    private let separator: UIView = {
-        let view = UIView()
-        view.backgroundColor = .lightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+    private var capturedImages: [UIImage] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
-        setupNavigationBar()
     }
     
     private func setupUI() {
+        view.addSubview(outButton)
         view.addSubview(titleLabel)
         view.addSubview(galleryButton)
         view.addSubview(galleryLabel)
         view.addSubview(cameraButton)
         view.addSubview(cameraLabel)
-        view.addSubview(saveButton)
-        view.addSubview(backButton)
-        view.addSubview(separator)
         
         NSLayoutConstraint.activate([
-            // 뒤로가기 버튼 위치
-            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            backButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            backButton.widthAnchor.constraint(equalToConstant: 24),
-            backButton.heightAnchor.constraint(equalToConstant: 24),
+            // Out Button Constraints
+            outButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 55),
+            outButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 26),
             
-            // 임시저장 버튼 위치
-            saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            saveButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
-            saveButton.widthAnchor.constraint(equalToConstant: 52),
-            saveButton.heightAnchor.constraint(equalToConstant: 23),
-            
-            // 구분선 위치
-            separator.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 10),
-            separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            separator.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            separator.heightAnchor.constraint(equalToConstant: 1),
-            
-            // 제목 라벨 위치
-            titleLabel.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 57),
+            // Title Label Constraints
+            titleLabel.topAnchor.constraint(equalTo: outButton.bottomAnchor, constant: 93),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            // 카메라 촬영 버튼 위치
-            cameraButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 50),
+            // Gallery Button Constraints
+            galleryButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 53),
+            galleryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            galleryButton.widthAnchor.constraint(equalToConstant: 122),
+            galleryButton.heightAnchor.constraint(equalToConstant: 122),
+            
+            // Gallery Label Constraints
+            galleryLabel.topAnchor.constraint(equalTo: galleryButton.bottomAnchor, constant: 10),
+            galleryLabel.centerXAnchor.constraint(equalTo: galleryButton.centerXAnchor),
+            
+            // Camera Button Constraints
+            cameraButton.topAnchor.constraint(equalTo: galleryLabel.bottomAnchor, constant: 44),
             cameraButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            cameraButton.widthAnchor.constraint(equalToConstant: 133),
+            cameraButton.widthAnchor.constraint(equalToConstant: 122),
             cameraButton.heightAnchor.constraint(equalToConstant: 122),
             
-            // 카메라 촬영 라벨 위치
+            // Camera Label Constraints
             cameraLabel.topAnchor.constraint(equalTo: cameraButton.bottomAnchor, constant: 10),
-            cameraLabel.centerXAnchor.constraint(equalTo: cameraButton.centerXAnchor),
-            
-            // 갤러리 업로드 버튼 위치
-            galleryButton.topAnchor.constraint(equalTo: cameraLabel.bottomAnchor, constant: 79),
-            galleryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            galleryButton.widthAnchor.constraint(equalTo: cameraButton.widthAnchor),
-            galleryButton.heightAnchor.constraint(equalTo: cameraButton.heightAnchor),
-            
-            // 갤러리 업로드 라벨 위치
-            galleryLabel.topAnchor.constraint(equalTo: galleryButton.bottomAnchor, constant: 10),
-            galleryLabel.centerXAnchor.constraint(equalTo: galleryButton.centerXAnchor)
+            cameraLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -184),
+            cameraLabel.centerXAnchor.constraint(equalTo: cameraButton.centerXAnchor)
         ])
     }
     
-    private func setupNavigationBar() {
-        navigationItem.title = "사진 업로드"
+    @objc private func buttonTouchDown(_ sender: UIButton) {
+        sender.backgroundColor = #colorLiteral(red: 0.462745098, green: 0.4509803922, blue: 0.7647058824, alpha: 1) // 배경색 변경
+        sender.tintColor = .white // 이미지 색상 흰색
+    }
+
+    @objc private func buttonTouchUp(_ sender: UIButton) {
+        sender.backgroundColor = #colorLiteral(red: 0.956299603, green: 0.9574014544, blue: 0.9907849431, alpha: 1) // 원래 배경색 복구
+        sender.tintColor = #colorLiteral(red: 0.462745098, green: 0.4509803922, blue: 0.7647058824, alpha: 1) // 원래 이미지 색상 복구
     }
     
-    @objc private func goBack() {
-        if let navigationController = navigationController {
-            // 네비게이션 컨트롤러를 사용하는 경우
-            navigationController.popViewController(animated: true)
-        } else {
-            // 모달로 표시된 경우
-            dismiss(animated: true, completion: nil)
-        }
+    @objc func handleOutButton() {
+        dismiss(animated: true)
     }
     
     @objc func openGallery() {
@@ -177,16 +164,19 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         present(imagePicker, animated: true)
     }
     
-    @objc func nextButtonTapped() {
-        let uploadViewController = UploadViewController()
-        navigationController?.pushViewController(uploadViewController, animated: true)
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true)
+        
+        if let image = info[.originalImage] as? UIImage {
+            capturedImages.append(image)
+            navigateToStoryEditor(with: capturedImages)
+        }
     }
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        dismiss(animated: true) // 피커 종료
-        var selectedImages: [UIImage] = [] // 선택한 이미지 저장
+        dismiss(animated: true)
+        var selectedImages: [UIImage] = []
 
-        // 선택한 이미지를 로드
         for result in results {
             if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
                 result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
@@ -194,7 +184,6 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
                         DispatchQueue.main.async {
                             selectedImages.append(image)
                             if selectedImages.count == results.count {
-                                // 모든 이미지를 로드한 후 StoryEditorViewController로 이동
                                 self?.navigateToStoryEditor(with: selectedImages)
                             }
                         }
@@ -204,19 +193,11 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         }
     }
     
-    private func showPhotoEditor(with images: [UIImage]) {
-        guard !images.isEmpty else {
-            print("No images selected!")
-            return
-        }
-    }
-    
-    // StoryEditorViewController로 이동하는 메서드
     private func navigateToStoryEditor(with images: [UIImage]) {
         let storyEditorVC = StoryEditorViewController()
-        storyEditorVC.images = images // 선택된 이미지 전달
-        storyEditorVC.modalPresentationStyle = .fullScreen // 전체 화면으로 표시
-        present(storyEditorVC, animated: true, completion: nil)
+        storyEditorVC.images = images
+        storyEditorVC.modalPresentationStyle = .fullScreen
+        present(storyEditorVC, animated: true)
     }
     
     private func showAlert(title: String, message: String) {
