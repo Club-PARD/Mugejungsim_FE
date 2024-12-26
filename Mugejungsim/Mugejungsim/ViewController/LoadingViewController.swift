@@ -68,7 +68,7 @@ class LoadingViewController: UIViewController {
     private func goToNextPage() {
         // 다음 화면 이동 코드
         let resultVC = ResultViewController()
-        resultVC.modalTransitionStyle = .crossDissolve
+        resultVC.modalTransitionStyle = .crossDissolve // 오픈 모션
         resultVC.modalPresentationStyle = .fullScreen
         self.present(resultVC, animated: true, completion: nil)
         print("ResultVC로 이동 성공")
