@@ -1,75 +1,41 @@
 import UIKit
 
-class SavedPhotosViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
     var savedData: [PhotoData] = []
-    var tableView: UITableView!
+    var collectionView: UICollectionView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         savedData = DataManager.shared.loadData()
-        setupTableView()
+        setupCollectionView()
     }
 
-    func setupTableView() {
-        tableView = UITableView(frame: view.bounds)
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(SavedPhotoCell.self, forCellReuseIdentifier: "SavedPhotoCell")
-        tableView.backgroundColor = .white
-        view.addSubview(tableView)
+    func setupCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: (view.bounds.width - 40) / 3, height: (view.bounds.width - 40) / 3) // 3 columns
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(toggleEditingMode))
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(SavedPhotoCell.self, forCellWithReuseIdentifier: "SavedPhotoCell")
+        collectionView.backgroundColor = .white
+        view.addSubview(collectionView)
     }
 
-    @objc func toggleEditingMode() {
-        tableView.setEditing(!tableView.isEditing, animated: true)
-        navigationItem.rightBarButtonItem?.title = tableView.isEditing ? "Done" : "Edit"
-    }
+    // MARK: - UICollectionViewDataSource
 
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return savedData.count
     }
 
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SavedPhotoCell", for: indexPath) as! SavedPhotoCell
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SavedPhotoCell", for: indexPath) as! SavedPhotoCell
         let data = savedData[indexPath.row]
-        cell.configure(with: data, at: indexPath.row)
-        cell.textField.delegate = self
+        cell.configure(with: data) // Display only the photo
         return cell
-    }
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
-    }
-
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let photoToDelete = savedData[indexPath.row]
-            DataManager.shared.deleteImage(at: photoToDelete.imagePath)
-            savedData.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
-            DataManager.shared.saveData(photoData: savedData)
-        }
-    }
-    
-    // UITextFieldDelegate: 리턴 키를 누르면 키보드 닫기
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder() // 키보드 닫기
-        return true
-    }
-
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        let index = textField.tag // 태그를 통해 인덱스 가져오기
-        guard index >= 0, index < savedData.count else {
-            print("Error: Index \(index) out of range for savedData.")
-            return
-        }
-
-        // 텍스트를 업데이트하고 저장
-        savedData[index].text = textField.text ?? ""
-        print("Updated text for index \(index): \(savedData[index].text)")
-
-        // 저장소에 변경사항 저장
-        DataManager.shared.saveData(photoData: savedData)
     }
 }
