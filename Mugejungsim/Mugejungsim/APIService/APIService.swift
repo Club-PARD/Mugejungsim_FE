@@ -1,5 +1,13 @@
+// APIService.swift
 
 import Foundation
+import UIKit
+
+/*
+ * 기존 클백 코드가 유저 데이터 기준으로 짜여진 코드
+ * Swagger 나오는대로 수정하여 진행
+ * JPG기준으로 진행하기
+ */
 
 // 서버와 통신할 때 사용되는 기본 사용자 모델이에요!
 struct User: Codable {
@@ -60,5 +68,12 @@ class APIService {
         networkManager.request("/user/\(id)",
                              method: "DELETE",
                              completion: completion)
+    }
+
+    
+    // MARK: - 멀티파트 이미지 업로드 위한 함수
+    func postImage(userId: Int, image: UIImage, completion: @escaping (Result<APIResponse, Error>) -> Void) {
+        let parameters = ["userId": "\(userId)"]
+        networkManager.uploadImage("/user/upload", parameters: parameters, image: image, completion: completion)
     }
 }
