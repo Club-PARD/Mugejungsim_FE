@@ -1,16 +1,10 @@
-//
-//  SavedPhotoCell.swift
-//  ImageCollectionForm
-//
-
 import UIKit
 
-class SavedPhotoCell: UITableViewCell {
+class SavedPhotoCell: UICollectionViewCell {
     var photoImageView: UIImageView!
-    var textField: UITextField!
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setupUI()
     }
 
@@ -20,20 +14,24 @@ class SavedPhotoCell: UITableViewCell {
     }
 
     private func setupUI() {
-        photoImageView = UIImageView(frame: CGRect(x: 10, y: 10, width: 80, height: 80))
-        photoImageView.contentMode = .scaleAspectFit
+        photoImageView = UIImageView()
+        photoImageView.contentMode = .scaleAspectFill
+        photoImageView.clipsToBounds = true
+        photoImageView.layer.cornerRadius = 4
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(photoImageView)
 
-        textField = UITextField(frame: CGRect(x: 100, y: 30, width: contentView.frame.width - 120, height: 40))
-        textField.borderStyle = .roundedRect
-        contentView.addSubview(textField)
+        NSLayoutConstraint.activate([
+            photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            photoImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
     }
 
-    func configure(with data: PhotoData, at index: Int) {
+    func configure(with data: PhotoData) {
         if let image = DataManager.shared.loadImage(from: data.imagePath) {
             photoImageView.image = image
         }
-        textField.text = data.text
-        textField.tag = index // 여기서 tag를 설정
     }
 }
