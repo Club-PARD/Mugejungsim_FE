@@ -118,7 +118,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     
     // MARK: - Update Image Count Label
     private func updateImageCountLabel() {
-        // 현재 저장된 사진 수 / 25로 설정
+        // 현재 저장된 사진 수 / 25로 설정애0
         let currentCount = savedData.count
         imageCountLabel.text = "\(currentCount) / 25"
     }
