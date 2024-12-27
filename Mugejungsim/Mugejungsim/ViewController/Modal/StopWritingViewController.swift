@@ -1,6 +1,11 @@
 import UIKit
+protocol StopWritingViewControllerDelegate: AnyObject {
+    func didStopWriting()
+}
 
 class StopWritingViewController: UIViewController {
+    weak var delegate: StopWritingViewControllerDelegate?
+
 
     // MARK: - UI Elements
     
@@ -35,21 +40,25 @@ class StopWritingViewController: UIViewController {
     
     private let promptLabel: UILabel = {
         let label = UILabel()
-        label.text = "한 줄 남기기를 그만두시겠어요?"
+        let text = "여행 기록 쓰기를\n그만두시겠어요?"
+
+        // Line height 설정
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 27 - 18 // Line height - Font size (18)
+
+        // Letter spacing 설정
+        let attributedString = NSMutableAttributedString(
+            string: text,
+            attributes: [
+                .font: UIFont.font(.pretendardBold, ofSize: 18), // 폰트
+                .foregroundColor: UIColor.black, // 텍스트 색상
+                .kern: -0.3, // 자간
+                .paragraphStyle: paragraphStyle // 줄 간격 스타일
+            ]
+        )
+        label.attributedText = attributedString
         label.numberOfLines = 2
         label.textAlignment = .center
-        label.font = UIFont.font(.pretendardBold, ofSize: 18)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let promptLabel2: UILabel = {
-        let label = UILabel()
-        label.text = "한 줄 남기기를 하지 않으면\n나만의 오브제도 만들 수 없어요!"
-        label.numberOfLines = 2
-        label.textColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
-        label.textAlignment = .center
-        label.font = UIFont.font(.pretendardSemiBold, ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -74,7 +83,7 @@ class StopWritingViewController: UIViewController {
 
     private let continueButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("이어서 하기", for: .normal)
+        button.setTitle("이어서 쓰기", for: .normal)
         button.setTitleColor(#colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
         button.backgroundColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
         button.layer.cornerRadius = 5.9
@@ -106,7 +115,6 @@ class StopWritingViewController: UIViewController {
         view.addSubview(containerView)
         containerView.addSubview(closeButton)
         containerView.addSubview(promptLabel)
-        containerView.addSubview(promptLabel2)
         containerView.addSubview(stopButton)
         containerView.addSubview(continueButton)
     }
@@ -135,14 +143,11 @@ class StopWritingViewController: UIViewController {
             // Prompt label
             promptLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 63),
             promptLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            
-            // Prompt2 label
-            promptLabel2.topAnchor.constraint(equalTo: promptLabel.bottomAnchor, constant: 10),
-            promptLabel2.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+
 
             // Stop button
-            stopButton.topAnchor.constraint(equalTo: promptLabel2.bottomAnchor, constant: 34),
-            stopButton.centerXAnchor.constraint(equalTo: promptLabel2.centerXAnchor),
+            stopButton.topAnchor.constraint(equalTo: promptLabel.bottomAnchor, constant: 36),
+            stopButton.centerXAnchor.constraint(equalTo: promptLabel.centerXAnchor),
             stopButton.widthAnchor.constraint(equalToConstant: 239),
             stopButton.heightAnchor.constraint(equalToConstant: 38.32),
             
@@ -161,29 +166,21 @@ class StopWritingViewController: UIViewController {
         continueButton.addTarget(self, action: #selector(ContinueButtonTapped), for: .touchUpInside)
         closeButton.addTarget(self, action: #selector(CloseButtonTapped), for: .touchUpInside) // Close 버튼 액션 추가
     }
-    // 개선 여지 가능성이 있어서 더 나은 방안 확인해볼 것
     @objc private func StopButtonTapped() {
         print("그만두기 버튼 클릭됨")
-        
-        // 현재 모달 닫기
-        dismiss(animated: true)
-        // MainViewController를 강제로 rootViewController로 띄우기
-        if let window = UIApplication.shared.windows.first {
-            let mainVC = MainViewController()
-            mainVC.modalPresentationStyle = .fullScreen
-            window.rootViewController = mainVC
-            window.makeKeyAndVisible()
-            print("MainViewController로 강제 이동")
+        dismiss(animated: false) { // 애니메이션 제거
+            self.delegate?.didStopWriting()
         }
     }
-    
+
     @objc private func ContinueButtonTapped() {
         print("이어서 하기 버튼 클릭됨")
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: false, completion: nil) // 애니메이션 제거
     }
-    
+
     @objc private func CloseButtonTapped() {
         print("Close 버튼 클릭됨")
-        dismiss(animated: true, completion: nil) // 화면 닫기
+        dismiss(animated: false, completion: nil) // 애니메이션 제거
     }
 }
+

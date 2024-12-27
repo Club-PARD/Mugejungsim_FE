@@ -65,4 +65,9 @@ extension UIFont {
     @nonobjc class var tiny: UIFont {
         return UIFont.font(.pretendardThin, ofSize: 10)
     }
+    
+    // Pretendard-medium 10
+    @nonobjc class var medium: UIFont {
+        return UIFont.font(.pretendardMedium, ofSize: 16)
+    }
 }
