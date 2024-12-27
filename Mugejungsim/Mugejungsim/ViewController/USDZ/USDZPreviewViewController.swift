@@ -1,10 +1,3 @@
-//
-//  USDZPreviewViewController.swift
-//  Mugejungsim
-//
-//  Created by 도현학 on 12/24/24.
-//
-
 import UIKit
 import RealityKit
 
@@ -36,7 +29,7 @@ class USDZPreviewViewController: UIViewController {
         arView.automaticallyConfigureSession = false // AR 비활성화
         arView.translatesAutoresizingMaskIntoConstraints = false
         // 배경 색 설정
-        arView.environment.background = .color(.lightGray) // 회색 배경 설정
+        arView.environment.background = .color(.white) // 회색 배경 설정
         view.addSubview(arView)
 
         // ARView 레이아웃 설정
@@ -51,11 +44,9 @@ class USDZPreviewViewController: UIViewController {
     func setupBackButton() {
         // 백 버튼 생성
         let backButton = UIButton(type: .system)
-        backButton.setTitle("Back", for: .normal)
-        backButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        backButton.setTitleColor(.white, for: .normal)
+        backButton.setImage(UIImage(named: "X_Button"), for: .normal) // "X_Button" 이미지 사용
+        backButton.tintColor = .black // 이미지 색상 (시스템 버튼의 경우 적용 가능)
         backButton.backgroundColor = .clear
-        backButton.layer.cornerRadius = 10
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.addTarget(self, action: #selector(dismissModal), for: .touchUpInside)
 
@@ -64,10 +55,10 @@ class USDZPreviewViewController: UIViewController {
 
         // 버튼 위치 설정 (ARView 위에 오버레이)
         NSLayoutConstraint.activate([
-            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            backButton.widthAnchor.constraint(equalToConstant: 60),
-            backButton.heightAnchor.constraint(equalToConstant: 40)
+            backButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
+            backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 65),
+            backButton.widthAnchor.constraint(equalToConstant: 14),
+            backButton.heightAnchor.constraint(equalToConstant: 14)
         ])
     }
     
