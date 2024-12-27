@@ -15,12 +15,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private var characterCountLabel: UILabel!
     private let maxCharacterCount = 100
     private var doneToolbar: UIToolbar!
-    private var categoryNumber : String = ""
-    // MARK: - 카테고리 관련 Properties
-        private var categoryOverlayView: UIView? // Overlay View
-
-    
-//    private let scrollView = UIScrollView()
+    private var categoryIndex: Int? = 0
 
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
@@ -71,6 +66,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     override func viewDidLoad() {
         super.viewDidLoad()
         texts = Array(repeating: "", count: images.count)
+
+        // 내비게이션 바 배경색을 흰색으로 설정
+        if let navigationController = self.navigationController {
+            let navBar = navigationController.navigationBar
+            navBar.barTintColor = .white
+            navBar.isTranslucent = false
+            navBar.titleTextAttributes = [
+                .foregroundColor: UIColor.black,
+                .font: UIFont.systemFont(ofSize: 18, weight: .bold)
+            ]
+        }
+
         view.backgroundColor = .white
 
         addButton.addTarget(self, action: #selector(openGallery), for: .touchUpInside)
@@ -83,6 +90,24 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         setupToolbar() // 키보드 위 툴바 설정
         setupKeyboardObservers() // 키보드 이벤트 감지 설정
         setupCategoryButtons()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+            
+    // 특정 뷰를 최상단으로 가져오기
+    view.bringSubviewToFront(addButton)
+    view.bringSubviewToFront(thumbnailCollectionView)
+            
+    // 네비게이션 바가 커스텀 뷰인 경우, 해당 뷰도 최상단으로
+    if let navigationBar = self.navigationController?.navigationBar {
+        view.bringSubviewToFront(navigationBar)
+    }
+            
+    // zPosition으로 이미지와 썸네일, 버튼을 최상단으로 설정
+    mainImageView.layer.zPosition = 100
+    thumbnailCollectionView.layer.zPosition = 100
+    addButton.layer.zPosition = 101 // 내비게이션 바보다 위로 설정
     }
     
     deinit {
@@ -160,18 +185,21 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor) // 가로 스크롤 방지
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 1000)
         ])
         self.contentView = contentView // 스크롤 뷰 안에 카테고리, 텍스트뷰 등을 배치하기 위해 contentView를 사용
         setupCategorySection()
         setupExpressionField()
         setupTextInputField()
+        setupButtonsAboutCategoryButton()
+        setupNextButton()
     }
     
 
     private func setupCustomNavigationBar() {
         let navBar = UIView()
-        navBar.backgroundColor = .clear
+        navBar.backgroundColor = .white
         navBar.translatesAutoresizingMaskIntoConstraints = false
 
         let backButton = UIButton(type: .system)
@@ -193,20 +221,21 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         navBar.addSubview(imageCountLabel)
 
         NSLayoutConstraint.activate([
-            navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -45),
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            navBar.heightAnchor.constraint(equalToConstant: 40),
+            navBar.heightAnchor.constraint(equalToConstant: 85),
 
-            backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
+            backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor, constant: 25),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
 
-            saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
+            saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor, constant: 25),
             saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
 
             imageCountLabel.centerYAnchor.constraint(equalTo: backButton.centerYAnchor),
             imageCountLabel.centerXAnchor.constraint(equalTo: navBar.centerXAnchor)
         ])
+        navBar.layer.zPosition = 100
     }
     
     private func setupToolbar() {
@@ -254,17 +283,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private func setupMainImageView() {
         mainImageView = UIImageView()
         mainImageView.contentMode = .scaleAspectFit
-        mainImageView.backgroundColor = .clear
+        mainImageView.backgroundColor = .white
         mainImageView.layer.borderWidth = 0
-        mainImageView.layer.borderColor = UIColor.clear.cgColor
+        mainImageView.layer.borderColor = UIColor.white.cgColor
         mainImageView.translatesAutoresizingMaskIntoConstraints = false
         mainImageView.image = images.first ?? UIImage()
         view.addSubview(mainImageView)
 
         NSLayoutConstraint.activate([
             mainImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            mainImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
-            mainImageView.widthAnchor.constraint(equalToConstant: 327),
+            mainImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            mainImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            mainImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             mainImageView.heightAnchor.constraint(equalToConstant: 263)
         ])
     }
@@ -272,6 +302,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private func setupThumbnailSection() {
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.backgroundColor = UIColor.white
         view.addSubview(containerView)
 
         let layout = UICollectionViewFlowLayout()
@@ -280,6 +311,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         layout.minimumLineSpacing = 11.45
 
         thumbnailCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        thumbnailCollectionView.backgroundColor = UIColor.white
         thumbnailCollectionView.delegate = self
         thumbnailCollectionView.dataSource = self
         thumbnailCollectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -290,9 +322,9 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         containerView.addSubview(addButton)
 
         NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: mainImageView.bottomAnchor, constant: 14.12),
-            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            containerView.topAnchor.constraint(equalTo: mainImageView.bottomAnchor),
+            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             containerView.heightAnchor.constraint(equalToConstant: 70),
 
             addButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
@@ -324,15 +356,70 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         NSLayoutConstraint.activate([
             // 카테고리 컨테이너 제약 조건
             categoryContainer.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-            categoryContainer.leadingAnchor.constraint(equalTo: addButton.leadingAnchor), // addButton의 leading과 동일하게 설정
-
-            categoryContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            categoryContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20), // addButton의 leading과 동일하게 설정
+            categoryContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
             // 카테고리 라벨 제약 조건
             categoryLabel.centerYAnchor.constraint(equalTo: categoryContainer.centerYAnchor),
             categoryLabel.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor)
 
         ])
+    }
+    
+    
+    private func setupButtonsAboutCategoryButton() {
+        // 문자열 배열 정의
+        guard let categoryIndex = self.categoryIndex,
+            let buttonTitles = MockData.shared.rows[categoryIndex] else {
+            print("유효하지 않은 카테고리 인덱스입니다.")
+            return
+        }
+
+            // StackView가 이미 존재하면 기존 버튼을 제거
+        if let existingStackView = contentView.subviews.first(where: { $0 is UIStackView }) as? UIStackView {
+            existingStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            existingStackView.removeFromSuperview()
+        }
+//        // 첫 10개의 문자열 가져오기
+//        let selectedTitles = buttonTitles.prefix(10)
+            
+        // StackView 생성
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.distribution = .equalSpacing
+        stackView.spacing = 8
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(stackView)
+
+        // 선택된 문자열로 버튼 생성
+        for (index, title) in buttonTitles.prefix(10).enumerated() {
+            let button = UIButton(type: .system)
+            button.setTitle(title, for: .normal)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+            button.setTitleColor(.black, for: .normal)
+            button.backgroundColor = UIColor.systemGray4
+            button.layer.cornerRadius = 18.5
+            button.tag = index // 버튼 인덱스를 태그로 저장
+            button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+            stackView.addArrangedSubview(button)
+
+            // 버튼 높이 설정
+            NSLayoutConstraint.activate([
+                button.heightAnchor.constraint(equalToConstant: 40),
+                button.widthAnchor.constraint(equalToConstant: 100)
+            ])
+        }
+
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 110),
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+        ])
+    }
+
+    @objc private func buttonTapped(_ sender: UIButton) {
+        guard let title = sender.title(for: .normal) else { return }
+        print("Button tapped: \(title), Tag: \(sender.tag)")
     }
 
     private func setupExpressionField() {
@@ -345,7 +432,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         NSLayoutConstraint.activate([
             // "글로 표현해보세요!"를 categoryButtons 아래에 위치
-            expressionLabel.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 114.49),
+            expressionLabel.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 610),
             expressionLabel.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor),
             expressionLabel.trailingAnchor.constraint(equalTo: categoryContainer.trailingAnchor)
 
@@ -382,21 +469,22 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         NSLayoutConstraint.activate([
             // Text Input Background
-            backgroundView.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 147.98),
-            backgroundView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            backgroundView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            backgroundView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 640),
+            backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            backgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             backgroundView.heightAnchor.constraint(equalToConstant: 163),
 
             // TextView
             textView.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 8),
-            textView.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 8),
-            textView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -8),
+            textView.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor),
+            textView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
             textView.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -8),
 
             // Character Count Label
             characterCountLabel.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -23),
             characterCountLabel.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -25)
         ])
+        backgroundView.layer.zPosition = -1
     }
 
     private func updateImageCountLabels() {
@@ -461,7 +549,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         let characterCount = textView.text.count
         characterCountLabel.text = "\(characterCount) / \(maxCharacterCount)"
         characterCountLabel.textColor = characterCount > maxCharacterCount ? .systemRed : .systemGray
-        texts[currentIndex] = textView.text ?? "" // 잠시 보류
+//        texts[currentIndex] = textView.text ?? ""  잠시 보류
     }
     
     private func setupCategoryButtons() {
@@ -473,6 +561,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         scrollView.isScrollEnabled = true
         scrollView.alwaysBounceVertical = false // 세로 방향 바운스 비활성화
         scrollView.showsHorizontalScrollIndicator = false // 스크롤바 제거
+        scrollView.layer.zPosition = -1 // 썸네일 컬렉션 뷰와 addButton보다 계층이 낮음
+        scrollView.isUserInteractionEnabled = true // 스크롤 이벤트 활성화
         view.addSubview(scrollView)
 
         // StackView 생성
@@ -507,8 +597,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         NSLayoutConstraint.activate([
         // ScrollView 제약 조건
             scrollView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 22.5),
-            scrollView.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: categoryContainer.trailingAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
         // StackView 제약 조건
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
@@ -517,21 +607,25 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
         ])
+//        scrollView.layer.zPosition = -1 // 썸네일 컬렉션 뷰와 addButton보다 계층이 낮음
+//        view.sendSubviewToBack(scrollView)
+        // 터치 이벤트 설정
+            scrollView.isUserInteractionEnabled = true
+            view.bringSubviewToFront(scrollView) // 스크롤 뷰 터치 활성화를 위해 계
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
         // 카테고리 버튼 클릭 시 호출
         guard let title = sender.titleLabel?.text else { return }
         let mockData = MockData()
-        var categoryIndex: Int?
 
         // 버튼 타이틀에 따라 인덱스 설정
         switch title {
-        case "문화 · 경험": categoryIndex = 0
-        case "AAAAA": categoryIndex = 1
-        case "BBBBB": categoryIndex = 2
-        case "CCCCC": categoryIndex = 3
-        case "DDDDD": categoryIndex = 4
+            case "문화 · 경험": categoryIndex = 0
+            case "AAAAA": categoryIndex = 1
+            case "BBBBB": categoryIndex = 2
+            case "CCCCC": categoryIndex = 3
+            case "DDDDD": categoryIndex = 4
         default: return
         }
 
@@ -539,97 +633,36 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             print("데이터 없음")
             return
         }
+        setupButtonsAboutCategoryButton()
 
-        if categoryOverlayView == nil {
-            categoryOverlayView = createCategoryOverlay(with: data)
-            if let overlayView = categoryOverlayView {
-                view.addSubview(overlayView)
-                NSLayoutConstraint.activate([
-                    overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-                    overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-                    overlayView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-                    overlayView.heightAnchor.constraint(equalToConstant: 300)
-                ])
-                UIView.animate(withDuration: 0.3) {
-                    overlayView.alpha = 1.0
-                }
-            }
-        } else {
-            hideCategoryOverlay()
-        }
     }
-    
-    private func createCategoryOverlay(with data: [String]) -> UIView {
-        let overlay = UIView()
-        overlay.translatesAutoresizingMaskIntoConstraints = false
-        overlay.backgroundColor = UIColor.white
-        overlay.layer.cornerRadius = 15
-        overlay.layer.borderWidth = 1
-        overlay.layer.borderColor = UIColor.systemGray4.cgColor
-        overlay.alpha = 0
-
-        // ScrollView 생성
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.showsVerticalScrollIndicator = true
-        scrollView.alwaysBounceVertical = true
-        overlay.addSubview(scrollView)
-
-        // StackView 생성
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 15
-        stackView.alignment = .fill
-        stackView.distribution = .fillProportionally
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(stackView)
-
-        // 데이터에 따라 버튼 생성
-        for item in data {
-            let button = UIButton(type: .system)
-            button.setTitle(item, for: .normal)
-            button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-            button.setTitleColor(.black, for: .normal)
-            button.backgroundColor = UIColor.systemGray6
-            button.layer.cornerRadius = 10
-            button.layer.borderWidth = 1
-            button.layer.borderColor = UIColor.systemGray5.cgColor
-            button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 15, bottom: 10, right: 15)
-            button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
-            stackView.addArrangedSubview(button)
-        }
-
-        // ScrollView 및 StackView 제약 조건 설정
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: overlay.topAnchor, constant: 15),
-            scrollView.leadingAnchor.constraint(equalTo: overlay.leadingAnchor, constant: 15),
-            scrollView.trailingAnchor.constraint(equalTo: overlay.trailingAnchor, constant: -15),
-            scrollView.bottomAnchor.constraint(equalTo: overlay.bottomAnchor, constant: -15),
-
-            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor) // 가로 스크롤 방지
-        ])
-
-        return overlay
-    }
-    
     @objc private func categoryItemSelected(_ sender: UIButton) {
         guard let title = sender.title(for: .normal) else { return }
         print("선택된 아이템: \(title)")
-        hideCategoryOverlay()
     }
 
-    private func hideCategoryOverlay() {
-        if let overlayView = categoryOverlayView {
-            UIView.animate(withDuration: 0.3, animations: {
-                overlayView.alpha = 0
-            }) { _ in
-                overlayView.removeFromSuperview()
-                self.categoryOverlayView = nil
-            }
-        }
+    private func setupNextButton() {
+        let button = UIButton(type: .system)
+        button.setTitle("다음", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        button.layer.cornerRadius = 8
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+
+        contentView.addSubview(button)
+        NSLayoutConstraint.activate([
+            button.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 900),
+            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            button.heightAnchor.constraint(equalToConstant: 44),
+        ])
+    }
+
+    @objc private func nextButtonTapped() {
+        print("Next button tapped")
     }
 }
+
+
