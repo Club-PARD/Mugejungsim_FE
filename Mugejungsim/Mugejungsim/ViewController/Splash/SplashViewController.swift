@@ -35,8 +35,8 @@ class SplashViewController: UIViewController {
 //            let mainVC = EmailViewController()
 //            let mainVC = NameViewController()
 //            let mainVC = StoryEditorViewController()
-//            let mainVC = StopWritingViewController()
-        //    let mainVC = SaveAndEditViewController()
+//            let mainVC = SaveAndEditViewController()
+//            let mainVC = DetailedPhotoViewController()
 
 
             mainVC.modalTransitionStyle = .crossDissolve
