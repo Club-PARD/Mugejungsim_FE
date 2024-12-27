@@ -38,6 +38,7 @@ class SplashViewController: UIViewController {
 //            let mainVC = SaveAndEditViewController()
 //            let mainVC = DetailedPhotoViewController()
 
+
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
             self.present(mainVC, animated: true, completion: nil)
