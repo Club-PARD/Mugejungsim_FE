@@ -415,9 +415,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 // 키보드 액세서리 추가
                 let toolbar = UIToolbar()
                 toolbar.sizeToFit()
-                
                 let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(doneButtonTapped))
-                            
                 let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
                 toolbar.setItems([flexibleSpace, doneButton], animated: false)
                             
