@@ -141,7 +141,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
       
         // CollectionView 생성
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.delegate = self ㅈ
+        collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(SavedPhotoCell.self, forCellWithReuseIdentifier: "SavedPhotoCell")
         collectionView.backgroundColor = .white
