@@ -6,8 +6,8 @@ class ResultViewController: UIViewController {
 
     let memoryLabel: UILabel = {
         let label = UILabel()
-        label.text = "OOO 님의\nOOO 여행 추억입니다."
-        label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
+        label.text = "OOO 님의 여행 오브제가\n완성되었어요!"
+        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -17,10 +17,10 @@ class ResultViewController: UIViewController {
 
     let touchLabel: UILabel = {
         let label = UILabel()
-        label.text = "오브제를 터치하고\n움직여 보세요!"
-        label.numberOfLines = 2
+        label.text = "오브제를 터치하고 움직여 보세요!"
+        label.numberOfLines = 0
         label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
-        label.font = UIFont(name: "Pretendard-Bold", size: 16)
+        label.font = UIFont(name: "Pretendard-SemiBold", size: 17)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -103,16 +103,16 @@ class ResultViewController: UIViewController {
 
     private func setConstraints() {
         NSLayoutConstraint.activate([
+            memoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 175),
+            memoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            touchLabel.topAnchor.constraint(equalTo: memoryLabel.bottomAnchor, constant: 14),
+            touchLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
             openPreviewButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             openPreviewButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            openPreviewButton.widthAnchor.constraint(equalToConstant: 150),
-            openPreviewButton.heightAnchor.constraint(equalToConstant: 150),
-
-            touchLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            touchLabel.bottomAnchor.constraint(equalTo: openPreviewButton.topAnchor, constant: -20),
-
-            memoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            memoryLabel.bottomAnchor.constraint(equalTo: touchLabel.topAnchor, constant: -10),
+            openPreviewButton.widthAnchor.constraint(equalToConstant: 175),
+            openPreviewButton.heightAnchor.constraint(equalToConstant: 175),
 
             saveButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),

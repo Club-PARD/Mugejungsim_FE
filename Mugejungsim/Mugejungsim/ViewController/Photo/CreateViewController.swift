@@ -23,6 +23,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         textField.placeholder = "제목을 입력하세요"
         textField.font = UIFont(name: "Pretendard-Regular", size: 16)
         textField.borderStyle = .none
+        textField.tintColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1) // 6E6EDE
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -60,6 +61,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         textField.placeholder = "여행지를 입력하세요"
         textField.font = UIFont(name: "Pretendard-Regular", size: 16)
         textField.borderStyle = .none
+        textField.tintColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1) // 6E6EDE
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -155,7 +157,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            navBar.heightAnchor.constraint(equalToConstant: 40),
+            navBar.heightAnchor.constraint(equalToConstant: 48),
             
             separator.bottomAnchor.constraint(equalTo: navBar.bottomAnchor),
             separator.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
@@ -174,11 +176,10 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc private func didTapBackButton() {
-        print("backButton 누름")
         let stopWritingVC = StopWritingViewController()
-        stopWritingVC.modalTransitionStyle = .crossDissolve
         stopWritingVC.modalPresentationStyle = .overFullScreen
-        self.present(stopWritingVC, animated: true, completion: nil)
+        stopWritingVC.delegate = self // Delegate 설정
+        present(stopWritingVC, animated: false, completion: nil) // 애니메이션 제거
     }
     
     @objc private func didTapSaveButton() {
@@ -579,5 +580,17 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             11: 30, 12: 31
         ]
         return dayInt <= (daysInMonth[monthInt] ?? 0)
+    }
+}
+
+extension CreateViewController: StopWritingViewControllerDelegate {
+    func didStopWriting() {
+        // MainViewController로 이동
+        if let window = UIApplication.shared.windows.first {
+            let mainVC = MainViewController()
+            let navController = UINavigationController(rootViewController: mainVC)
+            window.rootViewController = navController
+            window.makeKeyAndVisible()
+        }
     }
 }
