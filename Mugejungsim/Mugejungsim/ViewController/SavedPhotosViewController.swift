@@ -9,12 +9,13 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         let label = UILabel()
         label.text = "0 / 25"
         label.textColor = .black
+
         label.font = UIFont(name: "Pretendard-Medium", size: 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+  
     let lineButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("한 줄 남기기", for: .normal)
@@ -74,6 +75,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         setupButtonsConstraints()
     }
     
+
     func setupButtonsConstraints() {
         NSLayoutConstraint.activate([
             lineButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
@@ -87,7 +89,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
             saveAndHomeButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
-    
+
     private func setupCustomNavigationBar() {
         let navBar = UIView()
         navBar.backgroundColor = .clear
@@ -97,32 +99,32 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         backButton.tintColor = .black
         backButton.addTarget(self, action: #selector(goBack), for: .touchUpInside)
         backButton.translatesAutoresizingMaskIntoConstraints = false
-        
+
         view.addSubview(navBar)
         navBar.addSubview(backButton)
         navBar.addSubview(imageCountLabel)
-        
         NSLayoutConstraint.activate([
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             navBar.heightAnchor.constraint(equalToConstant: 40),
-            
+
+
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
-            
+
             imageCountLabel.centerYAnchor.constraint(equalTo: backButton.centerYAnchor),
             imageCountLabel.centerXAnchor.constraint(equalTo: navBar.centerXAnchor)
         ])
     }
-    
+
     // MARK: - Update Image Count Label
     private func updateImageCountLabel() {
         // 현재 저장된 사진 수 / 25로 설정
         let currentCount = savedData.count
+
         imageCountLabel.text = "\(currentCount) / 25"
-    }
-    
+
     // MARK: - Collection View Setup
     func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
@@ -136,7 +138,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         
         // Section Insets 설정 (좌우 여백)
         layout.sectionInset = UIEdgeInsets(top: 10, left: 24, bottom: 10, right: 24)
-        
+      
         // CollectionView 생성
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
