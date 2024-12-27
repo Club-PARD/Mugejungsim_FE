@@ -31,10 +31,10 @@ class SplashViewController: UIViewController {
 //            let mainVC = UploadViewController()
 //            let mainVC = MyRecordsViewController()
 //            let mainVC = CreateViewController()
-            let mainVC = SavedPhotosViewController()
+//            let mainVC = SavedPhotosViewController()
 //            let mainVC = EmailViewController()
 //            let mainVC = NameViewController()
-//            let mainVC = StoryEditorViewController()
+            let mainVC = StoryEditorViewController()
 //            let mainVC = SaveAndEditViewController()
 //            let mainVC = DetailedPhotoViewController()
 
