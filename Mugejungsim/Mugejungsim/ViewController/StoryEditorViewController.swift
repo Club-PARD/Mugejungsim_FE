@@ -18,6 +18,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private var categoryNumber : String = ""
     // MARK: - 카테고리 관련 Properties
         private var categoryOverlayView: UIView? // Overlay View
+
     
 //    private let scrollView = UIScrollView()
 
@@ -324,11 +325,13 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             // 카테고리 컨테이너 제약 조건
             categoryContainer.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             categoryContainer.leadingAnchor.constraint(equalTo: addButton.leadingAnchor), // addButton의 leading과 동일하게 설정
+
             categoryContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
             // 카테고리 라벨 제약 조건
             categoryLabel.centerYAnchor.constraint(equalTo: categoryContainer.centerYAnchor),
             categoryLabel.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor)
+
         ])
     }
 
@@ -345,6 +348,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             expressionLabel.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 114.49),
             expressionLabel.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor),
             expressionLabel.trailingAnchor.constraint(equalTo: categoryContainer.trailingAnchor)
+
         ])
     }
 
@@ -628,7 +632,4 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             }
         }
     }
-    
-    
-    
 }
