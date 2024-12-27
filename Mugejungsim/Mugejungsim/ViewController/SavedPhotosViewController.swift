@@ -120,7 +120,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
 
     // MARK: - Update Image Count Label
     private func updateImageCountLabel() {
-        // 현재 저장된 사진 수 / 25로 설정
+        // 현재 저장된 사진 수 / 25로 설정애0
         let currentCount = savedData.count
 
         imageCountLabel.text = "\(currentCount) / 25"
@@ -141,7 +141,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
       
         // CollectionView 생성
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.delegate = self
+        collectionView.delegate = self ㅈ
         collectionView.dataSource = self
         collectionView.register(SavedPhotoCell.self, forCellWithReuseIdentifier: "SavedPhotoCell")
         collectionView.backgroundColor = .white
@@ -150,7 +150,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         
         // CollectionView 제약조건 설정
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 80),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
