@@ -1,14 +1,19 @@
 import UIKit
 import PhotosUI
 
-class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+protocol UploadViewControllerDelegate: AnyObject {
+    func didTapBackButton()
+}
+
+class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UploadViewControllerDelegate {
+    weak var delegate: UploadViewControllerDelegate?
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "여행의 순간이 담긴\n사진을 업로드 해보세요!"
-        label.textColor = .black
+        label.textColor = #colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1)
         label.numberOfLines = 2
-        label.font = UIFont.systemFont(ofSize: 25, weight: .bold)
+        label.font = UIFont(name: "Pretendard-Bold", size: 25)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -16,7 +21,7 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     
     private let outButton: UIButton = {
         let button = UIButton(type: .custom)
-        if let originalImage = UIImage(named: "out")?.withRenderingMode(.alwaysOriginal) {
+        if let originalImage = UIImage(named: "back_button")?.withRenderingMode(.alwaysOriginal) {
             button.setImage(originalImage, for: .normal)
         }
         button.addTarget(self, action: #selector(handleOutButton), for: .touchUpInside)
@@ -39,14 +44,22 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         button.addTarget(self, action: #selector(buttonTouchDown(_:)), for: .touchDown)
         button.addTarget(self, action: #selector(buttonTouchUp(_:)), for: [.touchUpInside, .touchCancel, .touchDragExit])
         button.translatesAutoresizingMaskIntoConstraints = false
+
+        // Drop shadow 설정
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.15 // 투명도 15%
+        button.layer.shadowOffset = CGSize(width: 1.95, height: 1.95) // 그림자 위치
+        button.layer.shadowRadius = 2.6 // 블러 값
+        button.layer.masksToBounds = false
+
         return button
     }()
     
     private let galleryLabel: UILabel = {
         let label = UILabel()
         label.text = "갤러리 업로드"
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        label.textColor = .black
+        label.font = UIFont(name: "Pretendard-Medium", size: 16)
+        label.textColor = #colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -67,14 +80,22 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         button.addTarget(self, action: #selector(buttonTouchDown(_:)), for: .touchDown)
         button.addTarget(self, action: #selector(buttonTouchUp(_:)), for: [.touchUpInside, .touchCancel, .touchDragExit])
         button.translatesAutoresizingMaskIntoConstraints = false
+
+        // Drop shadow 설정
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.15 // 투명도 15%
+        button.layer.shadowOffset = CGSize(width: 1.95, height: 1.95) // 그림자 위치
+        button.layer.shadowRadius = 2.6 // 블러 값
+        button.layer.masksToBounds = false
+
         return button
     }()
     
     private let cameraLabel: UILabel = {
         let label = UILabel()
         label.text = "카메라 촬영"
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        label.textColor = .black
+        label.font = UIFont(name: "Pretendard-Medium", size: 16)
+        label.textColor = #colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -85,11 +106,41 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        setupCustomNavigationBar()
         setupUI()
     }
     
+    private func setupCustomNavigationBar() {
+        let navBar = UIView()
+        navBar.backgroundColor = .clear
+        navBar.translatesAutoresizingMaskIntoConstraints = false
+        
+        let backButton = UIButton(type: .system)  // 왼쪽 고정
+        backButton.setImage(UIImage(named: "back_button"), for: .normal)
+        backButton.tintColor = .black
+        backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(navBar)
+        navBar.addSubview(backButton)
+        
+        NSLayoutConstraint.activate([
+            navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            navBar.heightAnchor.constraint(equalToConstant: 48),
+            
+            backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
+            backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
+        ])
+    }
+    
+    @objc internal func didTapBackButton() {
+            delegate?.didTapBackButton()
+            dismiss(animated: true, completion: nil)
+        }
+    
     private func setupUI() {
-        view.addSubview(outButton)
         view.addSubview(titleLabel)
         view.addSubview(galleryButton)
         view.addSubview(galleryLabel)
@@ -97,12 +148,9 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         view.addSubview(cameraLabel)
         
         NSLayoutConstraint.activate([
-            // Out Button Constraints
-            outButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 55),
-            outButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 26),
             
             // Title Label Constraints
-            titleLabel.topAnchor.constraint(equalTo: outButton.bottomAnchor, constant: 93),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 93),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             // Gallery Button Constraints
@@ -140,16 +188,6 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
     
     @objc func handleOutButton() {
         dismiss(animated: true)
-    }
-    
-    @objc func openGallery() {
-        var config = PHPickerConfiguration()
-        config.selectionLimit = 25 // 최대 선택 가능 이미지 수
-        config.filter = .images // 이미지만 필터링
-
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = self
-        present(picker, animated: true)
     }
     
     @objc func openCamera() {
@@ -193,9 +231,20 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         }
     }
     
+    @objc func openGallery() {
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 25
+        config.filter = .images
+
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+
     private func navigateToStoryEditor(with images: [UIImage]) {
         let storyEditorVC = StoryEditorViewController()
         storyEditorVC.images = images
+        storyEditorVC.delegate = self // delegate 설정
         storyEditorVC.modalPresentationStyle = .fullScreen
         present(storyEditorVC, animated: true)
     }

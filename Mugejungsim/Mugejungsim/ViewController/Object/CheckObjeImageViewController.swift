@@ -1,10 +1,3 @@
-//
-//  CheckObjeImageViewController.swift
-//  Mugejungsim
-//
-//  Created by 도현학 on 12/26/24.
-//
-
 import UIKit
 
 class CheckObjeImageViewController: UIViewController {
@@ -13,7 +6,7 @@ class CheckObjeImageViewController: UIViewController {
     
     let textLabel: UILabel = {
         let label = UILabel()
-        label.text = "유리병 편지에 담긴 나만의 여행\n추억 컬러를 확인해 보세요!"
+        label.text = "유리병 편지에 담긴 나만의 여행\n추억 컬러를 확인해보세요!"
         label.numberOfLines = 2
         label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
@@ -25,7 +18,7 @@ class CheckObjeImageViewController: UIViewController {
     let readButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("편지 읽기", for: .normal)
-        button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Bold", size: 16)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
         button.layer.masksToBounds = false // 그림자가 잘리지 않도록 false로 설정
@@ -71,12 +64,12 @@ class CheckObjeImageViewController: UIViewController {
             // bottleImageView 위치
             bottleImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             bottleImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            bottleImageView.widthAnchor.constraint(equalToConstant: 150), // 이미지 너비
-            bottleImageView.heightAnchor.constraint(equalToConstant: 150), // 이미지 높이
+            bottleImageView.widthAnchor.constraint(equalToConstant: 175), // 이미지 너비
+            bottleImageView.heightAnchor.constraint(equalToConstant: 175), // 이미지 높이
             
             // textLabel 위치
             textLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            textLabel.bottomAnchor.constraint(equalTo: bottleImageView.topAnchor, constant: -20),
+            textLabel.bottomAnchor.constraint(equalTo: bottleImageView.topAnchor, constant: -23),
             
             // readButton 위치
             readButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),

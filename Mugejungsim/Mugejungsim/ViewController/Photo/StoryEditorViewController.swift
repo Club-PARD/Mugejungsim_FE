@@ -16,6 +16,14 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private let maxCharacterCount = 100
     private var doneToolbar: UIToolbar!
     private var categoryIndex: Int? = 0
+    private var categoryNumber : String = ""
+    // MARK: - 카테고리 관련 Properties
+    private var categoryOverlayView: UIView? // Overlay View
+    weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
+    
+
+    
+//    private let scrollView = UIScrollView()
 
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
@@ -237,6 +245,12 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         ])
         navBar.layer.zPosition = 100
     }
+    
+    @objc private func goBack() {
+            delegate?.didTapBackButton() // 이전 화면의 동작 실행
+            dismiss(animated: true, completion: nil)
+            navigationController?.popViewController(animated: true)
+        }
     
     private func setupToolbar() {
         doneToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 44))
@@ -493,10 +507,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
            let countLabel = stackView.arrangedSubviews.last as? UILabel {
             countLabel.text = "\(images.count) / 25"
         }
-    }
-
-    @objc private func goBack() {
-        navigationController?.popViewController(animated: true)
     }
 
     @objc private func saveTemporarily() {

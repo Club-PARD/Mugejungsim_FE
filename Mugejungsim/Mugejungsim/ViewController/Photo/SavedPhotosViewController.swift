@@ -107,9 +107,9 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            navBar.heightAnchor.constraint(equalToConstant: 40),
-            
-            
+            navBar.heightAnchor.constraint(equalToConstant: 65),
+
+
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             
@@ -140,6 +140,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         // Section Insets 설정 (좌우 여백)
         layout.sectionInset = UIEdgeInsets(top: 10, left: 24, bottom: 10, right: 24)
             
+        // layout.sectionInset = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 24)
         // CollectionView 생성
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
@@ -170,7 +171,15 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         cell.configure(with: data) // Display only the photo
         return cell
     }
-        
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedData = savedData[indexPath.row]
+        let detailVC = PhotoDetailViewController()
+        detailVC.selectedPhotoData = selectedData // 데이터 전달
+        detailVC.modalPresentationStyle = .fullScreen
+        present(detailVC, animated: true, completion: nil)
+    }
+    
     @objc private func goBack() {
         //        navigationController?.popViewController(animated: true)
         dismiss(animated: true, completion: nil)
