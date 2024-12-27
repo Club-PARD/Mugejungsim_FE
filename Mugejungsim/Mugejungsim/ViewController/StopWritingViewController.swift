@@ -1,10 +1,3 @@
-//
-//  StopWritingViewController.swift
-//  Mugejungsim
-//
-//  Created by 도현학 on 12/24/24.
-//
-
 import UIKit
 
 class StopWritingViewController: UIViewController {
@@ -21,17 +14,42 @@ class StopWritingViewController: UIViewController {
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = 15
+        view.layer.cornerRadius = 12
         view.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Drop Shadow 설정
+        view.layer.shadowColor = UIColor.black.cgColor // 그림자 색상
+        view.layer.shadowOpacity = 0.25 // 그림자 투명도 (25%)
+        view.layer.shadowRadius = 4 // 그림자 블러 반경
+        view.layer.shadowOffset = CGSize(width: 0, height: 4) // X, Y 위치
+        
         return view
+    }()
+    
+    private let closeButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "X_Button"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     private let promptLabel: UILabel = {
         let label = UILabel()
-        label.text = "여행기 작성을\n그만두시겠어요?"
+        label.text = "한 줄 남기기를 그만두시겠어요?"
         label.numberOfLines = 2
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        label.font = UIFont.font(.pretendardBold, ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let promptLabel2: UILabel = {
+        let label = UILabel()
+        label.text = "한 줄 남기기를 하지 않으면\n나만의 오브제도 만들 수 없어요!"
+        label.numberOfLines = 2
+        label.textColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
+        label.textAlignment = .center
+        label.font = UIFont.font(.pretendardSemiBold, ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -39,20 +57,36 @@ class StopWritingViewController: UIViewController {
     private let stopButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("그만두기", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .darkGray
-        button.layer.cornerRadius = 10
+        button.setTitleColor(#colorLiteral(red: 0.3333333333, green: 0.3333333333, blue: 0.3450980392, alpha: 1), for: .normal)
+        button.backgroundColor = #colorLiteral(red: 0.9137254902, green: 0.9137254902, blue: 0.9137254902, alpha: 1)
+        button.layer.cornerRadius = 5.9
+        button.titleLabel?.font = UIFont.font(.pretendardSemiBold, ofSize: 13)
         button.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Drop Shadow 설정
+        button.layer.shadowColor = UIColor.black.cgColor // 그림자 색상
+        button.layer.shadowOpacity = 0.25 // 그림자 투명도 (25%)
+        button.layer.shadowRadius = 0.74 // 그림자 블러 반경
+        button.layer.shadowOffset = CGSize(width: 0.37, height: 0.37) // X, Y 위치
+        
         return button
     }()
-    
+
     private let continueButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("이어서 하기", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = UIColor(hex: "#CFFFDD")
-        button.layer.cornerRadius = 10
+        button.setTitleColor(#colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
+        button.backgroundColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
+        button.layer.cornerRadius = 5.9
+        button.titleLabel?.font = UIFont.font(.pretendardBold, ofSize: 13)
         button.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Drop Shadow 설정
+        button.layer.shadowColor = UIColor.black.cgColor // 그림자 색상
+        button.layer.shadowOpacity = 0.25 // 그림자 투명도 (25%)
+        button.layer.shadowRadius = 0.74 // 그림자 블러 반경
+        button.layer.shadowOffset = CGSize(width: 0.37, height: 0.37) // X, Y 위치
+        
         return button
     }()
 
@@ -70,7 +104,9 @@ class StopWritingViewController: UIViewController {
     private func setUI() {
         view.addSubview(overlayView)
         view.addSubview(containerView)
+        containerView.addSubview(closeButton)
         containerView.addSubview(promptLabel)
+        containerView.addSubview(promptLabel2)
         containerView.addSubview(stopButton)
         containerView.addSubview(continueButton)
     }
@@ -88,25 +124,33 @@ class StopWritingViewController: UIViewController {
             // Container view
             containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            containerView.widthAnchor.constraint(equalToConstant: 300),
-            containerView.heightAnchor.constraint(equalToConstant: 200),
+            containerView.widthAnchor.constraint(equalToConstant: 297),
+            containerView.heightAnchor.constraint(equalToConstant: 278),
+            
+            // Close button (X_Button)
+            closeButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 21),
+            closeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -23),
+
             
             // Prompt label
-            promptLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20),
-            promptLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
-            promptLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
+            promptLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 63),
+            promptLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             
+            // Prompt2 label
+            promptLabel2.topAnchor.constraint(equalTo: promptLabel.bottomAnchor, constant: 10),
+            promptLabel2.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+
             // Stop button
-            stopButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
-            stopButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
-            stopButton.bottomAnchor.constraint(equalTo: continueButton.topAnchor, constant: -10),
-            stopButton.heightAnchor.constraint(equalToConstant: 50),
+            stopButton.topAnchor.constraint(equalTo: promptLabel2.bottomAnchor, constant: 34),
+            stopButton.centerXAnchor.constraint(equalTo: promptLabel2.centerXAnchor),
+            stopButton.widthAnchor.constraint(equalToConstant: 239),
+            stopButton.heightAnchor.constraint(equalToConstant: 38.32),
             
             // Continue button
-            continueButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
-            continueButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
-            continueButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -20),
-            continueButton.heightAnchor.constraint(equalToConstant: 50)
+            continueButton.topAnchor.constraint(equalTo: stopButton.bottomAnchor, constant: 9.68),
+            continueButton.centerXAnchor.constraint(equalTo: stopButton.centerXAnchor),
+            continueButton.widthAnchor.constraint(equalToConstant: 239),
+            continueButton.heightAnchor.constraint(equalToConstant: 38.32),
         ])
     }
     
@@ -115,9 +159,8 @@ class StopWritingViewController: UIViewController {
     private func setActions() {
         stopButton.addTarget(self, action: #selector(StopButtonTapped), for: .touchUpInside)
         continueButton.addTarget(self, action: #selector(ContinueButtonTapped), for: .touchUpInside)
+        closeButton.addTarget(self, action: #selector(CloseButtonTapped), for: .touchUpInside) // Close 버튼 액션 추가
     }
-    
-    
     // 개선 여지 가능성이 있어서 더 나은 방안 확인해볼 것
     @objc private func StopButtonTapped() {
         print("그만두기 버튼 클릭됨")
@@ -137,5 +180,10 @@ class StopWritingViewController: UIViewController {
     @objc private func ContinueButtonTapped() {
         print("이어서 하기 버튼 클릭됨")
         dismiss(animated: true, completion: nil)
+    }
+    
+    @objc private func CloseButtonTapped() {
+        print("Close 버튼 클릭됨")
+        dismiss(animated: true, completion: nil) // 화면 닫기
     }
 }

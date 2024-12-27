@@ -7,6 +7,7 @@
 import UIKit
 
 struct MockData {
+    static let shared = MockData()
     let rows: [Int: [String]] = [
         0: ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet"],
         1: ["Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango"],

@@ -17,7 +17,6 @@ class SavedPhotoCell: UICollectionViewCell {
         photoImageView = UIImageView()
         photoImageView.contentMode = .scaleAspectFill
         photoImageView.clipsToBounds = true
-        photoImageView.layer.cornerRadius = 4
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(photoImageView)
 
