@@ -85,15 +85,11 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        if collectionView == nil {
-            setupCollectionView()
-        }
-
-        // 데이터 갱신
-        loadDataAndRefresh()
+        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
+        collectionView.reloadData() // 컬렉션 뷰 갱신
+        updateImageCountLabel() // 이미지 카운트 업데이트
     }
-
+    
     func refreshData() {
         savedData = DataManager.shared.loadData()
         collectionView?.reloadData()
@@ -270,4 +266,4 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("MainViewController를 초기화할 수 없습니다. 스토리보드 ID를 확인하세요.")
             }
         }
-    }
+}
