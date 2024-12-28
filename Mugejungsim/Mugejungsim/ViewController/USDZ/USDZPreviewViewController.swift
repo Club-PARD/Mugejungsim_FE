@@ -69,7 +69,7 @@ class USDZPreviewViewController: UIViewController {
 
     // USDZ 파일 가져오기
     func loadUSDZModel() {
-        guard let usdzURL = Bundle.main.url(forResource: "airplane", withExtension: "usdz") else {
+        guard let usdzURL = Bundle.main.url(forResource: "final_bottle", withExtension: "usdz") else {
             print("USDZ 파일을 찾을 수 없습니다.")
             return
         }
