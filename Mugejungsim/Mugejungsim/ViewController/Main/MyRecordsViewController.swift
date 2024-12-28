@@ -257,7 +257,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         // CreateViewController로 이동
         let createViewController = CreateViewController()
         createViewController.modalPresentationStyle = .fullScreen // 모달로 띄우는 경우
-        self.present(createViewController, animated: true, completion: nil)
+        self.present(createViewController, animated: false, completion: nil)
     }
     
     
@@ -436,7 +436,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             print("오브제 셀 클릭됨: \(indexPath.row)")
             let objectModalVC = ObjectModalViewController()
             objectModalVC.modalPresentationStyle = .overFullScreen
-            present(objectModalVC, animated: true, completion: nil)
+            present(objectModalVC, animated: false, completion: nil)
         }
     }
     
