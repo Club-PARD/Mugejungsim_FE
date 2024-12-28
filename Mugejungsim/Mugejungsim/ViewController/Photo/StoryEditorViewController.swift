@@ -508,9 +508,14 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func saveTemporarily() {
-        print("임시 저장 버튼 클릭")
+        presentSaveDraftModal()
     }
-
+    func presentSaveDraftModal() {
+        let saveDraftModal = SaveDraftModal() // 커스텀 모달 뷰 컨트롤러
+            saveDraftModal.modalPresentationStyle = .overFullScreen // 화면 전체에 표시
+            saveDraftModal.modalTransitionStyle = .crossDissolve // 전환 애니메이션 설정
+            present(saveDraftModal, animated: true, completion: nil)
+        }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return images.count
     }
@@ -790,5 +795,3 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         present(savedPhotosVC, animated: true)
     }
 }
-
-
