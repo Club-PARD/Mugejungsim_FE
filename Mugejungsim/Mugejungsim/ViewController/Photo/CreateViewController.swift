@@ -115,6 +115,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         
         configureTextFieldDelegates(in: startDateStackView)
         configureTextFieldDelegates(in: endDateStackView)
+        
         titleTextField.delegate = self
         locationTextField.delegate = self
         
@@ -421,13 +422,15 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 textField.delegate = self
                 textField.addTarget(self, action: #selector(textFieldEditingChanged(_:)), for: .editingChanged)
                 
-                // 키보드 액세서리 추가
+                // 키보드 완료 버튼 추가
                 let toolbar = UIToolbar()
                 toolbar.sizeToFit()
                 let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(doneButtonTapped))
                 let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
                 toolbar.setItems([flexibleSpace, doneButton], animated: false)
-                            
+                // 모든 키보드
+                titleTextField.inputAccessoryView = toolbar
+                locationTextField.inputAccessoryView = toolbar
                 textField.inputAccessoryView = toolbar
             }
         }
@@ -558,6 +561,44 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    // MARK: - UITextFieldDelegate
+
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        // 현재 텍스트
+        guard let currentText = textField.text else { return true }
+        
+        // 변경될 텍스트
+        let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
+        
+        // 입력 중 상태 확인 (한국어 조합 등)
+        if let markedTextRange = textField.markedTextRange {
+            // 조합 중인 텍스트는 허용
+            if textField.position(from: markedTextRange.start, offset: 0) != nil {
+                return true
+            }
+        }
+        // 삭제 동작 처리 (replacementString이 빈 문자열이면 삭제)
+        if string.isEmpty { return true }
+        
+        // 길이 제한 및 유효성 검사
+        switch textField.placeholder {
+        case "YYYY":
+            return updatedText.count <= 4 // 최대 4자
+        case "MM":
+            if updatedText.count <= 2, let month = Int(updatedText), month >= 1 && month <= 12 {
+                return true
+            }
+            return false // 잘못된 입력
+        case "DD":
+            if updatedText.count <= 2, let day = Int(updatedText), day >= 1 && day <= 31 {
+                return true
+            }
+            return false // 잘못된 입력
+        default:
+            return true // 제한 없음
+        }
+    }
+    
     @objc func nextButtonTapped() {
         travelTitle = titleTextField.text ?? "없음"
         companion = selectedCompanion?.title(for: .normal) ?? "없음"
@@ -591,7 +632,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         print("여행 기록이 저장되었습니다.")
         print("저장된 기록: \(newRecord)")
         print("기록 ID: \(newRecord.id)")
-
         
         let uploadViewController = UploadViewController()
         uploadViewController.recordID = newRecord.id.uuidString //
@@ -612,6 +652,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         ]
         return dayInt <= (daysInMonth[monthInt] ?? 0)
     }
+    
 }
 
 extension CreateViewController: StopWritingViewControllerDelegate {
