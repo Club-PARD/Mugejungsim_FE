@@ -617,7 +617,7 @@ extension CreateViewController: StopWritingViewControllerDelegate {
     func didStopWriting() {
         // MainViewController로 이동
         if let window = UIApplication.shared.windows.first {
-            let mainVC = MainViewController()
+            let mainVC = CreateViewController()
             let navController = UINavigationController(rootViewController: mainVC)
             window.rootViewController = navController
             window.makeKeyAndVisible()

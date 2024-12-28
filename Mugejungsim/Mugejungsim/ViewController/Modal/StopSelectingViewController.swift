@@ -169,7 +169,7 @@ class StopSelectingViewController: UIViewController {
         dismiss(animated: true)
         // MainViewController를 강제로 rootViewController로 띄우기
         if let window = UIApplication.shared.windows.first {
-            let mainVC = MainViewController()
+            let mainVC = CreateViewController()
             mainVC.modalPresentationStyle = .fullScreen
             window.rootViewController = mainVC
             window.makeKeyAndVisible()

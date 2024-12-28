@@ -251,7 +251,7 @@ class CollectionPhotosViewController: UIViewController, UICollectionViewDelegate
                 print("NavigationController가 없습니다. 네비게이션 스택에 추가 후 다시 시도하세요.")
                 
                 // 네비게이션 컨트롤러가 없을 경우 루트 뷰 컨트롤러 변경
-                let mainViewController = MainViewController()
+                let mainViewController = OBViewController3()
                 let window = UIApplication.shared.windows.first { $0.isKeyWindow }
                 window?.rootViewController = UINavigationController(rootViewController: mainViewController)
                 window?.makeKeyAndVisible()
@@ -260,7 +260,7 @@ class CollectionPhotosViewController: UIViewController, UICollectionViewDelegate
             
             // MainViewController로 이동
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? MainViewController {
+            if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? OBViewController3 {
                 navigationController.setViewControllers([mainViewController], animated: true)
             } else {
                 print("MainViewController를 초기화할 수 없습니다. 스토리보드 ID를 확인하세요.")
