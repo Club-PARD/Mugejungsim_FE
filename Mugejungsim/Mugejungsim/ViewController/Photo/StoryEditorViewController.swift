@@ -702,6 +702,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         if let previousButton = selectedButton {
 <<<<<<< HEAD
             previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
@@ -715,6 +716,9 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         // 현재 버튼을 선택된 버튼으로 설정
         selectedButton = sender
 =======
+=======
+        if let previousButton = selectedButton {
+>>>>>>> b7c011a ([Chore]: StoryEditViewController 버튼UI 설정)
                 previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
                 previousButton.setTitleColor(.black, for: .normal)
             }
@@ -727,7 +731,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             selectedButton = sender
 
         
+<<<<<<< HEAD
 >>>>>>> c9db874 ([Chore]: StoryEditViewController 버튼UI 설정)
+=======
+>>>>>>> b7c011a ([Chore]: StoryEditViewController 버튼UI 설정)
         // 카테고리 버튼 클릭 시 호출
 =======
 >>>>>>> b4cae27 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
