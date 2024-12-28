@@ -5,6 +5,10 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     var savedData: [PhotoData] = []
     var collectionView: UICollectionView!
     
+    private var photoDataList: [PhotoData] = []
+
+    
+    
     private var imageCountLabel: UILabel = {
         let label = UILabel()
         label.text = "0 / 25"
@@ -56,6 +60,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         
         // 내비게이션 바 설정
         setupCustomNavigationBar()
+        setupCollectionView()
         
         // 데이터 로드
         savedData = DataManager.shared.loadData()
@@ -63,8 +68,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         // 이미지 개수 레이블 업데이트
         updateImageCountLabel()
         
-        // 컬렉션 뷰 설정
-        setupCollectionView()
+        // UI 업데이트
+        updateUI()
         
         view.addSubview(lineButton)
         view.addSubview(saveAndHomeButton)
@@ -73,7 +78,34 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         saveAndHomeButton.addTarget(self, action: #selector(saveAndHomeButtonTapped), for: .touchUpInside)
         
         setupButtonsConstraints()
+        photoDataList = DataManager.shared.loadData()
+        collectionView.reloadData()
+//        DataManager.shared.resetData() // 데이터 초기화 시키는 함수
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        if collectionView == nil {
+            setupCollectionView()
+        }
+
+        // 데이터 갱신
+        loadDataAndRefresh()
+    }
+
+    func refreshData() {
+        savedData = DataManager.shared.loadData()
+        collectionView?.reloadData()
+        updateImageCountLabel()
+        print("SavedPhotosViewController가 리로드되었습니다.")
+    }
+
+        private func loadDataAndRefresh() {
+            photoDataList = DataManager.shared.loadData()
+            collectionView.reloadData()
+        }
+
     
     
     func setupButtonsConstraints() {
@@ -125,6 +157,22 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         
         imageCountLabel.text = "\(currentCount) / 25"
     }
+    
+    func updateUI() {
+        guard let collectionView = collectionView else {
+            print("collectionView가 nil입니다.")
+            return
+        }
+        collectionView.reloadData()
+    }
+    
+
+    // 프로토콜 메서드 구현
+        func didDelete() {
+            // 데이터 삭제 후 처리
+            savedData = DataManager.shared.loadData() // 예: 삭제 후 데이터 재로드
+            collectionView.reloadData() // UI 업데이트
+        }
     
     // MARK: - Collection View Setup
     func setupCollectionView() {
@@ -178,6 +226,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         detailVC.selectedPhotoData = selectedData // 데이터 전달
         detailVC.modalPresentationStyle = .fullScreen
         present(detailVC, animated: true, completion: nil)
+        
+        
     }
     
     @objc private func goBack() {
@@ -221,4 +271,3 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
             }
         }
     }
-
