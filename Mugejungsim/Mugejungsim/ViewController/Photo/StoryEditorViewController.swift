@@ -728,6 +728,44 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
+
+//    @objc private func nextButtonTapped() {
+//        guard currentIndex < images.count else {
+//            print("잘못된 인덱스입니다.")
+//            return
+//        }
+//
+//        // 서브 카테고리 선택 확인
+//        guard !selectedSubCategories.isEmpty else {
+//            print("최소 하나의 서브 카테고리를 선택해야 합니다.")
+//            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+//            present(alert, animated: true, completion: nil)
+//            return
+//        }
+//
+//        // 현재 이미지와 텍스트 가져오기
+//        let currentImage = images[currentIndex]
+//        let currentText = textView.text ?? ""
+//
+//
+//        // 이미지 저장
+//        guard let imagePath = DataManager.shared.saveImage(currentImage) else {
+//            print("이미지 저장 실패")
+//            return
+//        }
+//
+//        // PhotoData 생성
+//        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedSubCategories.joined(separator: ", "))
+//
+//        // 저장
+//        DataManager.shared.addNewData(photoData: [photoData])
+//
+//        // `SavedPhotosViewController`로 이동
+//        let savedPhotosVC = SavedPhotosViewController()
+//        savedPhotosVC.modalPresentationStyle = .fullScreen
+//        present(savedPhotosVC, animated: true)
+//    }
     
     @objc private func nextButtonTapped() {
         guard let recordUUID = UUID(uuidString: recordID) else {
