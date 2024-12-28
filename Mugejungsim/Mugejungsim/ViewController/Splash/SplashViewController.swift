@@ -36,12 +36,11 @@ class SplashViewController: UIViewController {
 //            let mainVC = NameViewController()
 //            let mainVC = StoryEditorViewController()
 //            let mainVC = SaveAndEditViewController()
-//            let mainVC = DetailedPhotoViewController()
 //            let mainVC = StopWritingViewController()
 //            let mainVC = CheckObjeImageViewController()
-//            let mainVC = DetailedPhotoViewController()
 //            let mainVC = DraftViewController()
 //            let mainVC = USDZPreviewViewController()
+//            let mainVC = PhotoDetailViewController()
 
 
             mainVC.modalTransitionStyle = .crossDissolve
