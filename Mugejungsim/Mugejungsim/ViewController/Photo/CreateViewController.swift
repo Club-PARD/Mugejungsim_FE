@@ -610,7 +610,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         print("종료일자: \(endDate)")
         print("장소: \(location)")
         
-        
         let newRecord = TravelRecord(
             title: travelTitle,
             description: "\(companion) | \(startDate) ~ \(endDate)",
