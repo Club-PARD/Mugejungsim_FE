@@ -24,7 +24,7 @@ class SplashViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
 //            let mainVC = OBViewController1()
 //            let mainVC = MainViewController()
-            let mainVC = LoginViewController()
+//            let mainVC = LoginViewController()
 //            let mainVC = ObjeCreationViewController()
 //            let mainVC = LoadingViewController()
 //            let mainVC = ResultViewController()
@@ -42,6 +42,7 @@ class SplashViewController: UIViewController {
 //            let mainVC = DetailedPhotoViewController()
 //            let mainVC = DraftViewController()
 //            let mainVC = USDZPreviewViewController()
+            let mainVC = ShareViewController()
 
 
             mainVC.modalTransitionStyle = .crossDissolve
