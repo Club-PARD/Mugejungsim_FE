@@ -7,6 +7,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     var images: [UIImage] = [] // 선택된 이미지 배열
     var texts: [String] = []   // 각 이미지에 대응하는 텍스트 배열
     var categories: [[String]] = [] // 각 이미지에 대응하는 카테고리 배열
+    var selectedCategoriesForImages: [[String]] = [] // 각 사진에 대응하는 카테고리
     private var mainImageView: UIImageView!
     private var thumbnailCollectionView: UICollectionView!
     private var textView: UITextView!
@@ -27,8 +28,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
     
     var recordID : String = ""
-    
-//    private let scrollView = UIScrollView()
 
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
@@ -161,6 +160,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private func addSelectedImages(_ newImages: [UIImage]) {
         images.append(contentsOf: newImages)
         texts.append(contentsOf: Array(repeating: "", count: newImages.count))
+        selectedCategoriesForImages.append(contentsOf: Array(repeating: [], count: newImages.count)) // 각 이미지별 카테고리 초기화
         updateImageCountLabels()
         thumbnailCollectionView.reloadData()
     }
@@ -189,7 +189,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         // ScrollView와 ContentView의 제약 조건
         NSLayoutConstraint.activate([
             // ScrollView 제약 조건
-            scrollView.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor, constant: 15),
+            scrollView.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -238,7 +238,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -45),
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            navBar.heightAnchor.constraint(equalToConstant: 85),
+            navBar.heightAnchor.constraint(equalToConstant: 95),
 
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor, constant: 25),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
@@ -304,15 +304,15 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         mainImageView = UIImageView()
         mainImageView.contentMode = .scaleAspectFit
         mainImageView.backgroundColor = .white
-        mainImageView.layer.borderWidth = 0
-        mainImageView.layer.borderColor = UIColor.white.cgColor
+        mainImageView.layer.borderWidth = 1
+        mainImageView.layer.borderColor = UIColor.black.cgColor
         mainImageView.translatesAutoresizingMaskIntoConstraints = false
         mainImageView.image = images.first ?? UIImage()
         view.addSubview(mainImageView)
 
         NSLayoutConstraint.activate([
             mainImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            mainImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            mainImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
             mainImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             mainImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             mainImageView.heightAnchor.constraint(equalToConstant: 263)
@@ -338,7 +338,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         thumbnailCollectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: "ThumbnailCell")
         thumbnailCollectionView.backgroundColor = .white
         containerView.addSubview(thumbnailCollectionView)
-
         containerView.addSubview(addButton)
 
         NSLayoutConstraint.activate([
@@ -415,7 +414,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.setTitle(title, for: .normal)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
             button.setTitleColor(.black, for: .normal)
-            button.backgroundColor = UIColor.systemGray4
+            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
             button.layer.cornerRadius = 18.5
             button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
@@ -521,12 +520,23 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // 현재 선택한 이미지를 갱신
+//        // 현재 선택한 이미지를 갱신
+//        texts[currentIndex] = textView.text // 이전 이미지의 텍스트 저장
+//        currentIndex = indexPath.item // 선택한 이미지의 인덱스
+//        mainImageView.image = images[currentIndex] // 이미지 변경
+//        textView.text = texts[currentIndex] // 텍스트 변경
+//        updateImageCountLabels() // 이미지 카운트 레이블 갱신
+        
+        // 현재 선택한 이미지로 갱신
         texts[currentIndex] = textView.text // 이전 이미지의 텍스트 저장
-        currentIndex = indexPath.item // 선택한 이미지의 인덱스
+        selectedCategoriesForImages[currentIndex] = selectedSubCategories // 이전 이미지의 카테고리 저장
+            
+        currentIndex = indexPath.item // 선택한 이미지 인덱스로 변경
         mainImageView.image = images[currentIndex] // 이미지 변경
         textView.text = texts[currentIndex] // 텍스트 변경
-        updateImageCountLabels() // 이미지 카운트 레이블 갱신
+        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 카테고리 갱신
+        updateCategoryButtonsAppearance() // 버튼 상태 업데이트
+        updateImageCountLabels() // 이미지 카운트 갱신
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -631,6 +641,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
+<<<<<<< HEAD
         if let previousButton = selectedButton {
                 previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
                 previousButton.setTitleColor(.black, for: .normal)
@@ -645,16 +656,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         
         // 카테고리 버튼 클릭 시 호출
+=======
+>>>>>>> b4cae27 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
         guard let title = sender.titleLabel?.text else { return }
         let mockData = MockData()
 
         // 버튼 타이틀에 따라 인덱스 설정
         switch title {
-            case "문화 · 경험": categoryIndex = 0
-            case "AAAAA": categoryIndex = 1
-            case "BBBBB": categoryIndex = 2
-            case "CCCCC": categoryIndex = 3
-            case "DDDDD": categoryIndex = 4
+        case "문화 · 경험": categoryIndex = 0
+        case "AAAAA": categoryIndex = 1
+        case "BBBBB": categoryIndex = 2
+        case "CCCCC": categoryIndex = 3
+        case "DDDDD": categoryIndex = 4
         default: return
         }
 
@@ -662,6 +675,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             print("데이터 없음")
             return
         }
+        
+        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 현재 이미지에 저장된 선택된 카테고리 불러오기
         setupButtonsAboutCategoryButton()
 
     }
@@ -682,9 +697,22 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             sender.backgroundColor = UIColor(hex: "#6E6EDE") // 선택 색상 적용
         }
 
-        print("현재 선택된 카테고리: \(selectedSubCategories)")
+//        print("현재 선택된 카테고리: \(selectedSubCategories)")
+        // 선택된 카테고리를 현재 이미지에 저장
+        selectedCategoriesForImages[currentIndex] = selectedSubCategories
+        print("현재 이미지의 선택된 카테고리: \(selectedCategoriesForImages[currentIndex])")
     }
 
+    private func updateCategoryButtonsAppearance() {
+        guard let stackView = contentView.subviews.first(where: { $0 is UIStackView }) as? UIStackView else { return }
+
+        for case let button as UIButton in stackView.arrangedSubviews {
+            if let title = button.title(for: .normal) {
+                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
+            }
+        }
+    }
+    
     private func setupNextButton() {
         let button = UIButton(type: .system)
         button.setTitle("다음", for: .normal)
@@ -703,6 +731,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
+<<<<<<< HEAD
 
 //    @objc private func nextButtonTapped() {
 //        guard currentIndex < images.count else {
@@ -741,14 +770,14 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //        savedPhotosVC.modalPresentationStyle = .fullScreen
 //        present(savedPhotosVC, animated: true)
 //    }
+=======
+>>>>>>> b4cae27 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
     
     @objc private func nextButtonTapped() {
-
         guard let recordUUID = UUID(uuidString: recordID) else {
             print("유효하지 않은 Record ID: \(recordID)")
             return
         }
-
 
         // 저장된 데이터가 없을 경우 경고 메시지 출력
         guard !images.isEmpty else {
@@ -758,9 +787,11 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             present(alert, animated: true, completion: nil)
             return
         }
+        // 현재 이미지와 관련된 텍스트와 카테고리 저장
+        texts[currentIndex] = textView.text // 현재 이미지의 텍스트 저장
+        selectedCategoriesForImages[currentIndex] = selectedSubCategories // 현재 이미지의 카테고리 저장
 
         // 카테고리 선택 확인
-
         guard !selectedSubCategories.isEmpty else {
             let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
@@ -770,10 +801,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         for (index, image) in images.enumerated() {
             let text = texts[index]
-            let category = selectedSubCategories.joined(separator: ", ")
+            let category = selectedCategoriesForImages[index].joined(separator: ", ")
 
             let success = TravelRecordManager.shared.addPhoto(
-                to: recordUUID,
+                to: UUID(uuidString: recordID) ?? UUID(),
                 image: image,
                 text: text,
                 category: category
