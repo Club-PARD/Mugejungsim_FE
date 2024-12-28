@@ -3,6 +3,7 @@ import UIKit
 class ResultViewController: UIViewController {
 
     // MARK: - Properties (UI Elements)
+    var recordID: String = ""
 
     let memoryLabel: UILabel = {
         let label = UILabel()

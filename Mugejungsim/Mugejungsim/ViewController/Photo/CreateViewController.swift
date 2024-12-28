@@ -9,14 +9,13 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     var endDateMonth: String?
     var endDateDay: String?
     
+    // Local Flow 위한 변수
     var travelRecordID: String = ""
     var travelTitle: String = ""
     var companion: String = ""
     var startDate: String = ""
     var endDate: String = ""
     var location: String = ""
-    
-    
     
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -576,7 +575,9 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             title: travelTitle,
             description: "\(companion) | \(startDate) ~ \(endDate)",
             date: startDate,
-            location: location
+            location: location,
+            oneLine1: "",
+            oneLine2: ""
         )
         
         // 기록 추가
