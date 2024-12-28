@@ -122,3 +122,6 @@ iOSInjectionProject/
 
 # Exclude URLService.swift for security
 URLService.swift
+
+# Exclude .usdz files
+*.usdz
