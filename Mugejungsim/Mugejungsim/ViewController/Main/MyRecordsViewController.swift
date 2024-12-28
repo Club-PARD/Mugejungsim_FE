@@ -115,8 +115,8 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         return scrollView
     }()
 
-    // 기록 리스트를 표시할 CollectionView
-    let scrollableCollectionView: UICollectionView = {
+    // 여행 기록 리스트를 표시할 CollectionView
+    let scrollableTravelCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 16
         layout.minimumLineSpacing = 16
@@ -126,6 +126,17 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
+    let scrollableObjectCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumInteritemSpacing = 16
+        layout.minimumLineSpacing = 16
+
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .white
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+
     let contextMenu: UIView = {
             let view = UIView()
             view.backgroundColor = .white
@@ -202,6 +213,9 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         let addButton = createMenuButton(title: "여행 추가", iconName: "image-add") // "image-add"는 추가 버튼 아이콘의 파일 이름
         let deleteButton = createMenuButton(title: "여행 삭제", iconName: "trash") // "trash"는 삭제 버튼 아이콘의 시스템 이름
 
+        // 버튼에 액션 추가
+        addButton.addTarget(self, action: #selector(addTripTapped), for: .touchUpInside)
+
         // 구분선 추가
         let divider = UIView()
         divider.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0)
@@ -239,6 +253,14 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         ])
     }
 
+    @objc private func addTripTapped() {
+        // CreateViewController로 이동
+        let createViewController = CreateViewController()
+        createViewController.modalPresentationStyle = .fullScreen // 모달로 띄우는 경우
+        self.present(createViewController, animated: true, completion: nil)
+    }
+
+
     @objc private func toggleContextMenu() {
         UIView.animate(withDuration: 0.3) {
             self.contextMenuContainer.isHidden.toggle()
@@ -255,7 +277,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         segmentedControlContainer.addSubview(segmentedControl)
 
         view.addSubview(scrollView)
-        scrollView.addSubview(scrollableCollectionView)
+        scrollView.addSubview(scrollableTravelCollectionView)
 
         view.addSubview(floatingButton)
         view.addSubview(myPageButton)
@@ -306,12 +328,12 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -80),
 
             // CollectionView
-            scrollableCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            scrollableCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            scrollableCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            scrollableCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            scrollableCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            scrollableCollectionView.heightAnchor.constraint(equalToConstant: 800),
+            scrollableTravelCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            scrollableTravelCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            scrollableTravelCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            scrollableTravelCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            scrollableTravelCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: 800),
 
             // Floating Button
             floatingButton.widthAnchor.constraint(equalToConstant: 60),
@@ -332,24 +354,68 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     }
 
     private func setupCollectionView() {
-        scrollableCollectionView.delegate = self
-        scrollableCollectionView.dataSource = self
-        scrollableCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
+        // 각 CollectionView의 delegate와 dataSource 설정
+        scrollableTravelCollectionView.delegate = self
+        scrollableTravelCollectionView.dataSource = self
+        scrollableTravelCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
+
+        scrollableObjectCollectionView.delegate = self
+        scrollableObjectCollectionView.dataSource = self
+        scrollableObjectCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
     }
 
     @objc private func segmentedControlChanged() {
-        print("Segmented Control Changed")
+        // 선택된 세그먼트 인덱스에 따라 다른 CollectionView 표시
+        switch segmentedControl.selectedSegmentIndex {
+        case 0: // 여행 기록
+            scrollableObjectCollectionView.removeFromSuperview()
+            scrollView.addSubview(scrollableTravelCollectionView)
+            NSLayoutConstraint.activate([
+                scrollableTravelCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+                scrollableTravelCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+                scrollableTravelCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+                scrollableTravelCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+                scrollableTravelCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+                scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: 800)
+            ])
+        case 1: // 오브제
+            scrollableTravelCollectionView.removeFromSuperview()
+            scrollView.addSubview(scrollableObjectCollectionView)
+            NSLayoutConstraint.activate([
+                scrollableObjectCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+                scrollableObjectCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+                scrollableObjectCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+                scrollableObjectCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+                scrollableObjectCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+                scrollableObjectCollectionView.heightAnchor.constraint(equalToConstant: 800)
+            ])
+        default:
+            break
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 12
+        if collectionView == scrollableTravelCollectionView {
+            return 12 // 여행 기록 아이템 개수
+        } else if collectionView == scrollableObjectCollectionView {
+            return 8 // 오브제 아이템 개수
+        }
+        return 0
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
-        let imageName = "image\(indexPath.row + 1)"
-        cell.imageView.image = UIImage(named: imageName)
-        cell.titleLabel.text = "기록 \(indexPath.row + 1)"
+        
+        if collectionView == scrollableTravelCollectionView {
+            let imageName = "image\(indexPath.row + 1)"
+            cell.imageView.image = UIImage(named: imageName)
+            cell.titleLabel.text = "기록 \(indexPath.row + 1)"
+        } else if collectionView == scrollableObjectCollectionView {
+            let imageName = "object\(indexPath.row + 1)"
+            cell.imageView.image = UIImage(named: imageName)
+            cell.titleLabel.text = "오브제 \(indexPath.row + 1)"
+        }
+        
         return cell
     }
 
