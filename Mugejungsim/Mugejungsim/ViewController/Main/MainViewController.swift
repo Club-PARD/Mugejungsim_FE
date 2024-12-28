@@ -10,8 +10,8 @@ class MainViewController: UIViewController {
         // 타이틀 라벨 생성
         let titleLabel: UILabel = {
             let label = UILabel()
-            label.text = "무게중심 님의 \n여행기를 남겨보세요!"
-            label.font = .systemFont(ofSize: 25, weight: .bold)
+            label.text = "무게중심 님의\n여행기를 남겨보세요!"
+            label.font = UIFont.font(.pretendardSemiBold, ofSize: 22.46)
             label.textColor = .black
             label.textAlignment = .center
             label.numberOfLines = 0
@@ -51,18 +51,25 @@ class MainViewController: UIViewController {
             button.setTitleColor(.white, for: .normal)
             button.backgroundColor = UIColor(red: 117/255, green: 115/255, blue: 195/255, alpha: 1) // #7573C3
             button.layer.cornerRadius = 8
-            button.clipsToBounds = true
+            button.clipsToBounds = false // 섀도우를 표시하려면 `clipsToBounds`를 false로 설정
             button.translatesAutoresizingMaskIntoConstraints = false
 
             // 텍스트 스타일 설정
             let attributedText = NSMutableAttributedString(
                 string: "여행 기록 만들기",
                 attributes: [
-                    .font: UIFont(name: "Pretendard-SemiBold", size: 16) ?? UIFont.systemFont(ofSize: 16, weight: .semibold),
+                    .font: UIFont(name: "Pretendard-SemiBold", size: 16) ?? UIFont.font(.pretendardSemiBold, ofSize: 16),
                     .kern: -0.3 // 자간 설정
                 ]
             )
             button.setAttributedTitle(attributedText, for: .normal)
+
+            // Drop shadow 설정
+            button.layer.shadowColor = UIColor.black.cgColor // 섀도우 색상
+            button.layer.shadowOpacity = 0.15 // 섀도우 투명도 (15%)
+            button.layer.shadowOffset = CGSize(width: 1.95, height: 1.95) // X: 1.95, Y: 1.95
+            button.layer.shadowRadius = 2.6 // Blur 값
+
             return button
         }()
         
@@ -78,17 +85,16 @@ class MainViewController: UIViewController {
         NSLayoutConstraint.activate([
             // 타이틀 라벨
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 218),
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             // 이미지 영역
             imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 51),
             imageView.widthAnchor.constraint(equalToConstant: 237),
-            imageView.heightAnchor.constraint(equalToConstant: 237),
+            imageView.heightAnchor.constraint(equalToConstant: 219),
             
             // 버튼
-            button.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 60),
+            button.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -158),
             button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             button.widthAnchor.constraint(equalToConstant: 327),
             button.heightAnchor.constraint(equalToConstant: 50)

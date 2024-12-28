@@ -43,7 +43,7 @@ class ObjeCreationViewController: UIViewController {
         let label = UILabel()
         label.text = "최대 2개까지 선택할 수 있어요. (0 / 2)"
         label.font = UIFont(name: "Pretendard-Medium", size: 12)
-        label.textColor = UIColor(red: 0.459, green: 0.451, blue: 0.765, alpha: 1)
+        label.textColor = #colorLiteral(red: 0.6666666667, green: 0.6666666667, blue: 0.6666666667, alpha: 1)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -94,10 +94,6 @@ class ObjeCreationViewController: UIViewController {
         navBar.backgroundColor = .clear
         navBar.translatesAutoresizingMaskIntoConstraints = false
         
-        let separator = UIView()
-        separator.backgroundColor = .lightGray
-        separator.translatesAutoresizingMaskIntoConstraints = false
-        
         // closeButton -> 취소 확인 모달창으로 이동 필요
         let closeButton = UIButton(type: .system)
         closeButton.setImage(UIImage(named: "X_Button"), for: .normal)
@@ -106,7 +102,6 @@ class ObjeCreationViewController: UIViewController {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(navBar)
-        navBar.addSubview(separator)
         navBar.addSubview(closeButton)
         
         NSLayoutConstraint.activate([
@@ -114,11 +109,6 @@ class ObjeCreationViewController: UIViewController {
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             navBar.heightAnchor.constraint(equalToConstant: 40),
-            
-            separator.bottomAnchor.constraint(equalTo: navBar.bottomAnchor),
-            separator.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 20),
-            separator.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -20),
-            separator.heightAnchor.constraint(equalToConstant: 1),
             
             closeButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             closeButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -20)
@@ -202,7 +192,7 @@ class ObjeCreationViewController: UIViewController {
         button.setTitle(title, for: .normal)
         button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
         button.accessibilityIdentifier = value
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(UIColor(hex: "#555558"), for: .normal)
         button.backgroundColor = .clear
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
@@ -217,18 +207,21 @@ class ObjeCreationViewController: UIViewController {
         guard let value = sender.accessibilityIdentifier else { return }
         
         if selectedItems.contains(value) {
+            // 선택 해제
             selectedItems.removeAll { $0 == value }
             sender.backgroundColor = .white
             sender.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
+            sender.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14) // Regular 폰트로 변경
         } else {
+            // 최대 선택 개수 초과 방지
             guard selectedItems.count < 2 else { return }
             selectedItems.append(value)
             sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             sender.layer.borderColor = UIColor(red: 0.43, green: 0.43, blue: 0.87, alpha: 1).cgColor
+            sender.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14) 
         }
     }
     
-    // MARK: - 오브제 만들기 버튼 관련 함수 : 상태 확인 함수, 버튼 탭 함수
     private func updateCreateButtonState() {
         if selectedItems.count == 2 {
             createButton.isEnabled = true
@@ -256,6 +249,11 @@ class ObjeCreationViewController: UIViewController {
             }
             createButton.backgroundColor = UIColor(hex: "#D9D9D9")
         }
+        // subtitleLabel 텍스트 색상 변경
+        subtitleLabel.textColor = selectedItems.isEmpty
+            ? UIColor(hex: "#AAAAAA") // 아무것도 선택하지 않았을 때
+            : UIColor(hex: "#7573C3") // 선택했을 때
+
         createButton.layer.shadowPath = UIBezierPath(roundedRect: createButton.bounds, cornerRadius: 8).cgPath
         createButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
         createButton.layer.shadowOpacity = 1

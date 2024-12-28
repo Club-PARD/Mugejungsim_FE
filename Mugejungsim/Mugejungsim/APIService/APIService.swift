@@ -1,4 +1,4 @@
-import Foundation
+import Alamofire
 import UIKit
 
 struct User: Codable {
@@ -20,15 +20,15 @@ struct APIResponse: Codable {
 
 class APIService {
     static let shared = APIService()
-    private let networkManager = NetworkManager.shared
     
+    private let networkManager = NetworkManager.shared
     private init() {}
     
     // MARK: - 사용자 목록 조회
     func getUsers(part: String, completion: @escaping (Result<[User], Error>) -> Void) {
         networkManager.request(
             "/user",
-            method: "GET",
+            method: .get,
             parameters: ["part": part],
             completion: completion
         )
@@ -38,7 +38,8 @@ class APIService {
     func createUser(user: User, completion: @escaping (Result<APIResponse, Error>) -> Void) {
         networkManager.request(
             "/user",
-            method: "POST",
+            method: .post,
+            parameters: nil,
             body: user,
             completion: completion
         )
@@ -48,7 +49,8 @@ class APIService {
     func updateUser(id: Int, user: UpdateUserRequest, completion: @escaping (Result<APIResponse, Error>) -> Void) {
         networkManager.request(
             "/user/\(id)",
-            method: "PATCH",
+            method: .patch,
+            parameters: nil,
             body: user,
             completion: completion
         )
@@ -58,7 +60,8 @@ class APIService {
     func deleteUser(id: Int, completion: @escaping (Result<APIResponse, Error>) -> Void) {
         networkManager.request(
             "/user/\(id)",
-            method: "DELETE",
+            method: .delete,
+            parameters: nil,
             completion: completion
         )
     }
@@ -69,19 +72,10 @@ class APIService {
         images: [UIImage],
         completion: @escaping (Result<APIResponse, Error>) -> Void
     ) {
-        let parameters = ["userId": "\(userId)"]
-        
-        // EnumeratedSequence를 명확히 풀어서 사용
-        let imageInfos = images.enumerated().map { (index, image) -> (fieldName: String, image: UIImage, fileName: String) in
-            let fieldName = "image\(index + 1)"
-            let fileName = "image\(index + 1).jpg"
-            return (fieldName: fieldName, image: image, fileName: fileName)
-        }
-        
         networkManager.uploadImages(
             "/user/upload",
-            parameters: parameters,
-            images: imageInfos,
+            parameters: ["userId": "\(userId)"],
+            images: images,
             completion: completion
         )
     }

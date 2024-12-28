@@ -15,8 +15,8 @@ class LoginViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("구글로 시작하기", for: .normal)
         button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.borderColor = UIColor.lightGray.cgColor
+        button.titleLabel?.font = UIFont.medium
+        button.layer.borderColor = #colorLiteral(red: 0.7233663201, green: 0.7233663201, blue: 0.7233663201, alpha: 1)
         button.layer.borderWidth = 1
         button.layer.cornerRadius = 8
         button.backgroundColor = .white
@@ -35,8 +35,8 @@ class LoginViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("카카오로 시작하기", for: .normal)
         button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.borderColor = UIColor.lightGray.cgColor
+        button.titleLabel?.font = UIFont.medium
+        button.layer.borderColor = #colorLiteral(red: 0.7233663201, green: 0.7233663201, blue: 0.7233663201, alpha: 1)
         button.layer.borderWidth = 1
         button.layer.cornerRadius = 8
         button.backgroundColor = .white
@@ -55,11 +55,11 @@ class LoginViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("이메일로 시작하기", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.borderColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
+        button.titleLabel?.font = UIFont.font(.pretendardSemiBold, ofSize: 16)
+        button.layer.borderColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
         button.layer.borderWidth = 1
         button.layer.cornerRadius = 8
-        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
+        button.backgroundColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addShadow() // Shadow 추가
         return button
@@ -164,10 +164,10 @@ class LoginViewController: UIViewController {
 
 extension UIView {
     func addShadow() {
-        self.layer.shadowColor = UIColor.black.cgColor
-        self.layer.shadowOpacity = 0.2
-        self.layer.shadowOffset = CGSize(width: 0, height: 2)
-        self.layer.shadowRadius = 4
+        self.layer.shadowColor = UIColor.black.cgColor // 섀도우 색상
+        self.layer.shadowOpacity = 0.25 // 섀도우 투명도 (25%)
+        self.layer.shadowOffset = CGSize(width: 0.5, height: 0.5) // X: 0.5, Y: 0.5
+        self.layer.shadowRadius = 1 // Blur 값: 1
         self.layer.masksToBounds = false
     }
 }

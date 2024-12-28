@@ -1,10 +1,3 @@
-//
-//  LoadingViewController.swift
-//  Mugejungsim
-//
-//  Created by 도현학 on 12/24/24.
-//
-
 import UIKit
 
 class LoadingViewController: UIViewController {
@@ -14,8 +7,8 @@ class LoadingViewController: UIViewController {
         let label = UILabel()
         label.text = "나만의 오브제를\n만드는 중이에요!"
         label.numberOfLines = 2
-        label.textColor = .black
-        label.font = UIFont(name: "Pretendard-SemiBold", size: 18)
+        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -23,7 +16,7 @@ class LoadingViewController: UIViewController {
     
     // 로딩 중 이미지
     private let loadingImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "moments")) // "snow"는 프로젝트의 이미지 파일 이름
+        let imageView = UIImageView(image: UIImage(named: "moments"))
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -45,15 +38,15 @@ class LoadingViewController: UIViewController {
     
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            // 로딩 이미지 위치
+            // 로딩 라벨 위치 (이미지 위)
+            loadingLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 175),
+            loadingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
             loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
-            loadingImageView.widthAnchor.constraint(equalToConstant: 100),
-            loadingImageView.heightAnchor.constraint(equalToConstant: 100),
-            
-            // 로딩 라벨 위치 (이미지 위)
-            loadingLabel.bottomAnchor.constraint(equalTo: loadingImageView.topAnchor, constant: -80),
-            loadingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            loadingImageView.widthAnchor.constraint(equalToConstant: 175),
+            loadingImageView.heightAnchor.constraint(equalToConstant: 175),
+
         ])
     }
     
