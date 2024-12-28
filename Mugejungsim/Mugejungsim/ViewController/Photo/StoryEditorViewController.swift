@@ -641,23 +641,17 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
-<<<<<<< HEAD
         if let previousButton = selectedButton {
                 previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
                 previousButton.setTitleColor(.black, for: .normal)
             }
-            
-            // 새로 선택된 버튼 색상 변경
-            sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
-            sender.setTitleColor(.white, for: .normal)
-            
-            // 현재 버튼을 선택된 버튼으로 설정
-            selectedButton = sender
+        // 새로 선택된 버튼 색상 변경
+        sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
+        sender.setTitleColor(.white, for: .normal)
+        // 현재 버튼을 선택된 버튼으로 설정
+        selectedButton = sender
 
-        
         // 카테고리 버튼 클릭 시 호출
-=======
->>>>>>> b4cae27 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
         guard let title = sender.titleLabel?.text else { return }
         let mockData = MockData()
 
@@ -731,47 +725,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
-<<<<<<< HEAD
-
-//    @objc private func nextButtonTapped() {
-//        guard currentIndex < images.count else {
-//            print("잘못된 인덱스입니다.")
-//            return
-//        }
-//
-//        // 서브 카테고리 선택 확인
-//        guard !selectedSubCategories.isEmpty else {
-//            print("최소 하나의 서브 카테고리를 선택해야 합니다.")
-//            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-//            present(alert, animated: true, completion: nil)
-//            return
-//        }
-//
-//        // 현재 이미지와 텍스트 가져오기
-//        let currentImage = images[currentIndex]
-//        let currentText = textView.text ?? ""
-//
-//
-//        // 이미지 저장
-//        guard let imagePath = DataManager.shared.saveImage(currentImage) else {
-//            print("이미지 저장 실패")
-//            return
-//        }
-//
-//        // PhotoData 생성
-//        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedSubCategories.joined(separator: ", "))
-//
-//        // 저장
-//        DataManager.shared.addNewData(photoData: [photoData])
-//
-//        // `SavedPhotosViewController`로 이동
-//        let savedPhotosVC = SavedPhotosViewController()
-//        savedPhotosVC.modalPresentationStyle = .fullScreen
-//        present(savedPhotosVC, animated: true)
-//    }
-=======
->>>>>>> b4cae27 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
     
     @objc private func nextButtonTapped() {
         guard let recordUUID = UUID(uuidString: recordID) else {
