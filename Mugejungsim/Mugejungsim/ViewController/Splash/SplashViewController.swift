@@ -30,7 +30,7 @@ class SplashViewController: UIViewController {
 //            let mainVC = ResultViewController()
 //            let mainVC = UploadViewController()
 //            let mainVC = MyRecordsViewController()
-//            let mainVC = CreateViewController()
+            let mainVC = CreateViewController()
 //            let mainVC = SavedPhotosViewController()
 //            let mainVC = EmailViewController()
 //            let mainVC = NameViewController()
@@ -41,7 +41,6 @@ class SplashViewController: UIViewController {
 //            let mainVC = DraftViewController()
 //            let mainVC = USDZPreviewViewController()
 //            let mainVC = ShareViewController()
-
 
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
