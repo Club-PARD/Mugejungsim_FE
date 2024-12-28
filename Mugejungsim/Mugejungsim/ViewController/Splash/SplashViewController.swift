@@ -40,7 +40,7 @@ class SplashViewController: UIViewController {
 //            let mainVC = CheckObjeImageViewController()
 //            let mainVC = DraftViewController()
 //            let mainVC = USDZPreviewViewController()
-//            let mainVC = PhotoDetailViewController()
+            // let mainVC = ShareViewController()
 
 
             mainVC.modalTransitionStyle = .crossDissolve
