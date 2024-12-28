@@ -13,29 +13,11 @@ class SavedPhotoCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
 
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        categoryLabel.font = UIFont.systemFont(ofSize: 12, weight: .bold)
-        categoryLabel.textColor = .darkGray
-        contentView.addSubview(categoryLabel)
-
-        textLabel.translatesAutoresizingMaskIntoConstraints = false
-        textLabel.font = UIFont.systemFont(ofSize: 12)
-        textLabel.textColor = .black
-        contentView.addSubview(textLabel)
-
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             imageView.heightAnchor.constraint(equalTo: contentView.widthAnchor),
-
-            categoryLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 4),
-            categoryLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            categoryLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-
-            textLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 2),
-            textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            textLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])
     }
 
