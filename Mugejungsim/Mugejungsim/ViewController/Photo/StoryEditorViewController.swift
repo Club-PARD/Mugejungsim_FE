@@ -641,19 +641,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
-        if let previousButton = selectedButton {
-                previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
-                previousButton.setTitleColor(.black, for: .normal)
-            }
-            
-            // 새로 선택된 버튼 색상 변경
-            sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
-            sender.setTitleColor(.white, for: .normal)
-            
-            // 현재 버튼을 선택된 버튼으로 설정
-            selectedButton = sender
-
-        
         // 카테고리 버튼 클릭 시 호출
         guard let title = sender.titleLabel?.text else { return }
         let mockData = MockData()
@@ -747,7 +734,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //        // 현재 이미지와 텍스트 가져오기
 //        let currentImage = images[currentIndex]
 //        let currentText = textView.text ?? ""
-//
+//        
 //
 //        // 이미지 저장
 //        guard let imagePath = DataManager.shared.saveImage(currentImage) else {
