@@ -78,18 +78,20 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         saveAndHomeButton.addTarget(self, action: #selector(saveAndHomeButtonTapped), for: .touchUpInside)
         
         setupButtonsConstraints()
-        photoDataList = DataManager.shared.loadData()
+//        photoDataList = DataManager.shared.loadData()
         collectionView.reloadData()
 //        DataManager.shared.resetData() // 데이터 초기화 시키는 함수
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
+//        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
+        loadPhotosForRecord()
         collectionView.reloadData() // 컬렉션 뷰 갱신
         updateImageCountLabel() // 이미지 카운트 업데이트
     }
     
+    // 굳이 필요 없음
     func refreshData() {
         savedData = DataManager.shared.loadData()
         collectionView?.reloadData()
@@ -97,10 +99,10 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         print("SavedPhotosViewController가 리로드되었습니다.")
     }
 
-        private func loadDataAndRefresh() {
-            photoDataList = DataManager.shared.loadData()
-            collectionView.reloadData()
-        }
+    private func loadDataAndRefresh() {
+        photoDataList = DataManager.shared.loadData()
+        collectionView.reloadData()
+    }
 
     
     
@@ -237,6 +239,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         print("Line Button Tapped!")
         // 저장하고 한 줄 넘기기 페이지로 이동
         let OCVC = ObjeCreationViewController() // 이동할 ViewController 인스턴스 생성
+        OCVC.recordID = recordID
         OCVC.modalTransitionStyle = .crossDissolve
         OCVC.modalPresentationStyle = .fullScreen
         self.present(OCVC, animated: true, completion: nil)

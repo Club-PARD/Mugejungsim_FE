@@ -1,7 +1,11 @@
 import UIKit
 import KakaoSDKUser
 
+
 class LoginViewController: UIViewController {
+    
+    var name : String = ""
+    var provider : String = ""
     
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -143,7 +147,20 @@ class LoginViewController: UIViewController {
                 self.showAlert(title: "에러", message: "사용자 정보를 가져오는 데 실패했습니다.")
             } else if let user = user {
                 let nickname = user.kakaoAccount?.profile?.nickname ?? "사용자"
+                self.name = nickname
+                self.provider = "kakao"
                 print("사용자 정보 가져오기 성공: \(nickname)")
+                print("ID: \(user.id ?? 0)")
+                print("닉네임: \(user.kakaoAccount?.profile?.nickname ?? "없음")")
+                print("프로필 이미지 URL: \(user.kakaoAccount?.profile?.profileImageUrl?.absoluteString ?? "없음")")
+                print("이메일: \(user.kakaoAccount?.email ?? "없음")")
+                print("전화번호: \(user.kakaoAccount?.phoneNumber ?? "없음")")
+                print("성별: \(user.kakaoAccount?.gender?.rawValue ?? "없음")")
+                print("연령대: \(user.kakaoAccount?.ageRange?.rawValue ?? "없음")")
+                print("생일: \(user.kakaoAccount?.birthday ?? "없음")")
+                
+                // 서버로 데이터 전송
+                self.sendLoginDataToServer(name: self.name, provider: self.provider)
                 self.navigateToOnboarding(with: nickname)
             }
         }
@@ -159,6 +176,59 @@ class LoginViewController: UIViewController {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)
+    }
+    
+    // 클백 확인용 코드 : Kakao 연결
+    func sendLoginDataToServer(name: String, provider: String) {
+        // 1. 서버 URL 설정
+        guard let url = URL(string: "{BASE_URL}") else { // 서버 URL 변경
+            print("Invalid server URL")
+            return
+        }
+        
+        // 2. 요청 생성
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST" // HTTP 메서드 설정
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type") // 요청 헤더 설정
+
+        // 3. JSON 데이터 구성
+        let parameters: [String: String] = [
+            "name": name,
+            "provider": provider
+        ]
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            request.httpBody = jsonData // HTTP Body에 JSON 데이터 추가
+        } catch {
+            print("Failed to serialize JSON: \(error.localizedDescription)")
+            return
+        }
+        // 4. 네트워크 요청
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            // 에러 처리
+            if let error = error {
+                print("Failed to send login data: \(error.localizedDescription)")
+                return
+            }
+            // HTTP 응답 처리
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    print("Login data sent successfully")
+                } else {
+                    print("Failed to send login data: HTTP \(httpResponse.statusCode)")
+                }
+            }
+            // 응답 데이터 처리
+            if let data = data {
+                do {
+                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                    print("Server Response: \(jsonResponse)")
+                } catch {
+                    print("Failed to parse response: \(error.localizedDescription)")
+                }
+            }
+        }
+        task.resume()
     }
 }
 

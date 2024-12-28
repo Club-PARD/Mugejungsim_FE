@@ -1,6 +1,7 @@
 import UIKit
 
 class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     let myPageButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "person.circle"), for: .normal)
@@ -11,8 +12,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         return button
     }()
     
-    
-    // 상단 제목 카드 뷰
     let titleCardView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
