@@ -6,6 +6,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     // MARK: - Properties
     var images: [UIImage] = [] // 선택된 이미지 배열
     var texts: [String] = []   // 각 이미지에 대응하는 텍스트 배열
+    var categories: [[String]] = [] // 각 이미지에 대응하는 카테고리 배열
     private var mainImageView: UIImageView!
     private var thumbnailCollectionView: UICollectionView!
     private var textView: UITextView!
@@ -21,6 +22,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     // MARK: - 카테고리 관련 Properties
     private var categoryOverlayView: UIView? // Overlay View
     private var selectedSubCategories: [String] = [] // 선택된 세부 카테고리 저장
+    private var selectedCategoriesForCurrentImage: [String] = [] // 현재 이미지에 선택된 카테고리
+
     weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
     
     var recordID : String = ""
@@ -76,6 +79,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     override func viewDidLoad() {
         super.viewDidLoad()
         texts = Array(repeating: "", count: images.count)
+        categories = Array(repeating: [], count: images.count) // 카테고리 초기화
 
         // 내비게이션 바 배경색을 흰색으로 설정
         if let navigationController = self.navigationController {
@@ -512,10 +516,12 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        currentIndex = indexPath.item
-        mainImageView.image = images[currentIndex]
-        textView.text = texts[currentIndex]
-        updateImageCountLabels()
+        // 현재 선택한 이미지를 갱신
+        texts[currentIndex] = textView.text // 이전 이미지의 텍스트 저장
+        currentIndex = indexPath.item // 선택한 이미지의 인덱스
+        mainImageView.image = images[currentIndex] // 이미지 변경
+        textView.text = texts[currentIndex] // 텍스트 변경
+        updateImageCountLabels() // 이미지 카운트 레이블 갱신
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -718,10 +724,23 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //    }
     
     @objc private func nextButtonTapped() {
+
         guard let recordUUID = UUID(uuidString: recordID) else {
             print("유효하지 않은 Record ID: \(recordID)")
             return
         }
+
+
+        // 저장된 데이터가 없을 경우 경고 메시지 출력
+        guard !images.isEmpty else {
+            print("이미지가 없습니다.")
+            let alert = UIAlertController(title: "이미지 없음", message: "최소 한 장의 이미지를 추가해주세요.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return
+        }
+
+        // 카테고리 선택 확인
 
         guard !selectedSubCategories.isEmpty else {
             let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
