@@ -1,7 +1,17 @@
 import UIKit
 
 class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-
+    let myPageButton: UIButton = {
+                let button = UIButton(type: .system)
+                button.setImage(UIImage(systemName: "person.circle"), for: .normal)
+                button.tintColor = .gray
+                button.layer.cornerRadius = 25
+                button.clipsToBounds = true
+                button.translatesAutoresizingMaskIntoConstraints = false
+                return button
+            }()
+    
+    
     // 상단 제목 카드 뷰
     let titleCardView: UIView = {
         let view = UIView()
@@ -27,7 +37,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     let titleLabel: UILabel = {
         let label1 = UILabel()
         label1.text = "무게중심 님의 여행 기록"
-        label1.font = .systemFont(ofSize: 22, weight: .bold)
+        label1.font = UIFont(name: "Pretendard-Bold", size: 22)
         label1.textColor = .black
         label1.numberOfLines = 1
         label1.textAlignment = .center
@@ -60,42 +70,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         return view
     }()
 
-//    let segmentedControl: UISegmentedControl = {
-//        let control = UISegmentedControl(items: ["여행 기록", "오브제"])
-//        control.selectedSegmentIndex = 0
-//        control.backgroundColor = .clear
-//        control.selectedSegmentTintColor = .white
-//        control.layer.cornerRadius = 12
-//        control.clipsToBounds = true // 필수 설정
-//
-//        let normalAttributes: [NSAttributedString.Key: Any] = [
-//            .foregroundColor: UIColor.white,
-//            .font: UIFont.systemFont(ofSize: 14, weight: .medium)
-//        ]
-//
-//        let selectedAttributes: [NSAttributedString.Key: Any] = [
-//            .foregroundColor: UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0),
-//            .font: UIFont.systemFont(ofSize: 14, weight: .bold)
-//        ]
-//
-//        control.setTitleTextAttributes(normalAttributes, for: .normal)
-//        control.setTitleTextAttributes(selectedAttributes, for: .selected)
-//
-//        control.translatesAutoresizingMaskIntoConstraints = false
-//        return control
-//    }()
-//
-    // 마이페이지 버튼
-    let myPageButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "person.circle"), for: .normal)
-        button.tintColor = .gray
-        button.layer.cornerRadius = 25
-        button.clipsToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
     let segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: ["여행 기록", "오브제"])
         control.selectedSegmentIndex = 0
@@ -152,7 +126,18 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
-
+    let contextMenu: UIView = {
+            let view = UIView()
+            view.backgroundColor = .white
+            view.layer.cornerRadius = 12
+            view.layer.shadowColor = UIColor.black.cgColor
+            view.layer.shadowOpacity = 0.25
+            view.layer.shadowOffset = CGSize(width: 0, height: 4)
+            view.layer.shadowRadius = 4
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.isHidden = true // 초기에는 숨김 상태
+            return view
+        }()
     // 우측 하단 핑크 버튼
     let floatingButton: UIButton = {
         let button = UIButton(type: .system)
@@ -165,14 +150,100 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         return button
     }()
 
+    private let contextMenuContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 12
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.25
+        view.layer.shadowOffset = CGSize(width: 0, height: 4)
+        view.layer.shadowRadius = 4
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true // 초기에는 숨김 상태
+        return view
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
         setupActions()
         setupCollectionView()
+        setupContextMenu() // contextMenuContainer를 설정
+    }
+    private func createMenuButton(title: String, iconName: String) -> UIButton {
+        let button = UIButton(type: .system)
+        button.setTitle(" \(title)", for: .normal) // 텍스트와 아이콘 사이 간격을 위한 공백 추가
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 16)
+
+        // 제공한 이미지 파일을 버튼 아이콘으로 설정
+        let iconImage = UIImage(named: iconName) // iconName을 파일 이름으로 사용
+        button.setImage(iconImage, for: .normal)
+
+        button.tintColor = .black // 아이콘 색상 설정
+        button.backgroundColor = .white
+        button.contentHorizontalAlignment = .center // 텍스트와 아이콘을 버튼의 가운데로 정렬
+        button.layer.cornerRadius = 8
+        button.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            button.heightAnchor.constraint(equalToConstant: 44) // 버튼 높이 설정
+        ])
+
+        return button
     }
 
+    private func setupContextMenu() {
+        // 컨텍스트 메뉴 추가
+        view.addSubview(contextMenuContainer)
+
+        // 메뉴 버튼 생성
+        let addButton = createMenuButton(title: "여행 추가", iconName: "image-add") // "image-add"는 추가 버튼 아이콘의 파일 이름
+        let deleteButton = createMenuButton(title: "여행 삭제", iconName: "trash") // "trash"는 삭제 버튼 아이콘의 시스템 이름
+
+        // 구분선 추가
+        let divider = UIView()
+        divider.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0)
+        divider.translatesAutoresizingMaskIntoConstraints = false
+
+        // 컨테이너에 버튼 및 구분선 추가
+        contextMenuContainer.addSubview(addButton)
+        contextMenuContainer.addSubview(divider)
+        contextMenuContainer.addSubview(deleteButton)
+
+        NSLayoutConstraint.activate([
+            // 컨테이너 크기 및 위치
+            contextMenuContainer.widthAnchor.constraint(equalToConstant: 146),
+            contextMenuContainer.heightAnchor.constraint(equalToConstant: 90),
+            contextMenuContainer.trailingAnchor.constraint(equalTo: floatingButton.trailingAnchor),
+            contextMenuContainer.bottomAnchor.constraint(equalTo: floatingButton.topAnchor, constant: -10),
+
+            // 추가 버튼
+            addButton.topAnchor.constraint(equalTo: contextMenuContainer.topAnchor),
+            addButton.leadingAnchor.constraint(equalTo: contextMenuContainer.leadingAnchor),
+            addButton.trailingAnchor.constraint(equalTo: contextMenuContainer.trailingAnchor),
+            addButton.heightAnchor.constraint(equalToConstant: 45),
+
+            // 구분선
+            divider.topAnchor.constraint(equalTo: addButton.bottomAnchor),
+            divider.leadingAnchor.constraint(equalTo: contextMenuContainer.leadingAnchor, constant: 1),
+            divider.trailingAnchor.constraint(equalTo: contextMenuContainer.trailingAnchor, constant: -1),
+            divider.heightAnchor.constraint(equalToConstant: 1),
+
+            // 삭제 버튼
+            deleteButton.topAnchor.constraint(equalTo: divider.bottomAnchor),
+            deleteButton.leadingAnchor.constraint(equalTo: contextMenuContainer.leadingAnchor),
+            deleteButton.trailingAnchor.constraint(equalTo: contextMenuContainer.trailingAnchor),
+            deleteButton.heightAnchor.constraint(equalToConstant: 45)
+        ])
+    }
+
+    @objc private func toggleContextMenu() {
+        UIView.animate(withDuration: 0.3) {
+            self.contextMenuContainer.isHidden.toggle()
+        }
+    }
     private func setupUI() {
         // UI 요소 추가
         view.addSubview(logoImageView)
@@ -246,13 +317,15 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             floatingButton.widthAnchor.constraint(equalToConstant: 60),
             floatingButton.heightAnchor.constraint(equalToConstant: 60),
             floatingButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            floatingButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            floatingButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            
+
         ])
     }
 
     private func setupActions() {
         // 플로팅 버튼 클릭 이벤트 설정
-        floatingButton.addTarget(self, action: #selector(floatingButtonTapped), for: .touchUpInside)
+        floatingButton.addTarget(self, action: #selector(toggleContextMenu), for: .touchUpInside)
 
         // 세그먼트 컨트롤 값 변경 이벤트 설정
         segmentedControl.addTarget(self, action: #selector(segmentedControlChanged), for: .valueChanged)
@@ -263,65 +336,37 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         scrollableCollectionView.dataSource = self
         scrollableCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
     }
-    @objc private func floatingButtonTapped() {
-            let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
-        let addAction = UIAlertAction(title: "페이지 추가", style: .default) { _ in
-            let createViewController = CreateViewController()
-            createViewController.modalPresentationStyle = .fullScreen
-            self.present(createViewController, animated: true, completion: nil)
-        }
-
-            let editAction = UIAlertAction(title: "페이지 편집", style: .default) { _ in
-                print("페이지 편집 선택됨")
-            }
-
-            let deleteAction = UIAlertAction(title: "페이지 삭제", style: .destructive) { _ in
-                print("페이지 삭제 선택됨")
-            }
-
-            let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-
-            alertController.addAction(addAction)
-            alertController.addAction(editAction)
-            alertController.addAction(deleteAction)
-            alertController.addAction(cancelAction)
-
-            present(alertController, animated: true, completion: nil)
-        }
 
     @objc private func segmentedControlChanged() {
         print("Segmented Control Changed")
     }
 
-    // MARK: - UICollectionView DataSource
-    // MARK: - UICollectionView DataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return 12
-        }
-
-        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
-            let imageName = "image\(indexPath.row + 1)"
-            cell.imageView.image = UIImage(named: imageName)
-            cell.titleLabel.text = "기록 \(indexPath.row + 1)"
-            return cell
-        }
-
-        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            let width = (collectionView.frame.width - 48) / 3
-            return CGSize(width: width, height: 150)
-        }
-
-        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-            print("셀 클릭됨: \(indexPath.row)")
-
-            // CollectionPhotosViewController로 화면 전환
-            let collectionPhotosVC = CollectionPhotosViewController()
-            collectionPhotosVC.modalPresentationStyle = .fullScreen
-            present(collectionPhotosVC, animated: true, completion: nil)
-        }
+        return 12
     }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
+        let imageName = "image\(indexPath.row + 1)"
+        cell.imageView.image = UIImage(named: imageName)
+        cell.titleLabel.text = "기록 \(indexPath.row + 1)"
+        return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = (collectionView.frame.width - 48) / 3
+        return CGSize(width: width, height: 150)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("셀 클릭됨: \(indexPath.row)")
+
+        // CollectionPhotosViewController로 화면 전환
+        let collectionPhotosVC = CollectionPhotosViewController()
+        collectionPhotosVC.modalPresentationStyle = .fullScreen
+        present(collectionPhotosVC, animated: true, completion: nil)
+    }
+}
 
 class TravelRecordCell: UICollectionViewCell {
     let imageView: UIImageView = {
