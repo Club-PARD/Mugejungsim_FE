@@ -5,6 +5,7 @@ class PhotoDetailViewController: UIViewController {
     var selectedPhotoData: PhotoData? // 선택한 데이터 저장
     
     private var imageView: UIImageView!
+    private var categoryLabel: UILabel!
     private var descriptionLabel: UILabel!
     
     // 이미지 개수 레이블
@@ -71,6 +72,14 @@ class PhotoDetailViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imageView)
         
+        // 카테고리 레이블 설정
+        categoryLabel = UILabel()
+        categoryLabel.font = UIFont(name: "Pretendard-Bold", size: 16)
+        categoryLabel.textColor = .darkGray
+        categoryLabel.textAlignment = .center
+        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(categoryLabel)
+        
         // 설명 레이블 설정
         descriptionLabel = UILabel()
         descriptionLabel.font = UIFont(name: "Pretendard-Medium", size: 16)
@@ -87,7 +96,11 @@ class PhotoDetailViewController: UIViewController {
             imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             imageView.heightAnchor.constraint(equalToConstant: 300),
             
-            descriptionLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+            categoryLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+            categoryLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            categoryLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            descriptionLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 20),
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
@@ -103,6 +116,9 @@ class PhotoDetailViewController: UIViewController {
             print("이미지를 로드할 수 없습니다: \(photoData.imagePath)")
         }
         
+        // 카테고리 설정
+        categoryLabel.text = "카테고리: \(photoData.category)"
+        
         // 텍스트 설정
         descriptionLabel.text = photoData.text
         
@@ -114,7 +130,7 @@ class PhotoDetailViewController: UIViewController {
         if let index = DataManager.shared.loadData().firstIndex(where: { $0.imagePath == selectedPhotoData?.imagePath }) {
             let currentIndex = index + 1 // 배열은 0부터 시작하므로 +1
             let totalCount = DataManager.shared.loadData().count
-            imageCountLabel.text = "\(currentIndex) / 25"
+            imageCountLabel.text = "\(currentIndex) / \(totalCount)"
         }
     }
     
