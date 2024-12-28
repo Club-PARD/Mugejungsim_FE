@@ -17,8 +17,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private var doneToolbar: UIToolbar!
     private var categoryIndex: Int? = 0
     private var categoryNumber : String = ""
+    private var selectedSubCategory: String? // 선택된 서브 카테고리 저장
     // MARK: - 카테고리 관련 Properties
     private var categoryOverlayView: UIView? // Overlay View
+    private var selectedSubCategories: [String] = [] // 선택된 세부 카테고리 저장
     weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
     
 
@@ -382,21 +384,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     
     
     private func setupButtonsAboutCategoryButton() {
-        // 문자열 배열 정의
         guard let categoryIndex = self.categoryIndex,
-            let buttonTitles = MockData.shared.rows[categoryIndex] else {
+              let buttonTitles = MockData.shared.rows[categoryIndex] else {
             print("유효하지 않은 카테고리 인덱스입니다.")
             return
         }
 
-            // StackView가 이미 존재하면 기존 버튼을 제거
+        // StackView가 이미 존재하면 기존 버튼을 제거
         if let existingStackView = contentView.subviews.first(where: { $0 is UIStackView }) as? UIStackView {
             existingStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
             existingStackView.removeFromSuperview()
         }
-//        // 첫 10개의 문자열 가져오기
-//        let selectedTitles = buttonTitles.prefix(10)
-            
+
         // StackView 생성
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -406,28 +405,23 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         stackView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(stackView)
 
-        // 선택된 문자열로 버튼 생성
-        for (index, title) in buttonTitles.prefix(10).enumerated() {
+        // 서브 카테고리 버튼 생성
+        for title in buttonTitles {
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
             button.setTitleColor(.black, for: .normal)
             button.backgroundColor = UIColor.systemGray4
             button.layer.cornerRadius = 18.5
-            button.tag = index // 버튼 인덱스를 태그로 저장
-            button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
-
-            // 버튼 높이 설정
-            NSLayoutConstraint.activate([
-                button.heightAnchor.constraint(equalToConstant: 40),
-                button.widthAnchor.constraint(equalToConstant: 100)
-            ])
         }
 
+        // 서브 카테고리 버튼을 기존 categoryContainer 아래에 배치
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 110),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            stackView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 90),
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
         ])
     }
 
@@ -646,9 +640,24 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         setupButtonsAboutCategoryButton()
 
     }
+    
     @objc private func categoryItemSelected(_ sender: UIButton) {
         guard let title = sender.title(for: .normal) else { return }
-        print("선택된 아이템: \(title)")
+
+        if selectedSubCategories.contains(title) {
+            // 이미 선택된 카테고리를 다시 누르면 해제
+            selectedSubCategories.removeAll { $0 == title }
+            sender.backgroundColor = UIColor.systemGray4 // 원래 색상으로 복구
+        } else {
+            guard selectedSubCategories.count < 3 else {
+                print("최대 3개의 카테고리만 선택할 수 있습니다.")
+                return
+            }
+            selectedSubCategories.append(title) // 새로운 카테고리 추가
+            sender.backgroundColor = UIColor(hex: "#6E6EDE") // 선택 색상 적용
+        }
+
+        print("현재 선택된 카테고리: \(selectedSubCategories)")
     }
 
     private func setupNextButton() {
@@ -676,15 +685,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             return
         }
 
-        guard let categoryIndex = categoryIndex,
-              let selectedCategory = MockData.shared.rows[categoryIndex]?.first else {
-            print("카테고리가 선택되지 않았습니다.")
+        // 서브 카테고리 선택 확인
+        guard !selectedSubCategories.isEmpty else {
+            print("최소 하나의 서브 카테고리를 선택해야 합니다.")
+            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
             return
         }
 
         // 현재 이미지와 텍스트 가져오기
         let currentImage = images[currentIndex]
-        let currentText = texts[currentIndex]
+        let currentText = textView.text ?? ""
 
         // 이미지 저장
         guard let imagePath = DataManager.shared.saveImage(currentImage) else {
@@ -693,7 +705,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         }
 
         // PhotoData 생성
-        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedCategory)
+        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedSubCategories.joined(separator: ", "))
 
         // 저장
         DataManager.shared.addNewData(photoData: [photoData])

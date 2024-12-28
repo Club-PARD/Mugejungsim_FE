@@ -5,6 +5,7 @@ class DataManager {
     private let fileManager = FileManager.default
     private let documentsDirectory: URL
     private let dataFile: URL
+    private var photoDataList: [PhotoData] = []
 
     private init() {
         documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -52,14 +53,34 @@ class DataManager {
         }
     }
 
-    // MARK: - 이미지 삭제
-    func deleteImage(at imagePath: String) {
-        let fileURL = documentsDirectory.appendingPathComponent(imagePath)
-        do {
-            try fileManager.removeItem(at: fileURL)
-            print("이미지 삭제 완료: \(imagePath)")
-        } catch {
-            print("이미지 삭제 실패: \(error.localizedDescription)")
+//    // MARK: - 이미지 삭제
+//    func deleteImage(at imagePath: String) {
+//        let fileURL = documentsDirectory.appendingPathComponent(imagePath)
+//        do {
+//            try fileManager.removeItem(at: fileURL)
+//            print("이미지 삭제 완료: \(imagePath)")
+//        } catch {
+//            print("이미지 삭제 실패: \(error.localizedDescription)")
+//        }
+//    }
+    
+    func addData(_ data: PhotoData) {
+            photoDataList.append(data)
         }
+    
+    func deleteData(photoData: PhotoData) {
+            photoDataList.removeAll { $0.imagePath == photoData.imagePath }
+            print("\(photoData.imagePath)가 삭제되었습니다.")
+        }
+    
+    // 전체 데이터 업데이트 (필요시)
+    func updateDataList(_ dataList: [PhotoData]) {
+        photoDataList = dataList
     }
+    
+//    // MARK: - 데이터 초기화
+//        func resetData() {
+//            saveData(photoData: []) // 빈 배열 저장
+//            print("저장된 데이터가 초기화되었습니다.")
+//        }
 }
