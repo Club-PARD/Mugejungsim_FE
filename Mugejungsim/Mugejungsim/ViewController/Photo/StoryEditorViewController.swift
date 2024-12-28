@@ -672,6 +672,19 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
     @objc private func nextButtonTapped() {
         print("Next button tapped")
+        
+        let savedPhotosViewController = SavedPhotosViewController()
+        savedPhotosViewController.modalPresentationStyle = .fullScreen
+        
+        // savedPhotosViewController에 데이터를 전달
+        savedPhotosViewController.savedData = DataManager.shared.loadData() // 예시 데이터 전달
+        
+        // navigationController가 있는 경우 push, 없을 경우 present
+        if let navigationController = self.navigationController {
+            navigationController.pushViewController(savedPhotosViewController, animated: true)
+        } else {
+            self.present(savedPhotosViewController, animated: true, completion: nil)
+        }
     }
 }
 
