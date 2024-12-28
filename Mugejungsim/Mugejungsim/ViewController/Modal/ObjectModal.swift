@@ -9,7 +9,9 @@ class ObjectModalViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    
 
+    
     private let containerView: UIView = { // 모달 창 컨테이너
         let view = UIView()
         view.backgroundColor = .white
@@ -86,13 +88,25 @@ class ObjectModalViewController: UIViewController {
 
     // MARK: - UI Setup
 
+//    private func setupUI() {
+//        view.addSubview(overlayView)
+//        view.addSubview(containerView)
+//        
+//        containerView.addSubview(scrollView)
+//        scrollView.addSubview(contentView)
+//        
+//        contentView.addSubview(closeButton)
+//        contentView.addSubview(titleLabel)
+//        contentView.addSubview(descriptionLabel)
+//        contentView.addSubview(bottleImageView)
+//        contentView.addSubview(contentImageView)
+//    }
+    // overlayView 제거
     private func setupUI() {
         view.addSubview(overlayView)
         view.addSubview(containerView)
-        
         containerView.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        
         contentView.addSubview(closeButton)
         contentView.addSubview(titleLabel)
         contentView.addSubview(descriptionLabel)
@@ -101,6 +115,7 @@ class ObjectModalViewController: UIViewController {
     }
 
     // MARK: - Constraints
+    
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
@@ -161,6 +176,6 @@ class ObjectModalViewController: UIViewController {
     // MARK: - Actions
 
     @objc private func closeButtonTapped() {
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil) // 모달을 닫는 애니메이션 (기본 제공)
     }
 }
