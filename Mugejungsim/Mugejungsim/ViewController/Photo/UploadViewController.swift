@@ -7,6 +7,7 @@ protocol UploadViewControllerDelegate: AnyObject {
 
 class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UploadViewControllerDelegate {
     weak var delegate: UploadViewControllerDelegate?
+    var recordID: String = ""
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -243,6 +244,7 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
 
     private func navigateToStoryEditor(with images: [UIImage]) {
         let storyEditorVC = StoryEditorViewController()
+        storyEditorVC.recordID = self.recordID //
         storyEditorVC.images = images
         storyEditorVC.delegate = self // delegate 설정
         storyEditorVC.modalPresentationStyle = .fullScreen

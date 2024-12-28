@@ -26,7 +26,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
     weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
     
-
+    var recordID : String = ""
     
 //    private let scrollView = UIScrollView()
 
@@ -685,7 +685,52 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         ])
     }
 
+//    @objc private func nextButtonTapped() {
+//        guard currentIndex < images.count else {
+//            print("잘못된 인덱스입니다.")
+//            return
+//        }
+//
+//        // 서브 카테고리 선택 확인
+//        guard !selectedSubCategories.isEmpty else {
+//            print("최소 하나의 서브 카테고리를 선택해야 합니다.")
+//            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+//            present(alert, animated: true, completion: nil)
+//            return
+//        }
+//
+//        // 현재 이미지와 텍스트 가져오기
+//        let currentImage = images[currentIndex]
+//        let currentText = textView.text ?? ""
+//        
+//
+//        // 이미지 저장
+//        guard let imagePath = DataManager.shared.saveImage(currentImage) else {
+//            print("이미지 저장 실패")
+//            return
+//        }
+//
+//        // PhotoData 생성
+//        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedSubCategories.joined(separator: ", "))
+//
+//        // 저장
+//        DataManager.shared.addNewData(photoData: [photoData])
+//
+//        // `SavedPhotosViewController`로 이동
+//        let savedPhotosVC = SavedPhotosViewController()
+//        savedPhotosVC.modalPresentationStyle = .fullScreen
+//        present(savedPhotosVC, animated: true)
+//    }
+    
     @objc private func nextButtonTapped() {
+
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 Record ID: \(recordID)")
+            return
+        }
+
+
         // 저장된 데이터가 없을 경우 경고 메시지 출력
         guard !images.isEmpty else {
             print("이미지가 없습니다.")
@@ -696,40 +741,51 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         }
 
         // 카테고리 선택 확인
+
         guard !selectedSubCategories.isEmpty else {
-            print("최소 하나의 서브 카테고리를 선택해야 합니다.")
             let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
             return
         }
 
-        // 현재 텍스트를 저장
-        texts[currentIndex] = textView.text
-
-        // 모든 이미지와 데이터를 저장
         for (index, image) in images.enumerated() {
-            let text = texts[index] // 각 이미지의 텍스트
-            let categories = selectedSubCategories.joined(separator: ", ") // 선택된 카테고리
+            let text = texts[index]
+            let category = selectedSubCategories.joined(separator: ", ")
 
-            // 이미지 저장
-            guard let imagePath = DataManager.shared.saveImage(image) else {
-                print("이미지 저장 실패: \(image)")
-                continue
+            let success = TravelRecordManager.shared.addPhoto(
+                to: recordUUID,
+                image: image,
+                text: text,
+                category: category
+            )
+
+            if success {
+                print("사진 \(index + 1) 추가 성공")
+            } else {
+                print("사진 \(index + 1) 추가 실패")
             }
-
-            // PhotoData 생성
-            let photoData = PhotoData(imagePath: imagePath, text: text, category: categories)
-
-            // 데이터 저장
-            DataManager.shared.addNewData(photoData: [photoData])
-            print("이미지 저장 완료: \(imagePath)")
         }
 
-        print("모든 이미지 데이터가 저장되었습니다.")
-
-        // `SavedPhotosViewController`로 이동
+        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            print("해당 Record ID (\(recordUUID))의 데이터:")
+            print("Title: \(record.title)")
+            print("Description: \(record.description)")
+            print("Date: \(record.date)")
+            print("Location: \(record.location)")
+            print("Photos:")
+            for (index, photo) in record.photos.enumerated() {
+                print("Photo \(index + 1):")
+                print("    Image Path: \(photo.imagePath)")
+                print("    Text: \(photo.text)")
+                print("    Category: \(photo.category)")
+            }
+        } else {
+            print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
+        }
+        
         let savedPhotosVC = SavedPhotosViewController()
+        savedPhotosVC.recordID = recordID
         savedPhotosVC.modalPresentationStyle = .fullScreen
         present(savedPhotosVC, animated: true)
     }

@@ -4,11 +4,10 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     
     var savedData: [PhotoData] = []
     var collectionView: UICollectionView!
+    var recordID : String = ""
     
     private var photoDataList: [PhotoData] = []
 
-    
-    
     private var imageCountLabel: UILabel = {
         let label = UILabel()
         label.text = "0 / 25"
@@ -63,7 +62,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         setupCollectionView()
         
         // 데이터 로드
-        savedData = DataManager.shared.loadData()
+//        savedData = DataManager.shared.loadData()
+        loadPhotosForRecord()
         
         // 이미지 개수 레이블 업데이트
         updateImageCountLabel()
@@ -266,4 +266,19 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("MainViewController를 초기화할 수 없습니다. 스토리보드 ID를 확인하세요.")
             }
         }
+    
+    private func loadPhotosForRecord() {
+        guard let uuid = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+
+        if let record = TravelRecordManager.shared.getRecord(by: uuid) {
+            // record.photos 데이터를 savedData에 저장
+            savedData = record.photos
+            print("Loaded \(savedData.count) photos for record ID: \(recordID)")
+        } else {
+            print("recordID (\(recordID))에 해당하는 데이터를 찾을 수 없습니다.")
+        }
+    }
 }

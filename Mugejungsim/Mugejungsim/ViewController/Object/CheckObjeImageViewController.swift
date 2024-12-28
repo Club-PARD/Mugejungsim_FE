@@ -83,6 +83,8 @@ class CheckObjeImageViewController: UIViewController {
     
     @objc func saveButtonTapped() {
         print("성공!")
-        // 페이지 이동 추가
+        let ShareVC = ShareViewController()
+        ShareVC.modalPresentationStyle = .fullScreen
+        self.present(ShareVC, animated: true, completion: nil)
     }
 }

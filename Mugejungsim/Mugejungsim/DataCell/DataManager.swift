@@ -5,11 +5,13 @@ class DataManager {
     private let fileManager = FileManager.default
     private let documentsDirectory: URL
     private let dataFile: URL
+    private let travelDataFile: URL
     private var photoDataList: [PhotoData] = []
 
     private init() {
         documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         dataFile = documentsDirectory.appendingPathComponent("photoData.json")
+        travelDataFile = documentsDirectory.appendingPathComponent("travelRecords.json") // Tr
     }
 
     // MARK: - 데이터 저장
@@ -83,4 +85,20 @@ class DataManager {
 //            saveData(photoData: []) // 빈 배열 저장
 //            print("저장된 데이터가 초기화되었습니다.")
 //        }
+    
+    // MARK: - TravelRecord 저장
+    func saveTravelRecords(_ records: [TravelRecord]) {
+        if let jsonData = try? JSONEncoder().encode(records) {
+            try? jsonData.write(to: travelDataFile)
+        }
+    }
+
+    // MARK: - TravelRecord 불러오기
+    func loadTravelRecords() -> [TravelRecord] {
+        guard let jsonData = try? Data(contentsOf: travelDataFile),
+              let records = try? JSONDecoder().decode([TravelRecord].self, from: jsonData) else {
+            return []
+        }
+        return records
+    }
 }
