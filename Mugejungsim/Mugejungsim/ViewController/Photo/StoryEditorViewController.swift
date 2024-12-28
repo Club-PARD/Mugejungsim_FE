@@ -576,7 +576,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         characterCountLabel.textColor = characterCount > maxCharacterCount ? .systemRed : .systemGray
 //        texts[currentIndex] = textView.text ?? ""  잠시 보류
     }
-    
+    var selectedButton: UIButton?
+
     private func setupCategoryButtons() {
         // ScrollView 생성
         let scrollView = UIScrollView()
@@ -640,6 +641,20 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
+        if let previousButton = selectedButton {
+                previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
+                previousButton.setTitleColor(.black, for: .normal)
+            }
+            
+            // 새로 선택된 버튼 색상 변경
+            sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
+            sender.setTitleColor(.white, for: .normal)
+            
+            // 현재 버튼을 선택된 버튼으로 설정
+            selectedButton = sender
+
+        
+        // 카테고리 버튼 클릭 시 호출
         guard let title = sender.titleLabel?.text else { return }
         let mockData = MockData()
 
