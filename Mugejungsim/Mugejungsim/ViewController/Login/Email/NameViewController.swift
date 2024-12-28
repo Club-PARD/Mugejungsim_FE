@@ -14,7 +14,7 @@ class NameViewController: UIViewController {
         let label = UILabel()
         label.text = "닉네임"
         label.textColor = .gray
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.font(.pretendardRegular, ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -24,7 +24,8 @@ class NameViewController: UIViewController {
         textField.placeholder = "닉네임을 입력하세요."
         textField.backgroundColor = .white
         textField.borderStyle = .none // 기본 테두리를 제거
-        textField.font = UIFont.systemFont(ofSize: 16)
+        textField.addShadow() // Drop shadow 추가
+        textField.font = UIFont.font(.pretendardRegular, ofSize: 16)
         textField.translatesAutoresizingMaskIntoConstraints = false
 
         // 테두리 색상 설정
@@ -44,7 +45,9 @@ class NameViewController: UIViewController {
         textField.leftViewMode = .always
 
         // 텍스트 입력 시 글씨 색상 설정
-        textField.textColor = .black
+        textField.textColor = UIColor(hex: "#242424")
+        // 깜빡거리는 커서 색상 변경
+        textField.tintColor = UIColor(hex: "#6E6EDE") // 커서 색상 설정
 
         return textField
     }()
@@ -53,7 +56,7 @@ class NameViewController: UIViewController {
         let label = UILabel()
         label.text = "0/6" // 초기 값
         label.textColor = #colorLiteral(red: 0.7233663201, green: 0.7233663201, blue: 0.7233663201, alpha: 1)
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.font(.pretendardRegular, ofSize: 16)
         label.textAlignment = .right
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -62,11 +65,11 @@ class NameViewController: UIViewController {
     private let nextButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("시작하기", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = #colorLiteral(red: 0.9309713244, green: 0.9309713244, blue: 0.9309713244, alpha: 1)
-        button.layer.cornerRadius = 4
+        button.setTitleColor(#colorLiteral(red: 0.5411764706, green: 0.5411764706, blue: 0.5411764706, alpha: 1), for: .normal)
+        button.backgroundColor = #colorLiteral(red: 0.9137254902, green: 0.9137254902, blue: 0.9137254902, alpha: 1)
+        button.layer.cornerRadius = 8
         button.addShadow() // Drop shadow 추가
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.titleLabel?.font = UIFont.font(.pretendardSemiBold , ofSize: 16)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -133,13 +136,14 @@ class NameViewController: UIViewController {
             emailTextField.text = String(text.prefix(6))
         }
         
-        // 버튼 스타일 업데이트
-        if charCount > 0 {
-            nextButton.setTitleColor(.white, for: .normal)
-            nextButton.backgroundColor = UIColor(red: 117.0/255.0, green: 115.0/255.0, blue: 195.0/255.0, alpha: 1.0) // #7573C3
+        // 텍스트가 있는 경우 버튼 스타일 변경
+        if let text = emailTextField.text, !text.isEmpty {
+            nextButton.setTitleColor(UIColor(hex: "#FFFFFF"), for: .normal)
+            nextButton.backgroundColor = UIColor(hex: "#7573C3")
         } else {
-            nextButton.setTitleColor(.black, for: .normal)
-            nextButton.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
+            // 텍스트가 비어 있는 경우 버튼 기본 스타일로 복원
+            nextButton.setTitleColor(UIColor(hex: "#8A8A8A"), for: .normal)
+            nextButton.backgroundColor = UIColor(hex: "#E9E9E9")
         }
     }
     
@@ -152,7 +156,6 @@ class NameViewController: UIViewController {
     // MARK: - Actions
     @objc private func nextButtonTapped() {
         guard let nickname = emailTextField.text, !nickname.isEmpty else {
-            showAlert(title: "알림", message: "닉네임을 입력하세요.")
             return
         }
         print("입력된 닉네임: \(nickname)")

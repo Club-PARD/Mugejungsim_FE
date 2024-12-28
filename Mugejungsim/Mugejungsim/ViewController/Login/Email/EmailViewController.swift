@@ -14,7 +14,7 @@ class EmailViewController: UIViewController {
         let label = UILabel()
         label.text = "이메일"
         label.textColor = .gray
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.font(.pretendardRegular, ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -24,7 +24,8 @@ class EmailViewController: UIViewController {
         textField.placeholder = "이메일을 입력하세요."
         textField.backgroundColor = .white
         textField.borderStyle = .none // 기본 테두리를 제거
-        textField.font = UIFont.systemFont(ofSize: 16)
+        textField.font = UIFont.font(.pretendardRegular , ofSize: 16)
+        textField.addShadow() // Drop shadow 추가
         textField.translatesAutoresizingMaskIntoConstraints = false
 
         // 테두리 색상 설정
@@ -44,7 +45,9 @@ class EmailViewController: UIViewController {
         textField.leftViewMode = .always
 
         // 텍스트 입력 시 글씨 색상 설정
-        textField.textColor = .black
+        textField.textColor = UIColor(hex: "#242424")
+        // 깜빡거리는 커서 색상 변경
+        textField.tintColor = UIColor(hex: "#6E6EDE") // 커서 색상 설정
 
         return textField
     }()
@@ -52,11 +55,11 @@ class EmailViewController: UIViewController {
     private let nextButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("다음", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = #colorLiteral(red: 0.9309713244, green: 0.9309713244, blue: 0.9309713244, alpha: 1)
-        button.layer.cornerRadius = 4
+        button.setTitleColor(#colorLiteral(red: 0.5411764706, green: 0.5411764706, blue: 0.5411764706, alpha: 1), for: .normal)
+        button.backgroundColor = #colorLiteral(red: 0.9137254902, green: 0.9137254902, blue: 0.9137254902, alpha: 1)
+        button.layer.cornerRadius = 8
         button.addShadow() // Drop shadow 추가
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.titleLabel?.font = UIFont.font(.pretendardSemiBold , ofSize: 16)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -106,19 +109,18 @@ class EmailViewController: UIViewController {
     @objc private func textFieldDidChange() {
         // 텍스트가 있는 경우 버튼 스타일 변경
         if let text = emailTextField.text, !text.isEmpty {
-            nextButton.setTitleColor(.white, for: .normal)
-            nextButton.backgroundColor = UIColor(red: 117.0/255.0, green: 115.0/255.0, blue: 195.0/255.0, alpha: 1.0) // #7573C3
+            nextButton.setTitleColor(UIColor(hex: "#FFFFFF"), for: .normal)
+            nextButton.backgroundColor = UIColor(hex: "#7573C3")
         } else {
             // 텍스트가 비어 있는 경우 버튼 기본 스타일로 복원
-            nextButton.setTitleColor(.black, for: .normal)
-            nextButton.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
+            nextButton.setTitleColor(UIColor(hex: "#8A8A8A"), for: .normal)
+            nextButton.backgroundColor = UIColor(hex: "#E9E9E9")
         }
     }
     
     // MARK: - Actions
     @objc private func nextButtonTapped() {
         guard let email = emailTextField.text, !email.isEmpty else {
-            showAlert(title: "알림", message: "이메일을 입력하세요.")
             return
         }
         print("입력된 이메일: \(email)")

@@ -16,6 +16,14 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private let maxCharacterCount = 100
     private var doneToolbar: UIToolbar!
     private var categoryIndex: Int? = 0
+    private var categoryNumber : String = ""
+    // MARK: - 카테고리 관련 Properties
+    private var categoryOverlayView: UIView? // Overlay View
+    weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
+    
+
+    
+//    private let scrollView = UIScrollView()
 
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
@@ -237,6 +245,12 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         ])
         navBar.layer.zPosition = 100
     }
+    
+    @objc private func goBack() {
+            delegate?.didTapBackButton() // 이전 화면의 동작 실행
+            dismiss(animated: true, completion: nil)
+            navigationController?.popViewController(animated: true)
+        }
     
     private func setupToolbar() {
         doneToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 44))
@@ -495,10 +509,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         }
     }
 
-    @objc private func goBack() {
-        navigationController?.popViewController(animated: true)
-    }
-
     @objc private func saveTemporarily() {
         print("임시 저장 버튼 클릭")
     }
@@ -661,7 +671,37 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func nextButtonTapped() {
-        print("Next button tapped")
+        guard currentIndex < images.count else {
+            print("잘못된 인덱스입니다.")
+            return
+        }
+
+        guard let categoryIndex = categoryIndex,
+              let selectedCategory = MockData.shared.rows[categoryIndex]?.first else {
+            print("카테고리가 선택되지 않았습니다.")
+            return
+        }
+
+        // 현재 이미지와 텍스트 가져오기
+        let currentImage = images[currentIndex]
+        let currentText = texts[currentIndex]
+
+        // 이미지 저장
+        guard let imagePath = DataManager.shared.saveImage(currentImage) else {
+            print("이미지 저장 실패")
+            return
+        }
+
+        // PhotoData 생성
+        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedCategory)
+
+        // 저장
+        DataManager.shared.addNewData(photoData: [photoData])
+
+        // `SavedPhotosViewController`로 이동
+        let savedPhotosVC = SavedPhotosViewController()
+        savedPhotosVC.modalPresentationStyle = .fullScreen
+        present(savedPhotosVC, animated: true)
     }
 }
 
