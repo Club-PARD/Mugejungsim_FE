@@ -5,22 +5,31 @@
 //  Created by 도현학 on 12/28/24.
 //
 
+/*
+ * App 전체적인 기능 Flow 점검 위한 코드
+ *
+ */
+
 import UIKit
 
 struct TravelRecord: Codable {
-    var id: UUID
-    var title: String
-    var description: String
-    var date: String
-    var location: String
+    var id: UUID                // 기록물 id
+    var title: String           // 기록물 제목 : 여행 제목
+    var description: String     //
+    var date: String            // 여행 날짜
+    var location: String        // 여행지
+    var oneLine1: String        //
+    var oneLine2: String        //
     var photos: [PhotoData] // `PhotoData` 사용
 
-    init(title: String, description: String, date: String, location: String, photos: [PhotoData] = []) {
+    init(title: String, description: String, date: String, location: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
         self.id = UUID()
         self.title = title
         self.description = description
         self.date = date
         self.location = location
+        self.oneLine1 = oneLine1
+        self.oneLine2 = oneLine2
         self.photos = photos
     }
 }

@@ -9,6 +9,8 @@ import UIKit
 
 class ObjeCreationViewController: UIViewController {
     
+    var recordID : String = ""
+    
     private let items: [(value: String, title: String)] = [
         ("value1", "🥰 설레는 여행이었어요"),
         ("value2", "🫧 잊지 못할 여행이었어요"),
@@ -116,6 +118,12 @@ class ObjeCreationViewController: UIViewController {
     }
     
     @objc private func didTapCloseButton() {
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+        
+        
         let stopSelectingVC = StopSelectingViewController()
         stopSelectingVC.modalTransitionStyle = .crossDissolve
         stopSelectingVC.modalPresentationStyle = .overFullScreen
@@ -264,14 +272,43 @@ class ObjeCreationViewController: UIViewController {
     
     @objc private func didTapCreateButton() {
         print("선택된 값: \(selectedItems)")
-        goToNextPage()
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+
+        // TravelRecordManager에서 기록을 가져오기
+        if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            record.oneLine1 = selectedItems[0]
+            record.oneLine2 = selectedItems[1]
+            TravelRecordManager.shared.addRecord(record) // 기존 레코드를 대체하는 방식
+            print("Record \(recordUUID) 업데이트 완료:")
+            print("Title: \(record.title)")
+            print("Description: \(record.description)")
+            print("Date: \(record.date)")
+            print("Location: \(record.location)")
+            print("oneLine1: \(record.oneLine1)")
+            print("oneLine2: \(record.oneLine2)")
+            print("Photos: \(record.photos.count)장")
+            for (index, photo) in record.photos.enumerated() {
+                print("  Photo \(index + 1):")
+                print("    Image Path: \(photo.imagePath)")
+                print("    Text: \(photo.text)")
+                print("    Category: \(photo.category)")
+            }
+            goToNextPage()
+        } else {
+            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+        }
     }
     
     private func goToNextPage() {
-        let resultVC = LoadingViewController() // 이동할 ViewController 인스턴스 생성
-        resultVC.modalTransitionStyle = .crossDissolve // 화면 전환 스타일 설정 (페이드 효과)
-        resultVC.modalPresentationStyle = .fullScreen
-        self.present(resultVC, animated: true, completion: nil)
-        print("ResultVC로 이동 성공")
+        let loadingVC = LoadingViewController() // 이동할 ViewController 인스턴스 생성
+        loadingVC.recordID = recordID
+        print("recordID: \(recordID)")
+        loadingVC.modalTransitionStyle = .crossDissolve // 화면 전환 스타일 설정 (페이드 효과)
+        loadingVC.modalPresentationStyle = .fullScreen
+        self.present(loadingVC, animated: true, completion: nil)
+        print("loadingVC로 이동 성공")
     }
 }
