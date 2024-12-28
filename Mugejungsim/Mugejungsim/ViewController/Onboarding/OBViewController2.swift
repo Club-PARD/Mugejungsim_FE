@@ -77,7 +77,7 @@ class OBViewController2: UIViewController {
             placeholderView.heightAnchor.constraint(equalToConstant: 498),
 
             // Next Button Constraints
-            nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -35),
+            nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             nextButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             nextButton.widthAnchor.constraint(equalToConstant: 327),
             nextButton.heightAnchor.constraint(equalToConstant: 52)

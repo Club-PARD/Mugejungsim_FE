@@ -9,6 +9,15 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     var endDateMonth: String?
     var endDateDay: String?
     
+    var travelRecordID: String = ""
+    var travelTitle: String = ""
+    var companion: String = ""
+    var startDate: String = ""
+    var endDate: String = ""
+    var location: String = ""
+    
+    
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "여행기 제목"
@@ -551,19 +560,40 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc func nextButtonTapped() {
-        let title = titleTextField.text ?? "없음"
-        let companion = selectedCompanion?.title(for: .normal) ?? "없음"
-        let startDate = "\(startDateYear ?? "0000")-\(startDateMonth ?? "00")-\(startDateDay ?? "00")"
-        let endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
-        let location = locationTextField.text ?? "없음"
+        travelTitle = titleTextField.text ?? "없음"
+        companion = selectedCompanion?.title(for: .normal) ?? "없음"
+        startDate = "\(startDateYear ?? "0000")-\(startDateMonth ?? "00")-\(startDateDay ?? "00")"
+        endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
+        location = locationTextField.text ?? "없음"
         
-        print("제목: \(title)")
+        print("제목: \(travelTitle)")
         print("누구와: \(companion)")
         print("시작일자: \(startDate)")
         print("종료일자: \(endDate)")
         print("장소: \(location)")
         
+        let newRecord = TravelRecord(
+            title: travelTitle,
+            description: "\(companion) | \(startDate) ~ \(endDate)",
+            date: startDate,
+            location: location
+        )
+        
+        // 기록 추가
+        TravelRecordManager.shared.addRecord(newRecord)
+        // 데이터 저장
+        var records = DataManager.shared.loadTravelRecords()
+        records.append(newRecord)
+        DataManager.shared.saveTravelRecords(records)
+                
+        // 저장된 기록 출력
+        print("여행 기록이 저장되었습니다.")
+        print("저장된 기록: \(newRecord)")
+        print("기록 ID: \(newRecord.id)")
+
+        
         let uploadViewController = UploadViewController()
+        uploadViewController.recordID = newRecord.id.uuidString //
         uploadViewController.modalPresentationStyle = .fullScreen // 전체 화면 표시
         uploadViewController.modalTransitionStyle = .crossDissolve // 전환 애니메이션
         present(uploadViewController, animated: true, completion: nil)
