@@ -17,6 +17,9 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     var endDate: String = ""
     var location: String = ""
     
+    let startDateStackView = CreateViewController.createDateStackView(title: "시작일자")
+    let endDateStackView = CreateViewController.createDateStackView(title: "종료일자")
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "여행기 제목"
@@ -51,9 +54,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    let startDateStackView = CreateViewController.createDateStackView(title: "시작일자")
-    let endDateStackView = CreateViewController.createDateStackView(title: "종료일자")
     
     let locationLabel: UILabel = {
         let label = UILabel()
@@ -123,7 +123,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         setupUI()
         setupCompanionButtons()
         setupObservers()
-        
     }
     
     private func setupCustomNavigationBar() {
@@ -135,14 +134,14 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         separator.backgroundColor = .lightGray
         separator.translatesAutoresizingMaskIntoConstraints = false
         
-        let titleLabel = UILabel()  // center 고정
+        let titleLabel = UILabel()
         titleLabel.text = "여행 기록 쓰기"
         titleLabel.font = UIFont(name: "Pretendard-Bold", size: 20)
         titleLabel.textColor = .black
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let backButton = UIButton(type: .system)  // 왼쪽 고정
+        let backButton = UIButton(type: .system)
         backButton.setImage(UIImage(named: "back_button"), for: .normal)
         backButton.tintColor = .black
         backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
@@ -154,7 +153,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         saveButton.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
         saveButton.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
-        
         
         view.addSubview(navBar)
         navBar.addSubview(separator)
@@ -374,7 +372,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         fieldsStack.axis = .horizontal
         fieldsStack.spacing = 8
         fieldsStack.isLayoutMarginsRelativeArrangement = true
-        fieldsStack.layoutMargins = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8) // 패딩 적용
+        fieldsStack.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8) // 패딩 적용
         fieldsStack.distribution = .equalSpacing
         fieldsStack.alignment = .center
         
@@ -611,6 +609,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         print("시작일자: \(startDate)")
         print("종료일자: \(endDate)")
         print("장소: \(location)")
+        
         
         let newRecord = TravelRecord(
             title: travelTitle,
