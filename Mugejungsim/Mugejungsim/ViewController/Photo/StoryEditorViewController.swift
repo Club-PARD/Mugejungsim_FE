@@ -671,20 +671,37 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func nextButtonTapped() {
-        print("Next button tapped")
-        
-        let savedPhotosViewController = SavedPhotosViewController()
-        savedPhotosViewController.modalPresentationStyle = .fullScreen
-        
-        // savedPhotosViewController에 데이터를 전달
-        savedPhotosViewController.savedData = DataManager.shared.loadData() // 예시 데이터 전달
-        
-        // navigationController가 있는 경우 push, 없을 경우 present
-        if let navigationController = self.navigationController {
-            navigationController.pushViewController(savedPhotosViewController, animated: true)
-        } else {
-            self.present(savedPhotosViewController, animated: true, completion: nil)
+        guard currentIndex < images.count else {
+            print("잘못된 인덱스입니다.")
+            return
         }
+
+        guard let categoryIndex = categoryIndex,
+              let selectedCategory = MockData.shared.rows[categoryIndex]?.first else {
+            print("카테고리가 선택되지 않았습니다.")
+            return
+        }
+
+        // 현재 이미지와 텍스트 가져오기
+        let currentImage = images[currentIndex]
+        let currentText = texts[currentIndex]
+
+        // 이미지 저장
+        guard let imagePath = DataManager.shared.saveImage(currentImage) else {
+            print("이미지 저장 실패")
+            return
+        }
+
+        // PhotoData 생성
+        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedCategory)
+
+        // 저장
+        DataManager.shared.addNewData(photoData: [photoData])
+
+        // `SavedPhotosViewController`로 이동
+        let savedPhotosVC = SavedPhotosViewController()
+        savedPhotosVC.modalPresentationStyle = .fullScreen
+        present(savedPhotosVC, animated: true)
     }
 }
 

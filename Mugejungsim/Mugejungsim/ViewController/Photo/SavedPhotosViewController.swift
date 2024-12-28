@@ -167,8 +167,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SavedPhotoCell", for: indexPath) as! SavedPhotoCell
-        let data = savedData[indexPath.row]
-        cell.configure(with: data) // Display only the photo
+        let photoData = savedData[indexPath.row]
+        cell.configure(with: photoData) // PhotoData를 통해 이미지, 텍스트, 카테고리를 표시
         return cell
     }
     
