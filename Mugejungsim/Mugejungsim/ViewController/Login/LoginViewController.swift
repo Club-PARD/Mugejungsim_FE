@@ -181,7 +181,7 @@ class LoginViewController: UIViewController {
     // 클백 확인용 코드 : Kakao 연결
     func sendLoginDataToServer(name: String, provider: String) {
         // 1. 서버 URL 설정
-        guard let url = URL(string: "{BASE_URL}") else { // 서버 URL 변경
+        guard let url = URL(string: "\(URLService.shared.baseURL)/login") else { // 서버 URL 변경
             print("Invalid server URL")
             return
         }
