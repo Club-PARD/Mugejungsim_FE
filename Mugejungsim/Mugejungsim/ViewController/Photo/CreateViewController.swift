@@ -9,6 +9,17 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     var endDateMonth: String?
     var endDateDay: String?
     
+    // Local Flow 위한 변수
+    var travelRecordID: String = ""
+    var travelTitle: String = ""
+    var companion: String = ""
+    var startDate: String = ""
+    var endDate: String = ""
+    var location: String = ""
+    
+    let startDateStackView = CreateViewController.createDateStackView(title: "시작일자")
+    let endDateStackView = CreateViewController.createDateStackView(title: "종료일자")
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "여행기 제목"
@@ -43,9 +54,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    let startDateStackView = CreateViewController.createDateStackView(title: "시작일자")
-    let endDateStackView = CreateViewController.createDateStackView(title: "종료일자")
     
     let locationLabel: UILabel = {
         let label = UILabel()
@@ -107,6 +115,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         
         configureTextFieldDelegates(in: startDateStackView)
         configureTextFieldDelegates(in: endDateStackView)
+        
         titleTextField.delegate = self
         locationTextField.delegate = self
         
@@ -114,7 +123,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         setupUI()
         setupCompanionButtons()
         setupObservers()
-        
     }
     
     private func setupCustomNavigationBar() {
@@ -126,14 +134,14 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         separator.backgroundColor = .lightGray
         separator.translatesAutoresizingMaskIntoConstraints = false
         
-        let titleLabel = UILabel()  // center 고정
+        let titleLabel = UILabel()
         titleLabel.text = "여행 기록 쓰기"
         titleLabel.font = UIFont(name: "Pretendard-Bold", size: 20)
         titleLabel.textColor = .black
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let backButton = UIButton(type: .system)  // 왼쪽 고정
+        let backButton = UIButton(type: .system)
         backButton.setImage(UIImage(named: "back_button"), for: .normal)
         backButton.tintColor = .black
         backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
@@ -145,7 +153,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         saveButton.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
         saveButton.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
-        
         
         view.addSubview(navBar)
         navBar.addSubview(separator)
@@ -365,7 +372,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         fieldsStack.axis = .horizontal
         fieldsStack.spacing = 8
         fieldsStack.isLayoutMarginsRelativeArrangement = true
-        fieldsStack.layoutMargins = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8) // 패딩 적용
+        fieldsStack.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8) // 패딩 적용
         fieldsStack.distribution = .equalSpacing
         fieldsStack.alignment = .center
         
@@ -413,13 +420,15 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 textField.delegate = self
                 textField.addTarget(self, action: #selector(textFieldEditingChanged(_:)), for: .editingChanged)
                 
-                // 키보드 액세서리 추가
+                // 키보드 완료 버튼 추가
                 let toolbar = UIToolbar()
                 toolbar.sizeToFit()
                 let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(doneButtonTapped))
                 let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
                 toolbar.setItems([flexibleSpace, doneButton], animated: false)
-                            
+                // 모든 키보드
+                titleTextField.inputAccessoryView = toolbar
+                locationTextField.inputAccessoryView = toolbar
                 textField.inputAccessoryView = toolbar
             }
         }
@@ -550,20 +559,80 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    @objc func nextButtonTapped() {
-        let title = titleTextField.text ?? "없음"
-        let companion = selectedCompanion?.title(for: .normal) ?? "없음"
-        let startDate = "\(startDateYear ?? "0000")-\(startDateMonth ?? "00")-\(startDateDay ?? "00")"
-        let endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
-        let location = locationTextField.text ?? "없음"
+    // MARK: - UITextFieldDelegate
+
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        // 현재 텍스트
+        guard let currentText = textField.text else { return true }
         
-        print("제목: \(title)")
+        // 변경될 텍스트
+        let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
+        
+        // 입력 중 상태 확인 (한국어 조합 등)
+        if let markedTextRange = textField.markedTextRange {
+            // 조합 중인 텍스트는 허용
+            if textField.position(from: markedTextRange.start, offset: 0) != nil {
+                return true
+            }
+        }
+        // 삭제 동작 처리 (replacementString이 빈 문자열이면 삭제)
+        if string.isEmpty { return true }
+        
+        // 길이 제한 및 유효성 검사
+        switch textField.placeholder {
+        case "YYYY":
+            return updatedText.count <= 4 // 최대 4자
+        case "MM":
+            if updatedText.count <= 2, let month = Int(updatedText), month >= 1 && month <= 12 {
+                return true
+            }
+            return false // 잘못된 입력
+        case "DD":
+            if updatedText.count <= 2, let day = Int(updatedText), day >= 1 && day <= 31 {
+                return true
+            }
+            return false // 잘못된 입력
+        default:
+            return true // 제한 없음
+        }
+    }
+    
+    @objc func nextButtonTapped() {
+        travelTitle = titleTextField.text ?? "없음"
+        companion = selectedCompanion?.title(for: .normal) ?? "없음"
+        startDate = "\(startDateYear ?? "0000")-\(startDateMonth ?? "00")-\(startDateDay ?? "00")"
+        endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
+        location = locationTextField.text ?? "없음"
+        
+        print("제목: \(travelTitle)")
         print("누구와: \(companion)")
         print("시작일자: \(startDate)")
         print("종료일자: \(endDate)")
         print("장소: \(location)")
         
+        let newRecord = TravelRecord(
+            title: travelTitle,
+            description: "\(companion) | \(startDate) ~ \(endDate)",
+            date: startDate,
+            location: location,
+            oneLine1: "",
+            oneLine2: ""
+        )
+        
+        // 기록 추가
+        TravelRecordManager.shared.addRecord(newRecord)
+        // 데이터 저장
+        var records = DataManager.shared.loadTravelRecords()
+        records.append(newRecord)
+        DataManager.shared.saveTravelRecords(records)
+                
+        // 저장된 기록 출력
+        print("여행 기록이 저장되었습니다.")
+        print("저장된 기록: \(newRecord)")
+        print("기록 ID: \(newRecord.id)")
+        
         let uploadViewController = UploadViewController()
+        uploadViewController.recordID = newRecord.id.uuidString //
         uploadViewController.modalPresentationStyle = .fullScreen // 전체 화면 표시
         uploadViewController.modalTransitionStyle = .crossDissolve // 전환 애니메이션
         present(uploadViewController, animated: true, completion: nil)
@@ -581,13 +650,14 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         ]
         return dayInt <= (daysInMonth[monthInt] ?? 0)
     }
+    
 }
 
 extension CreateViewController: StopWritingViewControllerDelegate {
     func didStopWriting() {
         // MainViewController로 이동
         if let window = UIApplication.shared.windows.first {
-            let mainVC = MainViewController()
+            let mainVC = CreateViewController()
             let navController = UINavigationController(rootViewController: mainVC)
             window.rootViewController = navController
             window.makeKeyAndVisible()

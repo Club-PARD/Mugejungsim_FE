@@ -4,11 +4,10 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     
     var savedData: [PhotoData] = []
     var collectionView: UICollectionView!
+    var recordID : String = ""
     
     private var photoDataList: [PhotoData] = []
 
-    
-    
     private var imageCountLabel: UILabel = {
         let label = UILabel()
         label.text = "0 / 25"
@@ -63,7 +62,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         setupCollectionView()
         
         // 데이터 로드
-        savedData = DataManager.shared.loadData()
+//        savedData = DataManager.shared.loadData()
+        loadPhotosForRecord()
         
         // 이미지 개수 레이블 업데이트
         updateImageCountLabel()
@@ -78,18 +78,20 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         saveAndHomeButton.addTarget(self, action: #selector(saveAndHomeButtonTapped), for: .touchUpInside)
         
         setupButtonsConstraints()
-        photoDataList = DataManager.shared.loadData()
+//        photoDataList = DataManager.shared.loadData()
         collectionView.reloadData()
 //        DataManager.shared.resetData() // 데이터 초기화 시키는 함수
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
+//        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
+        loadPhotosForRecord()
         collectionView.reloadData() // 컬렉션 뷰 갱신
         updateImageCountLabel() // 이미지 카운트 업데이트
     }
     
+    // 굳이 필요 없음
     func refreshData() {
         savedData = DataManager.shared.loadData()
         collectionView?.reloadData()
@@ -97,10 +99,10 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         print("SavedPhotosViewController가 리로드되었습니다.")
     }
 
-        private func loadDataAndRefresh() {
-            photoDataList = DataManager.shared.loadData()
-            collectionView.reloadData()
-        }
+    private func loadDataAndRefresh() {
+        photoDataList = DataManager.shared.loadData()
+        collectionView.reloadData()
+    }
 
     
     
@@ -237,6 +239,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         print("Line Button Tapped!")
         // 저장하고 한 줄 넘기기 페이지로 이동
         let OCVC = ObjeCreationViewController() // 이동할 ViewController 인스턴스 생성
+        OCVC.recordID = recordID
         OCVC.modalTransitionStyle = .crossDissolve
         OCVC.modalPresentationStyle = .fullScreen
         self.present(OCVC, animated: true, completion: nil)
@@ -251,19 +254,34 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("NavigationController가 없습니다. 네비게이션 스택에 추가 후 다시 시도하세요.")
                 
                 // 네비게이션 컨트롤러가 없을 경우 루트 뷰 컨트롤러 변경
-                let mainViewController = MainViewController()
+                let mainViewController = CreateViewController()
                 let window = UIApplication.shared.windows.first { $0.isKeyWindow }
-                window?.rootViewController = UINavigationController(rootViewController: mainViewController)
+                window?.rootViewController = UINavigationController(rootViewController: CreateViewController())
                 window?.makeKeyAndVisible()
                 return
             }
             
             // MainViewController로 이동
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? MainViewController {
+            if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? CreateViewController {
                 navigationController.setViewControllers([mainViewController], animated: true)
             } else {
                 print("MainViewController를 초기화할 수 없습니다. 스토리보드 ID를 확인하세요.")
             }
         }
+    
+    private func loadPhotosForRecord() {
+        guard let uuid = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+
+        if let record = TravelRecordManager.shared.getRecord(by: uuid) {
+            // record.photos 데이터를 savedData에 저장
+            savedData = record.photos
+            print("Loaded \(savedData.count) photos for record ID: \(recordID)")
+        } else {
+            print("recordID (\(recordID))에 해당하는 데이터를 찾을 수 없습니다.")
+        }
+    }
 }

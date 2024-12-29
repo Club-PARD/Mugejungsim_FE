@@ -7,9 +7,8 @@
 
 import UIKit
 
-
 class ShareViewController: UIViewController {
-    
+
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let ButtontContentView = UIView()
@@ -62,7 +61,6 @@ class ShareViewController: UIViewController {
         return button
     }()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -96,17 +94,14 @@ class ShareViewController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // ScrollView Constraints
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-            // ContentLabel Constraints
             contentLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20),
             contentLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
 
-            // GlassImage Constraints
             glassImage.topAnchor.constraint(equalTo: contentLabel.bottomAnchor, constant: 20),
             glassImage.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             glassImage.widthAnchor.constraint(equalToConstant: 200),
@@ -123,8 +118,6 @@ class ShareViewController: UIViewController {
             homeButton.heightAnchor.constraint(equalToConstant: 52),
         ])
     }
-    
-    
     
     private func updateGlassImage(basedOn condition: String) {
         // 병 이미지도 여기서 관리하라!
@@ -169,17 +162,9 @@ class ShareViewController: UIViewController {
         backButton.tintColor = .black
         backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
         backButton.translatesAutoresizingMaskIntoConstraints = false
-        
-//        // closeButton -> 취소 확인 모달창으로 이동 필요
-//        let closeButton = UIButton(type: .system)
-//        closeButton.setImage(UIImage(named: "X_Button"), for: .normal)
-//        closeButton.tintColor = .black
-//        closeButton.addTarget(self, action: #selector(didTapCloseButton), for: .touchUpInside)
-//        closeButton.translatesAutoresizingMaskIntoConstraints = false
-        
+
         view.addSubview(navBar)
         navBar.addSubview(backButton)
-//        navBar.addSubview(closeButton)
         
         NSLayoutConstraint.activate([
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -189,9 +174,6 @@ class ShareViewController: UIViewController {
             
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 20),
-            
-//            closeButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
-//            closeButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -20)
         ])
     }
     

@@ -2,6 +2,7 @@ import UIKit
 
 class LoadingViewController: UIViewController {
     
+    var recordID : String = ""
     // "오브제 만드는 중" 라벨
     private let loadingLabel: UILabel = {
         let label = UILabel()
@@ -61,9 +62,11 @@ class LoadingViewController: UIViewController {
     private func goToNextPage() {
         // 다음 화면 이동 코드
         let resultVC = ResultViewController()
+        resultVC.recordID = recordID
         resultVC.modalTransitionStyle = .crossDissolve // 오픈 모션
         resultVC.modalPresentationStyle = .fullScreen
         self.present(resultVC, animated: true, completion: nil)
+        print("recordID: \(recordID)")
         print("ResultVC로 이동 성공")
     }
 }

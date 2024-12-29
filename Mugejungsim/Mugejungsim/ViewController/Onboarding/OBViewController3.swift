@@ -34,7 +34,7 @@ class OBViewController3: UIViewController {
 
     private let nextButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("시작하기", for: .normal)
+        button.setTitle("여행 기록 만들기", for: .normal)
         button.setTitleColor(#colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
         button.backgroundColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
         button.layer.cornerRadius = 8
@@ -77,7 +77,7 @@ class OBViewController3: UIViewController {
             placeholderView.heightAnchor.constraint(equalToConstant: 498),
 
             // Next Button Constraints
-            nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -35),
+            nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             nextButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             nextButton.widthAnchor.constraint(equalToConstant: 327),
             nextButton.heightAnchor.constraint(equalToConstant: 52)
@@ -89,7 +89,7 @@ class OBViewController3: UIViewController {
     }
 
     @objc private func nextButtonTapped() {
-        let mainViewController = MainViewController()
+        let mainViewController = CreateViewController()
         
         // 새 화면을 기존 뷰와 부드럽게 교체
         UIView.transition(with: self.view.window!, duration: 0.3, options: .transitionCrossDissolve, animations: {
