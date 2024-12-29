@@ -568,24 +568,48 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        // 현재 선택한 이미지를 갱신
-//        texts[currentIndex] = textView.text // 이전 이미지의 텍스트 저장
-//        currentIndex = indexPath.item // 선택한 이미지의 인덱스
-//        mainImageView.image = images[currentIndex] // 이미지 변경
-//        textView.text = texts[currentIndex] // 텍스트 변경
-//        updateImageCountLabels() // 이미지 카운트 레이블 갱신
-        
-        // 현재 선택한 이미지로 갱신
-        texts[currentIndex] = textView.text // 이전 이미지의 텍스트 저장
-        selectedCategoriesForImages[currentIndex] = selectedSubCategories // 이전 이미지의 카테고리 저장
-            
-        currentIndex = indexPath.item // 선택한 이미지 인덱스로 변경
-        mainImageView.image = images[currentIndex] // 이미지 변경
-        textView.text = texts[currentIndex] // 텍스트 변경
+        // 현재 인덱스가 배열 크기를 초과하지 않는지 확인 후 저장
+        if currentIndex < texts.count {
+            texts[currentIndex] = textView.text // 이전 사진의 텍스트 저장
+        } else {
+            while texts.count <= currentIndex {
+                texts.append("")
+            }
+            texts[currentIndex] = textView.text
+        }
 
-        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 카테고리 갱신
-        updateCategoryButtonsAppearance() // 버튼 상태 업데이트
-        updateImageCountLabels() // 이미지 카운트 갱신
+        if currentIndex < selectedCategoriesForImages.count {
+            selectedCategoriesForImages[currentIndex] = selectedSubCategories // 이전 사진의 카테고리 저장
+        } else {
+            while selectedCategoriesForImages.count <= currentIndex {
+                selectedCategoriesForImages.append([])
+            }
+            selectedCategoriesForImages[currentIndex] = selectedSubCategories
+        }
+
+        // 선택한 사진으로 데이터 전환
+        currentIndex = indexPath.item
+
+        // 배열 크기가 선택한 인덱스를 초과하지 않도록 초기화
+        if texts.count <= currentIndex {
+            while texts.count <= currentIndex {
+                texts.append("")
+            }
+        }
+
+        if selectedCategoriesForImages.count <= currentIndex {
+            while selectedCategoriesForImages.count <= currentIndex {
+                selectedCategoriesForImages.append([])
+            }
+        }
+
+        mainImageView.image = images[currentIndex] // 선택한 사진 업데이트
+        textView.text = texts[currentIndex] // 선택한 사진의 텍스트 불러오기
+        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 선택한 사진의 카테고리 불러오기
+
+        // UI 업데이트
+        updateCategoryButtonsAppearance()
+        updateImageCountLabels()
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -623,7 +647,11 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         let characterCount = textView.text.count
         characterCountLabel.text = "\(characterCount) / \(maxCharacterCount)"
         characterCountLabel.textColor = characterCount > maxCharacterCount ? .systemRed : .systemGray
-//        texts[currentIndex] = textView.text ?? ""  잠시 보류
+
+        // 현재 사진의 텍스트 실시간 업데이트
+        if currentIndex < texts.count {
+            texts[currentIndex] = textView.text
+        }
     }
     var selectedButton: UIButton?
 
@@ -727,38 +755,55 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             return
         }
         
-        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 현재 이미지에 저장된 선택된 카테고리 불러오기
+//        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 현재 이미지에 저장된 선택된 카테고리 불러오기
         setupButtonsAboutCategoryButton()
 
     }
     
+    // 서브 카테고리 선택 및 저장 기능
     @objc private func categoryItemSelected(_ sender: UIButton) {
         guard let title = sender.title(for: .normal) else { return }
 
+        // 현재 사진의 선택된 서브 카테고리 리스트 관리
         if selectedSubCategories.contains(title) {
             // 이미 선택된 카테고리를 다시 누르면 해제
             selectedSubCategories.removeAll { $0 == title }
-            sender.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-            sender.layer.borderColor = UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
+            sender.backgroundColor = UIColor.white
+            sender.layer.borderColor = UIColor.lightGray.cgColor
         } else {
+            // 최대 선택 개수 제한 (예: 3개)
             guard selectedSubCategories.count < 3 else {
-                print("최대 3개의 카테고리만 선택할 수 있습니다.")
+                print("최대 3개의 서브 카테고리만 선택할 수 있습니다.")
                 return
             }
-            selectedSubCategories.append(title) // 새로운 카테고리 추가
-            sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
-            sender.layer.borderColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor
+            selectedSubCategories.append(title) // 새로운 서브 카테고리 추가
+            sender.backgroundColor = UIColor.systemBlue
+            sender.layer.borderColor = UIColor.systemBlue.cgColor
         }
-        selectedCategoriesForImages[currentIndex] = selectedSubCategories
-        print("현재 이미지의 선택된 카테고리: \(selectedCategoriesForImages[currentIndex])")
-    }
 
+        // 현재 사진의 카테고리 저장
+        if currentIndex < selectedCategoriesForImages.count {
+            selectedCategoriesForImages[currentIndex] = selectedSubCategories
+        } else {
+            while selectedCategoriesForImages.count <= currentIndex {
+                selectedCategoriesForImages.append([])
+            }
+            selectedCategoriesForImages[currentIndex] = selectedSubCategories
+        }
+
+        print("사진 \(currentIndex + 1)의 현재 카테고리: \(selectedCategoriesForImages[currentIndex])")
+
+        // UI 업데이트
+        updateCategoryButtonsAppearance()
+    }
+    // UI 업데이트 함수
     private func updateCategoryButtonsAppearance() {
         guard let stackView = contentView.subviews.first(where: { $0 is UIStackView }) as? UIStackView else { return }
 
         for case let button as UIButton in stackView.arrangedSubviews {
             if let title = button.title(for: .normal) {
-                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.white
+                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor.systemBlue : UIColor.white
+                button.setTitleColor(selectedSubCategories.contains(title) ? .white : .black, for: .normal)
             }
         }
     }
@@ -820,32 +865,83 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //        present(savedPhotosVC, animated: true)
 //    }
 
+//    @objc private func nextButtonTapped() {
+//        guard let recordUUID = UUID(uuidString: recordID) else {
+//            print("유효하지 않은 Record ID: \(recordID)")
+//            return
+//        }
+//
+//        // 저장된 데이터가 없을 경우 경고 메시지 출력
+//        guard !images.isEmpty else {
+//            print("이미지가 없습니다.")
+//            let alert = UIAlertController(title: "이미지 없음", message: "최소 한 장의 이미지를 추가해주세요.", preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+//            present(alert, animated: true, completion: nil)
+//            return
+//        }
+//        // 현재 이미지와 관련된 텍스트와 카테고리 저장
+//        texts = Array(repeating: "", count: images.count)
+//        selectedCategoriesForImages = Array(repeating: [], count: images.count)
+//
+//        // 카테고리 선택 확인
+//        guard !selectedSubCategories.isEmpty else {
+//            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+//            present(alert, animated: true, completion: nil)
+//            return
+//        }
+//
+//        for (index, image) in images.enumerated() {
+//            let text = texts[index]
+//            let category = selectedCategoriesForImages[index].joined(separator: ", ")
+//
+//            let success = TravelRecordManager.shared.addPhoto(
+//                to: UUID(uuidString: recordID) ?? UUID(),
+//                image: image,
+//                text: text,
+//                category: category
+//            )
+//
+//            if success {
+//                print("사진 \(index + 1) 추가 성공")
+//            } else {
+//                print("사진 \(index + 1) 추가 실패")
+//            }
+//        }
+//
+//        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+//            print("해당 Record ID (\(recordUUID))의 데이터:")
+//            print("Title: \(record.title)")
+//            print("Description: \(record.description)")
+//            print("Date: \(record.date)")
+//            print("Location: \(record.location)")
+//            print("Photos:")
+//            for (index, photo) in record.photos.enumerated() {
+//                print("Photo \(index + 1):")
+//                print("    Image Path: \(photo.imagePath)")
+//                print("    Text: \(photo.text)")
+//                print("    Category: \(photo.category)")
+//            }
+//        } else {
+//            print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
+//        }
+//
+//        let savedPhotosVC = SavedPhotosViewController()
+//        savedPhotosVC.recordID = recordID
+//        savedPhotosVC.modalPresentationStyle = .fullScreen
+//        present(savedPhotosVC, animated: true)
+//    }
+    
     @objc private func nextButtonTapped() {
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 Record ID: \(recordID)")
-            return
+        // 현재 사진 데이터 저장
+        if currentIndex < texts.count {
+            texts[currentIndex] = textView.text
+        }
+        if currentIndex < selectedCategoriesForImages.count {
+            selectedCategoriesForImages[currentIndex] = selectedSubCategories
         }
 
-        // 저장된 데이터가 없을 경우 경고 메시지 출력
-        guard !images.isEmpty else {
-            print("이미지가 없습니다.")
-            let alert = UIAlertController(title: "이미지 없음", message: "최소 한 장의 이미지를 추가해주세요.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-            present(alert, animated: true, completion: nil)
-            return
-        }
-        // 현재 이미지와 관련된 텍스트와 카테고리 저장
-        texts[currentIndex] = textView.text // 현재 이미지의 텍스트 저장
-        selectedCategoriesForImages[currentIndex] = selectedSubCategories // 현재 이미지의 카테고리 저장
-
-        // 카테고리 선택 확인
-        guard !selectedSubCategories.isEmpty else {
-            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-            present(alert, animated: true, completion: nil)
-            return
-        }
-
+        // 모든 사진에 대해 데이터 저장
         for (index, image) in images.enumerated() {
             let text = texts[index]
             let category = selectedCategoriesForImages[index].joined(separator: ", ")
@@ -858,29 +954,13 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             )
 
             if success {
-                print("사진 \(index + 1) 추가 성공")
+                print("사진 \(index + 1) 저장 성공")
             } else {
-                print("사진 \(index + 1) 추가 실패")
+                print("사진 \(index + 1) 저장 실패")
             }
         }
 
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            print("해당 Record ID (\(recordUUID))의 데이터:")
-            print("Title: \(record.title)")
-            print("Description: \(record.description)")
-            print("Date: \(record.date)")
-            print("Location: \(record.location)")
-            print("Photos:")
-            for (index, photo) in record.photos.enumerated() {
-                print("Photo \(index + 1):")
-                print("    Image Path: \(photo.imagePath)")
-                print("    Text: \(photo.text)")
-                print("    Category: \(photo.category)")
-            }
-        } else {
-            print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
-        }
-        
+        // 다음 화면으로 이동
         let savedPhotosVC = SavedPhotosViewController()
         savedPhotosVC.recordID = recordID
         savedPhotosVC.modalPresentationStyle = .fullScreen
