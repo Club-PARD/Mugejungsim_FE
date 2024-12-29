@@ -190,16 +190,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         NSLayoutConstraint.activate([
             // ScrollView 제약 조건
             scrollView.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor),
-<<<<<<< HEAD
-<<<<<<< HEAD
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-=======
-=======
->>>>>>> d562014 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
->>>>>>> 4f644dd ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
             // ContentView 제약 조건
@@ -464,18 +458,13 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.setTitle(title, for: .normal)
             button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14)
             button.setTitleColor(.black, for: .normal)
-<<<<<<< HEAD
-<<<<<<< HEAD
             button.layer.borderWidth = 1
             button.layer.cornerRadius = 4
             button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1) : UIColor(red: 1, green: 1, blue: 1, alpha: 1)
             button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16) // 버튼 내부 패딩 설정
-=======
-=======
->>>>>>> d562014 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
+
             button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
             button.layer.cornerRadius = 18.5
->>>>>>> 4f644dd ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
             button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
             
             button.heightAnchor.constraint(equalToConstant: 39).isActive = true
@@ -596,13 +585,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         currentIndex = indexPath.item // 선택한 이미지 인덱스로 변경
         mainImageView.image = images[currentIndex] // 이미지 변경
         textView.text = texts[currentIndex] // 텍스트 변경
-<<<<<<< HEAD
-<<<<<<< HEAD
-        
-=======
->>>>>>> 4f644dd ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
-=======
->>>>>>> d562014 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
+
         selectedSubCategories = selectedCategoriesForImages[currentIndex] // 카테고리 갱신
         updateCategoryButtonsAppearance() // 버튼 상태 업데이트
         updateImageCountLabels() // 이미지 카운트 갱신
@@ -710,11 +693,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         if let previousButton = selectedButton {
-<<<<<<< HEAD
             previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             previousButton.setTitleColor(.black, for: .normal)
         }
@@ -725,10 +704,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                    
         // 현재 버튼을 선택된 버튼으로 설정
         selectedButton = sender
-=======
-=======
         if let previousButton = selectedButton {
->>>>>>> b7c011a ([Chore]: StoryEditViewController 버튼UI 설정)
                 previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
                 previousButton.setTitleColor(.black, for: .normal)
             }
@@ -740,16 +716,16 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             // 현재 버튼을 선택된 버튼으로 설정
             selectedButton = sender
 
-        
-<<<<<<< HEAD
->>>>>>> c9db874 ([Chore]: StoryEditViewController 버튼UI 설정)
-=======
->>>>>>> b7c011a ([Chore]: StoryEditViewController 버튼UI 설정)
-        // 카테고리 버튼 클릭 시 호출
-=======
->>>>>>> b4cae27 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
-=======
->>>>>>> d562014 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
+        if let previousButton = selectedButton {
+                previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
+                previousButton.setTitleColor(.black, for: .normal)
+            }
+        // 새로 선택된 버튼 색상 변경
+        sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
+        sender.setTitleColor(.white, for: .normal)
+        // 현재 버튼을 선택된 버튼으로 설정
+        selectedButton = sender
+
         guard let title = sender.titleLabel?.text else { return }
         let mockData = MockData()
 
@@ -790,17 +766,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             sender.layer.borderColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor
         }
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-//        print("현재 선택된 카테고리: \(selectedSubCategories)")
-        // 선택된 카테고리를 현재 이미지에 저장
->>>>>>> 4f644dd ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
-=======
-//        print("현재 선택된 카테고리: \(selectedSubCategories)")
-        // 선택된 카테고리를 현재 이미지에 저장
->>>>>>> d562014 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
         selectedCategoriesForImages[currentIndex] = selectedSubCategories
         print("현재 이미지의 선택된 카테고리: \(selectedCategoriesForImages[currentIndex])")
     }
@@ -810,15 +775,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         for case let button as UIButton in stackView.arrangedSubviews {
             if let title = button.title(for: .normal) {
-<<<<<<< HEAD
-<<<<<<< HEAD
                 button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.white
-=======
+
                 button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
->>>>>>> 4f644dd ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
-=======
                 button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
->>>>>>> d562014 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
             }
         }
     }
@@ -841,12 +801,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 4f644dd ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
 
 //    @objc private func nextButtonTapped() {
 //        guard currentIndex < images.count else {
@@ -885,15 +839,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //        savedPhotosVC.modalPresentationStyle = .fullScreen
 //        present(savedPhotosVC, animated: true)
 //    }
-<<<<<<< HEAD
->>>>>>> c9db874 ([Chore]: StoryEditViewController 버튼UI 설정)
-=======
-=======
->>>>>>> b4cae27 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
->>>>>>> 4f644dd ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
-=======
->>>>>>> d562014 ([Feat] : StoryEditorViewController 카테고리 버튼 기능 개선)
-    
+
     @objc private func nextButtonTapped() {
         guard let recordUUID = UUID(uuidString: recordID) else {
             print("유효하지 않은 Record ID: \(recordID)")
