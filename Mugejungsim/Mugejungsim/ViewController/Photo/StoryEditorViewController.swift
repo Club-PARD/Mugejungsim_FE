@@ -192,8 +192,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             scrollView.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
             // ContentView 제약 조건
@@ -460,10 +458,9 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.setTitleColor(.black, for: .normal)
             button.layer.borderWidth = 1
             button.layer.cornerRadius = 4
-            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1) : UIColor(red: 1, green: 1, blue: 1, alpha: 1)
             button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16) // 버튼 내부 패딩 설정
-
-            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
+            button.layer.borderColor = UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
+            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.white
             button.layer.cornerRadius = 18.5
             button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
             
@@ -701,20 +698,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         // 새로 선택된 버튼 색상 변경
         sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
         sender.setTitleColor(.white, for: .normal)
-                   
-        // 현재 버튼을 선택된 버튼으로 설정
-        selectedButton = sender
-        if let previousButton = selectedButton {
-                previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
-                previousButton.setTitleColor(.black, for: .normal)
-            }
-            
-            // 새로 선택된 버튼 색상 변경
-            sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
-            sender.setTitleColor(.white, for: .normal)
-            
-            // 현재 버튼을 선택된 버튼으로 설정
-            selectedButton = sender
 
         if let previousButton = selectedButton {
                 previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
@@ -776,9 +759,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         for case let button as UIButton in stackView.arrangedSubviews {
             if let title = button.title(for: .normal) {
                 button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.white
-
-                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
-                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.systemGray4
             }
         }
     }
