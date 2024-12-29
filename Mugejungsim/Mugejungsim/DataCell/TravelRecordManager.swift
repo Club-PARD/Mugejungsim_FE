@@ -99,7 +99,7 @@ class TravelRecordManager {
     }
 
     // MARK: - 기록 업데이트
-    private func updateRecord(_ updatedRecord: TravelRecord) {
+    func updateRecord(_ updatedRecord: TravelRecord) {
         if let index = travelRecords.firstIndex(where: { $0.id == updatedRecord.id }) {
             travelRecords[index] = updatedRecord
             saveData()
@@ -110,4 +110,5 @@ class TravelRecordManager {
     func getRecord(by id: UUID) -> TravelRecord? {
         return travelRecords.first { $0.id == id }
     }
+    
 }
