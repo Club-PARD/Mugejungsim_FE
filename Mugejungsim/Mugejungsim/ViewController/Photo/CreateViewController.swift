@@ -1,7 +1,8 @@
 import UIKit
 
 class CreateViewController: UIViewController, UITextFieldDelegate {
-    
+    private let maxTitleLength = 10
+
     var startDateYear: String?
     var startDateMonth: String?
     var startDateDay: String?
@@ -28,7 +29,13 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+    private let titleCount: UILabel = {
+            let label = UILabel()
+            label.text = "0 / 10"
+            label.font = UIFont.systemFont(ofSize: 12)
+            label.textColor = .gray
+            return label
+        }()
     let titleTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "제목을 입력하세요"
@@ -38,6 +45,15 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
+    let saveButton: UIButton = {
+            let button = UIButton(type: .system)
+            button.setTitle("임시저장", for: .normal)
+            button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
+            button.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
+            button.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
+            button.translatesAutoresizingMaskIntoConstraints = false
+            return button
+        }()
     
     let titleUnderline: UIView = {
         let view = UIView()
@@ -54,7 +70,15 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+    @objc private func didTapSaveButton() {
+        print("SaveButton 누름")
+        
+        // SaveDraftModal 모달을 present
+        let saveDraftModal = SaveDraftModal()
+        saveDraftModal.modalPresentationStyle = .overFullScreen // 전체 화면 모달로 띄움
+        present(saveDraftModal, animated: true, completion: nil)
+    }
+
     let locationLabel: UILabel = {
         let label = UILabel()
         label.text = "여행 장소"
@@ -63,7 +87,14 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+    private let locationCount: UILabel = {
+        let label = UILabel()
+        label.text = "0 / 10"
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .gray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     let locationTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "여행지를 입력하세요"
@@ -107,23 +138,85 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         button.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
         return button
     }()
+    let clearButton1: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal) // X 버튼 아이콘 설정
+        button.tintColor = .lightGray // 버튼 색상 설정
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(clearTextField), for: .touchUpInside) // X 버튼 클릭 시 동작
+        return button
+    }()
+    let clearButton2: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal) // X 버튼 아이콘 설정
+        button.tintColor = .lightGray // 버튼 색상 설정
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(clearTextField), for: .touchUpInside) // X 버튼 클릭 시 동작
+        return button
+    }()
     
     // MARK: - View Life Cycle
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        view.backgroundColor = .white
+//        view.addSubview(titleCount)
+//        configureTextFieldDelegates(in: startDateStackView)
+//        configureTextFieldDelegates(in: endDateStackView)
+//
+//        titleTextField.delegate = self
+//        locationTextField.delegate = self
+//
+//        setupCustomNavigationBar()
+//        setupUI()
+//        setupCompanionButtons()
+//        setupObservers()
+//
+//        titleCount.translatesAutoresizingMaskIntoConstraints = false
+//        titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
+//        titleTextField.delegate = self
+//        locationTextField.delegate = self
+//
+//        titleCount.translatesAutoresizingMaskIntoConstraints = false
+//
+//
+//    }
     override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        
-        configureTextFieldDelegates(in: startDateStackView)
-        configureTextFieldDelegates(in: endDateStackView)
-        
-        titleTextField.delegate = self
-        locationTextField.delegate = self
-        
-        setupCustomNavigationBar()
-        setupUI()
-        setupCompanionButtons()
-        setupObservers()
-    }
+            super.viewDidLoad()
+            view.backgroundColor = .white
+            view.addSubview(titleCount)
+            configureTextFieldDelegates(in: startDateStackView)
+            configureTextFieldDelegates(in: endDateStackView)
+            
+            titleTextField.delegate = self
+            locationTextField.delegate = self
+            
+            setupCustomNavigationBar()
+            setupUI()
+            setupCompanionButtons()
+            setupObservers()
+
+            titleCount.translatesAutoresizingMaskIntoConstraints = false
+            titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
+            titleTextField.delegate = self
+            locationTextField.delegate = self
+            
+            titleCount.translatesAutoresizingMaskIntoConstraints = false
+        }
+    
+    @objc private func titleTextFieldDidChange(_ textField: UITextField) {
+            let textCount = textField.text?.count ?? 0
+            if textCount > maxTitleLength {
+                textField.text = String(textField.text?.prefix(maxTitleLength) ?? "")
+            }
+            titleCount.text = "\(textField.text?.count ?? 0) / \(maxTitleLength)"
+            
+            // "임시저장" 버튼 글씨 색 변경
+            if let text = textField.text, !text.isEmpty {
+                saveButton.setTitleColor(.black, for: .normal)  // 글씨 색을 검정색으로 변경
+            } else {
+                saveButton.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)  // 글씨 색을 회색으로 변경
+            }
+        }
     
     private func setupCustomNavigationBar() {
         let navBar = UIView()
@@ -147,19 +240,18 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         
-        let saveButton = UIButton(type: .system) // 오른쪽 고정
-        saveButton.setTitle("임시저장", for: .normal)
-        saveButton.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
-        saveButton.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
-        saveButton.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
-        saveButton.translatesAutoresizingMaskIntoConstraints = false
-        
+        // Add navBar and its subviews
         view.addSubview(navBar)
         navBar.addSubview(separator)
         navBar.addSubview(titleLabel)
         navBar.addSubview(backButton)
         navBar.addSubview(saveButton)
         
+        // Add `titleCount` to the same view hierarchy as `titleTextField`
+        view.addSubview(titleCount)
+        view.addSubview(titleTextField)
+
+        // Setup constraints
         NSLayoutConstraint.activate([
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -178,8 +270,17 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             
             saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
-            saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24)
+            saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
+                 
         ])
+    }
+    
+    @objc private func clearTextField() {
+        titleTextField.text = "" // titleTextField의 텍스트를 비움
+        locationTextField.text = "" // locationTextField의 텍스트를 비움
+        titleCount.text = "0 / 10" // titleTextField에 텍스트가 비었으므로 카운트를 초기화
+        locationCount.text = "0 / 10" // locationTextField에 텍스트가 비었으므로 카운트를 초기화
+        validateInputs() // 유효성 검사 다시 실행
     }
     
     @objc private func didTapBackButton() {
@@ -189,13 +290,8 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         present(stopWritingVC, animated: false, completion: nil) // 애니메이션 제거
     }
     
-    @objc private func didTapSaveButton() {
-        print("SaveButton 누름")
-        // 저장 기능 필요
-        // 이것에 대한 구체적인 논의 필요
-        //
-    }
     
+
     private func setupUI() {
         view.addSubview(titleLabel)
         view.addSubview(titleTextField)
@@ -206,9 +302,22 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         view.addSubview(locationLabel)
         view.addSubview(locationTextField)
         view.addSubview(locationUnderline)
+        view.addSubview(locationCount)
         view.addSubview(companionLabel)
         view.addSubview(nextButton)
-        
+        view.addSubview(clearButton1) // X 버튼을 추가
+        clearButton1.widthAnchor.constraint(equalToConstant: 20).isActive = true
+        clearButton1.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        view.addSubview(saveButton)  // saveButton 추가
+
+        view.addSubview(clearButton2) // X 버튼을 추가
+        clearButton2.widthAnchor.constraint(equalToConstant: 20).isActive = true
+        clearButton2.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        titleCount.translatesAutoresizingMaskIntoConstraints = false
+
+        titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
+
+        // titleLabel과 titleTextField가 동일한 부모 뷰에 속하도록 constraint 수정
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 65),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
@@ -222,6 +331,12 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             titleUnderline.leadingAnchor.constraint(equalTo: titleTextField.leadingAnchor),
             titleUnderline.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor),
             titleUnderline.heightAnchor.constraint(equalToConstant: 1),
+            
+            clearButton1.topAnchor.constraint(equalTo: titleTextField.topAnchor, constant: 16), // X 버튼을 텍스트 필드 중앙에 배치
+            clearButton1.leadingAnchor.constraint(equalTo: titleTextField.leadingAnchor, constant: 325), // 텍스트 필드의 오른쪽에 배치
+            
+            titleCount.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 5),
+            titleCount.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor),
             
             dateLabel.topAnchor.constraint(equalTo: titleUnderline.bottomAnchor, constant: 24),
             dateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
@@ -242,10 +357,16 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             locationTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             locationTextField.heightAnchor.constraint(equalToConstant: 40),
             
+            clearButton2.topAnchor.constraint(equalTo: locationTextField.topAnchor, constant: 16), // X 버튼을 텍스트 필드 중앙에 배치
+            clearButton2.leadingAnchor.constraint(equalTo: locationTextField.leadingAnchor, constant: 325), // 텍스트 필드의 오른쪽에 배치
+          
             locationUnderline.topAnchor.constraint(equalTo: locationTextField.bottomAnchor, constant: 2),
             locationUnderline.leadingAnchor.constraint(equalTo: locationTextField.leadingAnchor),
             locationUnderline.trailingAnchor.constraint(equalTo: locationTextField.trailingAnchor),
             locationUnderline.heightAnchor.constraint(equalToConstant: 1),
+            
+            locationCount.topAnchor.constraint(equalTo: locationTextField.bottomAnchor, constant: 5),
+            locationCount.trailingAnchor.constraint(equalTo: locationTextField.trailingAnchor),
             
             companionLabel.topAnchor.constraint(equalTo: locationUnderline.bottomAnchor, constant: 24),
             companionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
@@ -254,8 +375,15 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             nextButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             nextButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             nextButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            saveButton.topAnchor.constraint(equalTo: titleUnderline.bottomAnchor, constant: -125),  // 적절한 위치 설정
+            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            saveButton.heightAnchor.constraint(equalToConstant: 19),
+            saveButton.widthAnchor.constraint(equalToConstant: 49),
+                 
         ])
     }
+
     
     private func setupCompanionButtons() {
         let options = ["혼자", "가족과", "친구와", "연인과", "기타"]
@@ -433,7 +561,8 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             }
         }
     }
-    
+   
+
 
     @objc private func doneButtonTapped() {
         view.endEditing(true) // 키보드 닫기
@@ -664,3 +793,4 @@ extension CreateViewController: StopWritingViewControllerDelegate {
         }
     }
 }
+
