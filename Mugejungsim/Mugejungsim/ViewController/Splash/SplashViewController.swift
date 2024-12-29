@@ -25,7 +25,7 @@ class SplashViewController: UIViewController {
 //            let mainVC = OBViewController1()
 //            let mainVC = MainViewController()
             let mainVC = LoginViewController()
-//           let mainVC = ObjeCreationViewController()
+//            let mainVC = ObjeCreationViewController()
 //            let mainVC = LoadingViewController()
 //            let mainVC = ResultViewController()
 //            let mainVC = UploadViewController()
@@ -41,7 +41,6 @@ class SplashViewController: UIViewController {
 //            let mainVC = DraftViewController()
 //            let mainVC = USDZPreviewViewController()
 //            let mainVC = ShareViewController()
-
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
             self.present(mainVC, animated: true, completion: nil)

@@ -40,7 +40,7 @@ class ResultViewController: UIViewController {
 
     let openPreviewButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "moments"), for: .normal)
+        button.setImage(UIImage(named: "Storybook Brown"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         button.clipsToBounds = true
         button.backgroundColor = .clear
@@ -56,6 +56,18 @@ class ResultViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
 
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+            
+        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            print("ResultViewController에서 데이터 확인:")
+            print("oneLine1: \(record.oneLine1)")
+        } else {
+            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+        }
+        
         // 버튼 액션 연결
         openPreviewButton.addTarget(self, action: #selector(openUSDZPreviewController), for: .touchUpInside)
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
@@ -72,6 +84,7 @@ class ResultViewController: UIViewController {
         super.viewDidLayoutSubviews()
         setupGradientLayer()
         setupShadowForSaveButton()
+        updateImages()
     }
 
     // MARK: - Gradient Layer Setup
@@ -111,9 +124,9 @@ class ResultViewController: UIViewController {
             touchLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             openPreviewButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            openPreviewButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            openPreviewButton.widthAnchor.constraint(equalToConstant: 175),
-            openPreviewButton.heightAnchor.constraint(equalToConstant: 175),
+            openPreviewButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 50),
+            openPreviewButton.widthAnchor.constraint(equalToConstant: 200),
+            openPreviewButton.heightAnchor.constraint(equalToConstant: 200),
 
             saveButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -122,11 +135,11 @@ class ResultViewController: UIViewController {
         ])
     }
 
-    // MARK: - Button Actions
-
+    // MARK: - Button Action
     @objc func saveButtonTapped() {
         print("성공!")
         let CheckObjeImageVC = CheckObjeImageViewController()
+        CheckObjeImageVC.recordID = recordID
         CheckObjeImageVC.modalPresentationStyle = .fullScreen
         self.present(CheckObjeImageVC, animated: true, completion: nil)
     }
@@ -136,4 +149,43 @@ class ResultViewController: UIViewController {
         USDZPreviewVC.modalPresentationStyle = .fullScreen
         present(USDZPreviewVC, animated: false, completion: nil)
     }
+    
+    private func updateImages() {
+        // 병 이미지도 여기서 관리하라!
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+        
+        // bottle(glass)
+        switch record?.oneLine1 {
+        case "value1":
+            openPreviewButton.setImage(UIImage(named: "Dreamy Pink"), for: .normal)
+        case "value2":
+            openPreviewButton.setImage(UIImage(named: "Cloud Whisper"), for: .normal)
+        case "value3":
+            openPreviewButton.setImage(UIImage(named: "Sunburst Yellow"), for: .normal)
+        case "value4":
+            openPreviewButton.setImage(UIImage(named: "Radiant Orange"), for: .normal)
+        case "value5":
+            openPreviewButton.setImage(UIImage(named: "Serene Sky"), for: .normal)
+        case "value6":
+            openPreviewButton.setImage(UIImage(named: "Midnight Depth"), for: .normal)
+        case "value7":
+            openPreviewButton.setImage(UIImage(named: "Wanderer's Flame"), for: .normal)
+        case "value8":
+            openPreviewButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
+        case "value9":
+            openPreviewButton.setImage(UIImage(named: "Ember Red"), for: .normal)
+        case "value10":
+            openPreviewButton.setImage(UIImage(named: "Meadow Green"), for: .normal)
+        default:
+            openPreviewButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
+        }
+        
+        openPreviewButton.imageView?.contentMode = .scaleAspectFit
+        openPreviewButton.imageEdgeInsets = .zero
+    }
+
 }
