@@ -574,10 +574,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //        mainImageView.image = images[currentIndex] // 이미지 변경
 //        textView.text = texts[currentIndex] // 텍스트 변경
 //        updateImageCountLabels() // 이미지 카운트 레이블 갱신
-        
-        // 현재 선택한 이미지로 갱신
-        texts[currentIndex] = textView.text // 이전 이미지의 텍스트 저장
-        selectedCategoriesForImages[currentIndex] = selectedSubCategories // 이전 이미지의 카테고리 저장
+        // 배열 및 인덱스 유효성 검사
+        guard !images.isEmpty, indexPath.item < images.count else {
+            print("Error: Invalid indexPath or no images available.")
+            return
+        }
+
+        // 현재 선택된 이미지와 데이터 갱신
+        if currentIndex < texts.count && currentIndex < selectedCategoriesForImages.count {
+            texts[currentIndex] = textView.text // 이전 이미지의 텍스트 저장
+            selectedCategoriesForImages[currentIndex] = selectedSubCategories // 이전 이미지의 카테고리 저장
+        }
+
             
         currentIndex = indexPath.item // 선택한 이미지 인덱스로 변경
         mainImageView.image = images[currentIndex] // 이미지 변경
