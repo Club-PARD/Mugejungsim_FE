@@ -150,7 +150,18 @@ class NameViewController: UIViewController {
     private func navigateToOnboarding() {
         let onboardingVC = OBViewController1()
         onboardingVC.modalPresentationStyle = .fullScreen
-        present(onboardingVC, animated: true, completion: nil)
+
+        // 현재 뷰와 다음 뷰 준비
+        guard let window = view.window else { return }
+        onboardingVC.view.frame = CGRect(x: 0, y: view.frame.height, width: view.frame.width, height: view.frame.height)
+        window.addSubview(onboardingVC.view)
+
+        // 애니메이션: 아래에서 위로 이동
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+            onboardingVC.view.frame = self.view.frame
+        }, completion: { _ in
+            window.rootViewController = onboardingVC
+        })
     }
     
     // MARK: - Actions

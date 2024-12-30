@@ -178,20 +178,35 @@ class LoginViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    // 클백 확인용 코드 : Kakao 연결
     func sendLoginDataToServer(name: String, provider: String) {
-        let url = URL(string: "http://192.168.1.22:8080/login")!
+        let url = URL(string: "http://172.17.208.113:8080/api/users/save")! // 서버 URL 수정 필요
+        
+        // 요청 생성
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let parameters: [String: String] = ["key": "value"]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: parameters)
+        
+        // 요청 본문 데이터 설정
+        let parameters: [String: String] = [
+            "name": name,
+            "provider": provider
+        ]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+        } catch {
+            print("Error serializing JSON: \(error.localizedDescription)")
+            return
+        }
 
+        // 네트워크 요청
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error: \(error.localizedDescription)")
             } else if let httpResponse = response as? HTTPURLResponse {
                 print("HTTP Status Code: \(httpResponse.statusCode)")
+                if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Response: \(responseString)")
+                }
             } else {
                 print("Unknown response")
             }
