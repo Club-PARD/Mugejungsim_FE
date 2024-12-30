@@ -9,28 +9,54 @@
  * App 전체적인 기능 Flow 점검 위한 코드
  *
  */
-
+import Alamofire
 import UIKit
 
-struct TravelRecord: Codable {
-    var id: UUID                // 기록물 id
-    var title: String           // 기록물 제목 : 여행 제목
-    var description: String     //
-    var date: String            // 여행 날짜
-    var location: String        // 여행지
-    var oneLine1: String        //
-    var oneLine2: String        //
-    var photos: [PhotoData] // `PhotoData` 사용
+//struct TravelRecord: Codable {
+//    var id: UUID                // 기록물 id
+//    var title: String           // 기록물 제목 : 여행 제목
+//    var description: String     //
+//    var date: String            // 여행 날짜
+//    var location: String        // 여행지
+//    var oneLine1: String        //
+//    var oneLine2: String        //
+//    var photos: [PhotoData] // `PhotoData` 사용
+//
+//    init(title: String, description: String, date: String, location: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
+//        self.id = UUID()
+//        self.title = title
+//        self.description = description
+//        self.date = date
+//        self.location = location
+//        self.oneLine1 = oneLine1
+//        self.oneLine2 = oneLine2
+//        self.photos = photos
+//    }
+//}
 
-    init(title: String, description: String, date: String, location: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
-        self.id = UUID()
+struct TravelRecord: Codable {
+    var id: UUID          // 기록물 id
+    var title: String           // 기록물 제목 : 여행 제목
+    var startDate: String            // 여행 시작 날짜
+    var endDate: String            // 여행 종료 날짜
+    var location: String        // 여행지
+    var companion : String // 동행자
+    var bottle : String // 유리병
+    var photos: [PhotoData] // `PhotoData` 사용
+    var oneLine1: String        //
+    var oneLine2: String
+
+    init(id:UUID = UUID(), title: String, description: String, startDate: String, endDate: String, location: String, companion: String, bottle: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
+        self.id = id
         self.title = title
-        self.description = description
-        self.date = date
+        self.startDate = startDate
+        self.endDate = endDate
         self.location = location
+        self.companion = companion
+        self.bottle = bottle
+        self.photos = photos
         self.oneLine1 = oneLine1
         self.oneLine2 = oneLine2
-        self.photos = photos
     }
 }
 
@@ -90,7 +116,7 @@ class TravelRecordManager {
 
         // `DataManager`를 사용하여 이미지 삭제
         let photoToDelete = record.photos[index]
-        DataManager.shared.deleteData(photoData: photoToDelete)
+//        DataManager.shared.deleteData(photoData: photoToDelete)
 
         // 사진 목록 업데이트
         record.photos.remove(at: index)

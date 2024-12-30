@@ -808,6 +808,12 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         }
     }
     
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
     private func setupNextButton() {
         let button = UIButton(type: .system)
         button.setTitle("다음", for: .normal)
@@ -864,7 +870,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //        savedPhotosVC.modalPresentationStyle = .fullScreen
 //        present(savedPhotosVC, animated: true)
 //    }
-
+//
 //    @objc private func nextButtonTapped() {
 //        guard let recordUUID = UUID(uuidString: recordID) else {
 //            print("유효하지 않은 Record ID: \(recordID)")
@@ -959,6 +965,73 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("사진 \(index + 1) 저장 실패")
             }
         }
+        
+        // Swagger 형식의 데이터를 생성
+            var swaggerData: [[String: Any]] = []
+            for (index, image) in images.enumerated() {
+                let text = texts[index]
+                let categories = selectedCategoriesForImages[index]
+                guard let imagePath = DataManager.shared.saveImage(image) else {
+                    print("이미지 저장 실패")
+                    continue
+                }
+
+                let photoData: [String: Any] = [
+                    "id": index,
+                    "content": text,
+                    "categories": categories,
+                    "imagePath": imagePath,
+                    "orderIndex": index
+                ]
+                swaggerData.append(photoData)
+            }
+
+        // Swagger 데이터 업로드
+            DataManager.shared.uploadPhotoData(swaggerData) { result in
+                switch result {
+                case .success(let response):
+                    print("Swagger 데이터 업로드 성공: \(response)")
+                    
+                    // 다음 화면으로 이동
+                    let savedPhotosVC = SavedPhotosViewController()
+                    savedPhotosVC.recordID = self.recordID
+                    savedPhotosVC.modalPresentationStyle = .fullScreen
+                    self.present(savedPhotosVC, animated: true)
+                case .failure(let error):
+                    if let urlError = error as? URLError {
+                        switch urlError.code {
+                        case .notConnectedToInternet:
+                            self.showAlert(title: "네트워크 오류", message: "인터넷 연결을 확인해주세요.")
+                        case .cannotFindHost:
+                            self.showAlert(title: "서버 오류", message: "서버 주소를 확인해주세요.")
+                        case .cannotConnectToHost:
+                            self.showAlert(title: "서버 연결 실패", message: "서버가 응답하지 않습니다.")
+                        default:
+                            self.showAlert(title: "네트워크 오류", message: urlError.localizedDescription)
+                        }
+                    } else {
+                        self.showAlert(title: "업로드 실패", message: error.localizedDescription)
+                    }
+                }
+            }
+        
+        // 서버에 데이터 업로드
+            let serverURL = "http://192.168.1.22:8080/api/stories"
+            StoryManager.shared.uploadStories(to: serverURL) { result in
+                switch result {
+                case .success(let message):
+                    print("업로드 성공: \(message)")
+                    DispatchQueue.main.async {
+                        // 업로드 성공 후 다음 화면으로 이동
+                        let savedPhotosVC = SavedPhotosViewController()
+                        savedPhotosVC.modalPresentationStyle = .fullScreen
+                        self.present(savedPhotosVC, animated: true)
+                    }
+                case .failure(let error):
+                    print("업로드 실패: \(error.localizedDescription)")
+                    self.showAlert(title: "업로드 실패", message: "서버로 데이터를 전송하지 못했습니다. 네트워크 상태를 확인해주세요.")
+                }
+            }
 
         // 다음 화면으로 이동
         let savedPhotosVC = SavedPhotosViewController()

@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 
 class DataManager {
@@ -11,7 +12,47 @@ class DataManager {
     private init() {
         documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         dataFile = documentsDirectory.appendingPathComponent("photoData.json")
-        travelDataFile = documentsDirectory.appendingPathComponent("travelRecords.json") // Tr
+        travelDataFile = documentsDirectory.appendingPathComponent("travelRecords.json")
+    }
+
+    // MARK: - Swagger API 호출
+    func uploadPhotoData(_ photoData: [[String: Any]], completion: @escaping (Result<String, Error>) -> Void) {
+        // API URL 설정 (실제 엔드포인트로 변경 필요)
+        
+        guard let url = URL(string: "http://49.142.120.93:8080/swagger-ui/index.html") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+
+        // URLRequest 설정
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // JSON 데이터 변환
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: photoData, options: [])
+            request.httpBody = jsonData
+        } catch {
+            completion(.failure(error))
+            return
+        }
+
+        // URLSession을 사용한 네트워크 요청
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data, let responseString = String(data: data, encoding: .utf8) else {
+                completion(.failure(NSError(domain: "No Data", code: -2, userInfo: nil)))
+                return
+            }
+
+            completion(.success(responseString))
+        }
+        task.resume()
     }
 
     // MARK: - 데이터 저장
@@ -46,7 +87,7 @@ class DataManager {
         let imagePath = documentsDirectory.appendingPathComponent(imageName)
         return UIImage(contentsOfFile: imagePath.path)
     }
-    
+
     func addNewData(photoData: [PhotoData]) {
         var existingData = loadData() // 기존 데이터를 불러옴
         existingData.append(contentsOf: photoData) // 새 데이터를 추가
@@ -55,37 +96,6 @@ class DataManager {
         }
     }
 
-//    // MARK: - 이미지 삭제
-//    func deleteImage(at imagePath: String) {
-//        let fileURL = documentsDirectory.appendingPathComponent(imagePath)
-//        do {
-//            try fileManager.removeItem(at: fileURL)
-//            print("이미지 삭제 완료: \(imagePath)")
-//        } catch {
-//            print("이미지 삭제 실패: \(error.localizedDescription)")
-//        }
-//    }
-    
-    func addData(_ data: PhotoData) {
-            photoDataList.append(data)
-        }
-    
-    func deleteData(photoData: PhotoData) {
-            photoDataList.removeAll { $0.imagePath == photoData.imagePath }
-            print("\(photoData.imagePath)가 삭제되었습니다.")
-        }
-    
-    // 전체 데이터 업데이트 (필요시)
-    func updateDataList(_ dataList: [PhotoData]) {
-        photoDataList = dataList
-    }
-    
-//    // MARK: - 데이터 초기화
-//        func resetData() {
-//            saveData(photoData: []) // 빈 배열 저장
-//            print("저장된 데이터가 초기화되었습니다.")
-//        }
-    
     // MARK: - TravelRecord 저장
     func saveTravelRecords(_ records: [TravelRecord]) {
         if let jsonData = try? JSONEncoder().encode(records) {

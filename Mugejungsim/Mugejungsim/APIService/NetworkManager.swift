@@ -32,6 +32,17 @@ class NetworkManager {
             return try? encoder.encode(body).toDictionary()
         }()
         
+        // Print request details
+        print("=== Request ===")
+        print("URL: \(url)")
+        print("Method: \(method.rawValue)")
+        print("Headers: \(headers)")
+        print("Parameters: \(parameters ?? [:])")
+        if let bodyParameters = bodyParameters {
+            print("Body: \(bodyParameters)")
+        }
+        print("===============")
+        
         AF.request(
             url,
             method: method,
@@ -41,12 +52,22 @@ class NetworkManager {
         )
         .validate(statusCode: 200..<300)
         .responseDecodable(of: T.self) { response in
+            // Print response details
+            print("=== Response ===")
+            print("URL: \(response.request?.url?.absoluteString ?? "No URL")")
+            print("Status Code: \(response.response?.statusCode ?? 0)")
+            if let data = response.data {
+                print("Raw Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
+            }
             switch response.result {
             case .success(let result):
+                print("Decoded Response: \(result)")
                 completion(.success(result))
             case .failure(let error):
+                print("Error: \(error.localizedDescription)")
                 completion(.failure(error))
             }
+            print("================")
         }
     }
 
@@ -61,6 +82,14 @@ class NetworkManager {
         let headers: HTTPHeaders = [
             "Content-Type": "multipart/form-data"
         ]
+        
+        // Print upload details
+        print("=== Upload Request ===")
+        print("URL: \(url)")
+        print("Headers: \(headers)")
+        print("Parameters: \(parameters)")
+        print("Images Count: \(images.count)")
+        print("======================")
         
         AF.upload(
             multipartFormData: { multipartFormData in
@@ -86,12 +115,22 @@ class NetworkManager {
         )
         .validate(statusCode: 200..<300)
         .responseDecodable(of: APIResponse.self) { response in
+            // Print upload response details
+            print("=== Upload Response ===")
+            print("URL: \(response.request?.url?.absoluteString ?? "No URL")")
+            print("Status Code: \(response.response?.statusCode ?? 0)")
+            if let data = response.data {
+                print("Raw Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
+            }
             switch response.result {
             case .success(let result):
+                print("Decoded Response: \(result)")
                 completion(.success(result))
             case .failure(let error):
+                print("Error: \(error.localizedDescription)")
                 completion(.failure(error))
             }
+            print("=======================")
         }
     }
 }

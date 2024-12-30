@@ -1,3 +1,4 @@
+import Alamofire
 import UIKit
 
 class CreateViewController: UIViewController, UITextFieldDelegate {
@@ -604,17 +605,21 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
         location = locationTextField.text ?? "없음"
         
-        print("제목: \(travelTitle)")
-        print("누구와: \(companion)")
-        print("시작일자: \(startDate)")
-        print("종료일자: \(endDate)")
-        print("장소: \(location)")
+//        print("제목: \(travelTitle)")
+//        print("누구와: \(companion)")
+//        print("시작일자: \(startDate)")
+//        print("종료일자: \(endDate)")
+//        print("장소: \(location)")
         
         let newRecord = TravelRecord(
+            id: UUID(), // 새로운 UUID 생성
             title: travelTitle,
             description: "\(companion) | \(startDate) ~ \(endDate)",
-            date: startDate,
+            startDate: startDate,
+            endDate: endDate,
             location: location,
+            companion: companion,
+            bottle: "", // 적절한 값 전달
             oneLine1: "",
             oneLine2: ""
         )
@@ -661,6 +666,62 @@ extension CreateViewController: StopWritingViewControllerDelegate {
             let navController = UINavigationController(rootViewController: mainVC)
             window.rootViewController = navController
             window.makeKeyAndVisible()
+        }
+    }
+}
+
+extension TravelRecordManager {
+    // MARK: - 서버로 기록 전송
+    func sendRecordToServer(_ record: TravelRecord, completion: @escaping (Result<String, Error>) -> Void) {
+        // 서버 URL
+        let serverURL = "http://192.168.1.22:8080/api/stories" // 서버 주소 수정 필요
+
+        // JSON 데이터로 변환
+        do {
+            let jsonData = try JSONEncoder().encode(record)
+            let json = try JSONSerialization.jsonObject(with: jsonData, options: [])
+            print("Record JSON:", json) // 디버깅용 출력
+
+            // Alamofire 요청
+            AF.request(
+                serverURL,
+                method: .post,
+                parameters: json as? [String: Any],
+                encoding: JSONEncoding.default,
+                headers: ["Content-Type": "application/json"]
+            ).response { response in
+                switch response.result {
+                case .success:
+                    completion(.success("Record successfully sent to server"))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        } catch {
+            print("JSON Encoding Error: \(error.localizedDescription)")
+            completion(.failure(error))
+        }
+    }
+}
+
+extension TravelRecordManager {
+    // MARK: - 서버에서 특정 기록 가져오기
+    func getRecordFromServer(postId: UUID, completion: @escaping (Result<TravelRecord, Error>) -> Void) {
+        // 서버 URL
+        let serverURL = "http://192.168.1.22:8080/api/stories/\(postId.uuidString)/stories" // 서버 주소 수정 필요
+
+        // Alamofire 요청
+        AF.request(
+            serverURL,
+            method: .get,
+            headers: ["Content-Type": "application/json"]
+        ).responseDecodable(of: TravelRecord.self) { response in
+            switch response.result {
+            case .success(let record):
+                completion(.success(record))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
 }
