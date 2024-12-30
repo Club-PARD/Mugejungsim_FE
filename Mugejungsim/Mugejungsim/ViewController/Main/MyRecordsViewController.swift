@@ -364,10 +364,16 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         scrollableTravelCollectionView.delegate = self
         scrollableTravelCollectionView.dataSource = self
         scrollableTravelCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
+        
+        scrollableObjectCollectionView.delegate = self
+        scrollableObjectCollectionView.dataSource = self
+        scrollableObjectCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
     }
     
     @objc private func segmentedControlChanged() {
         // 선택된 세그먼트 인덱스에 따라 다른 CollectionView 표시
+        print("Segmented control changed to index: \(segmentedControl.selectedSegmentIndex)")
+
         switch segmentedControl.selectedSegmentIndex {
         case 0: // 여행 기록
             scrollableObjectCollectionView.removeFromSuperview()
@@ -380,6 +386,11 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 scrollableTravelCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
                 scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: 800)
             ])
+            reloadTravelRecords() // 여행 기록 데이터를 다시 로드
+            print("Reloaded Travel Records. Count: \(travelRecords.count)")
+            travelRecords.forEach { record in
+                print("TravelRecord - Title: \(record.title), OneLine1: \(record.oneLine1)!")
+            }
         case 1: // 오브제
             scrollableTravelCollectionView.removeFromSuperview()
             scrollView.addSubview(scrollableObjectCollectionView)
@@ -391,6 +402,11 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 scrollableObjectCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
                 scrollableObjectCollectionView.heightAnchor.constraint(equalToConstant: 800)
             ])
+            reloadTravelRecords() // 여행 기록 데이터를 다시 로드
+            print("Reloaded Travel Records. Count: \(travelRecords.count)")
+            travelRecords.forEach { record in
+                print("TravelRecord - Title: \(record.title), OneLine1: \(record.oneLine1)!")
+            }
         default:
             break
         }
@@ -398,16 +414,20 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == scrollableTravelCollectionView {
+            print("T count: \(travelRecords.count)")
             return travelRecords.count // 여행 기록 데이터 개수
         } else if collectionView == scrollableObjectCollectionView {
-            return objects.count // 오브제 데이터 개수
+            print("O count: \(travelRecords.count)")
+//            return objects.count // 오브제 데이터 개수
+            return travelRecords.count // 여행 기록 데이터 개수
+
         }
         return 0
     }
     
 //    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 //        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
-//        
+//
 //        if collectionView == scrollableTravelCollectionView {
 //            let imageName = "image\(indexPath.row + 1)"
 //            cell.imageView.image = UIImage(named: imageName)
@@ -417,7 +437,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
 //            cell.imageView.image = UIImage(named: imageName)
 //            cell.titleLabel.text = "오브제 \(indexPath.row + 1)"
 //        }
-//        
+//
 //        return cell
 //    }
     
@@ -450,8 +470,9 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 cell.imageView.image = UIImage(named: "브라운") // 기본 이미지
             }
             cell.titleLabel.text = record.title // 여행 기록 제목
-            
+            print("pass")
         } else if collectionView == scrollableObjectCollectionView {
+//            print("oneLine1 value: \(record.oneLine1)") // 추가된 디버깅
             switch record.oneLine1 {
             case "value1":
                 cell.imageView.image = UIImage(named: "Dreamy Pink")
@@ -477,6 +498,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 cell.imageView.image = UIImage(named: "Storybook Brown") // 기본 이미지
             }
             cell.titleLabel.text = record.title // 오브제 이름
+            print("Shit")
         }
         
         return cell
@@ -554,6 +576,9 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         // 샘플 데이터를 TravelRecordManager에서 가져오기
         travelRecords = TravelRecordManager.shared.getAllRecords()
         print("Loaded travel records count: \(travelRecords.count)")
+        travelRecords.forEach { record in
+            print("TravelRecord - Title: \(record.title), OneLine1: \(record.oneLine1)")
+        }
     }
 
     

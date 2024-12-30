@@ -803,7 +803,7 @@ extension TravelRecordManager {
     // MARK: - 서버로 기록 전송
     func sendRecordToServer(_ record: TravelRecord, completion: @escaping (Result<String, Error>) -> Void) {
         // 서버 URL
-        let serverURL = "http://192.168.1.22:8080/api/stories" // 서버 주소 수정 필요
+        let serverURL = "http://172.17.208.113:8080/api/posts?userId=1" // 서버 주소 수정 필요
 
         // JSON 데이터로 변환
         do {
@@ -833,24 +833,24 @@ extension TravelRecordManager {
     }
 }
 
-extension TravelRecordManager {
-    // MARK: - 서버에서 특정 기록 가져오기
-    func getRecordFromServer(postId: UUID, completion: @escaping (Result<TravelRecord, Error>) -> Void) {
-        // 서버 URL
-        let serverURL = "http://192.168.1.22:8080/api/stories/\(postId.uuidString)/stories" // 서버 주소 수정 필요
-
-        // Alamofire 요청
-        AF.request(
-            serverURL,
-            method: .get,
-            headers: ["Content-Type": "application/json"]
-        ).responseDecodable(of: TravelRecord.self) { response in
-            switch response.result {
-            case .success(let record):
-                completion(.success(record))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-}
+//extension TravelRecordManager {
+//    // MARK: - 서버에서 특정 기록 가져오기
+//    func getRecordFromServer(postId: UUID, completion: @escaping (Result<TravelRecord, Error>) -> Void) {
+//        // 서버 URL
+//        let serverURL = "http://192.168.1.22:8080/api/stories/\(postId.uuidString)/stories" // 서버 주소 수정 필요
+//
+//        // Alamofire 요청
+//        AF.request(
+//            serverURL,
+//            method: .get,
+//            headers: ["Content-Type": "application/json"]
+//        ).responseDecodable(of: TravelRecord.self) { response in
+//            switch response.result {
+//            case .success(let record):
+//                completion(.success(record))
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//}
