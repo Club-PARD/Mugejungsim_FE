@@ -30,6 +30,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
     
     var recordID : String = ""
+    
+    private var nextButton: UIButton!
 
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
@@ -306,8 +308,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private func setupMainImageView() {
         let containerView = UIView()
         containerView.backgroundColor = .white
-//        containerView.layer.borderWidth = 1
-//        containerView.layer.borderColor = UIColor.black.cgColor
         containerView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(containerView)
         
@@ -429,7 +429,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         ])
     }
     
-    // Check
     private func setupButtonsAboutCategoryButton() {
         guard let categoryIndex = self.categoryIndex,
               let buttonTitles = MockData.shared.rows[categoryIndex] else {
@@ -456,16 +455,15 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         for title in buttonTitles {
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
-            button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14)
+            button.titleLabel?.font = selectedSubCategories.contains(title) ? UIFont(name: "Pretendard-SemiBold", size: 14) : UIFont(name: "Pretendard-Regular", size: 14)
             button.setTitleColor(.black, for: .normal)
             button.layer.borderWidth = 1
             button.layer.cornerRadius = 4
             button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16) // 버튼 내부 패딩 설정
-            button.layer.borderColor = UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
-            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.white
+            button.layer.borderColor = selectedSubCategories.contains(title) ? UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor : UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor //!!!!!
+            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1) : UIColor.white
             button.layer.cornerRadius = 18.5
             button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
-            
             button.heightAnchor.constraint(equalToConstant: 39).isActive = true
             stackView.addArrangedSubview(button)
         }
@@ -474,7 +472,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 140),
             stackView.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor),
-//            stackView.trailingAnchor.constraint(equalTo: categoryContainer.trailingAnchor),
         ])
     }
 
@@ -610,8 +607,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         selectedSubCategories = selectedCategoriesForImages[currentIndex] // 선택한 사진의 카테고리 불러오기
 
         // UI 업데이트
-        updateCategoryButtonsAppearance()
+        updateCategoryButtonsAppearance() // 하위 카테고리 버튼 UI 업데이트
+        setupButtonsAboutCategoryButton() // 세부 카테고리 버튼 다시 설정
         updateImageCountLabels()
+        updateNextButtonState(for: nextButton)
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -635,6 +634,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         images.remove(at: index)
         texts.remove(at: index)
+        
         if currentIndex == index {
             currentIndex = max(0, currentIndex - 1)
         }
@@ -650,10 +650,11 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         characterCountLabel.text = "\(characterCount) / \(maxCharacterCount)"
         characterCountLabel.textColor = characterCount > maxCharacterCount ? .systemRed : .systemGray
 
-        // 현재 사진의 텍스트 실시간 업데이트
-        if currentIndex < texts.count {
+        if currentIndex < texts.count {         // 현재 사진의 텍스트 실시간 업데이트
             texts[currentIndex] = textView.text
         }
+        
+        updateNextButtonState(for: nextButton)  // 버튼 상태 업데이트
     }
     var selectedButton: UIButton?
 
@@ -678,45 +679,53 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         stackView.spacing = 10
         stackView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(stackView)
-
-        // 버튼 데이터
+        
         let buttonTitles = ["문화 · 경험", "AAAAA", "BBBBB", "CCCCC"] // 필요한 버튼 제목
-        for title in buttonTitles {
+        for (index, title) in buttonTitles.enumerated() { // `enumerated`로 인덱스 추가
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
             button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
             button.setTitleColor(.black, for: .normal)
             button.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             button.layer.cornerRadius = 18.5
-            button.layer.borderWidth = 1
-            button.layer.borderColor = #colorLiteral(red: 0.9098039216, green: 0.9098039216, blue: 0.9098039216, alpha: 1)
+//            button.layer.borderWidth = 1
+//            button.layer.borderColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1).cgColor
             button.translatesAutoresizingMaskIntoConstraints = false
-            
+
             button.widthAnchor.constraint(equalToConstant: 86).isActive = true
             button.heightAnchor.constraint(equalToConstant: 37).isActive = true
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
+
+            // 초기화 시 첫 번째 버튼을 선택 상태로 설정
+            if index == 0 {
+                selectedButton = button
+                button.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
+                button.setTitleColor(.white, for: .normal)
+                
+                categoryIndex = 0 // 첫 번째 카테고리 선택
+            }
         }
-        
         // ScrollView와 StackView 제약 조건
         NSLayoutConstraint.activate([
-        // ScrollView 제약 조건
+            // ScrollView 제약 조건
             scrollView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 22.5),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 
-        // StackView 제약 조건
+            // StackView 제약 조건
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
         ])
-//        scrollView.layer.zPosition = -1 // 썸네일 컬렉션 뷰와 addButton보다 계층이 낮음
-//        view.sendSubviewToBack(scrollView)
+
+        categoryIndex = 0  //첫 번째 카테고리 인덱스
+        setupButtonsAboutCategoryButton() // 세부 카테고리 초기화
         // 터치 이벤트 설정
-            scrollView.isUserInteractionEnabled = true
-            view.bringSubviewToFront(scrollView) // 스크롤 뷰 터치 활성화를 위해 계
+        scrollView.isUserInteractionEnabled = true
+        view.bringSubviewToFront(scrollView) // 스크롤 뷰 터치 활성화를 위해 계
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
@@ -724,18 +733,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             previousButton.setTitleColor(.black, for: .normal)
         }
-                   
         // 새로 선택된 버튼 색상 변경
         sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
         sender.setTitleColor(.white, for: .normal)
-
-        if let previousButton = selectedButton {
-                previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
-                previousButton.setTitleColor(.black, for: .normal)
-            }
-        // 새로 선택된 버튼 색상 변경
-        sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
-        sender.setTitleColor(.white, for: .normal)
+        sender.layer.borderWidth = 0
         // 현재 버튼을 선택된 버튼으로 설정
         selectedButton = sender
 
@@ -756,10 +757,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             print("데이터 없음")
             return
         }
-        
 //        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 현재 이미지에 저장된 선택된 카테고리 불러오기
         setupButtonsAboutCategoryButton()
-
     }
     
     // 서브 카테고리 선택 및 저장 기능
@@ -770,8 +769,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         if selectedSubCategories.contains(title) {
             // 이미 선택된 카테고리를 다시 누르면 해제
             selectedSubCategories.removeAll { $0 == title }
-            sender.backgroundColor = UIColor.white
-            sender.layer.borderColor = UIColor.lightGray.cgColor
+            sender.backgroundColor = UIColor.black
+            sender.layer.borderColor = UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
+            sender.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
+            sender.setTitleColor(.black, for: .normal)
         } else {
             // 최대 선택 개수 제한 (예: 3개)
             guard selectedSubCategories.count < 3 else {
@@ -779,8 +780,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 return
             }
             selectedSubCategories.append(title) // 새로운 서브 카테고리 추가
-            sender.backgroundColor = UIColor.systemBlue
-            sender.layer.borderColor = UIColor.systemBlue.cgColor
+            sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
+            sender.layer.borderColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor
+            sender.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14)
+            sender.setTitleColor(.black, for: .normal)
         }
 
         // 현재 사진의 카테고리 저장
@@ -797,15 +800,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         // UI 업데이트
         updateCategoryButtonsAppearance()
+        updateNextButtonState(for: nextButton)
     }
-    // UI 업데이트 함수
+
+
+    // 하위 카테고리 버튼 UI 업데이트 함수
     private func updateCategoryButtonsAppearance() {
         guard let stackView = contentView.subviews.first(where: { $0 is UIStackView }) as? UIStackView else { return }
 
         for case let button as UIButton in stackView.arrangedSubviews {
             if let title = button.title(for: .normal) {
-                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor.systemBlue : UIColor.white
-                button.setTitleColor(selectedSubCategories.contains(title) ? .white : .black, for: .normal)
+                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1) : UIColor.white
+                button.setTitleColor(.black, for: .normal)
             }
         }
     }
@@ -817,88 +823,139 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     private func setupNextButton() {
-        let button = UIButton(type: .system)
-        button.setTitle("다음", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        nextButton = UIButton(type: .system)
+        nextButton.setTitle("다음", for: .normal)
 
-        contentView.addSubview(button)
+        // 비활성화
+        nextButton.isEnabled = false
+        nextButton.setTitleColor(UIColor(red: 0.54, green: 0.54, blue: 0.54, alpha: 1), for: .normal)
+        nextButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
+        
+//        // 활성화
+//        button.setTitleColor(.white, for: .normal)
+//        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
+        
+        
+        nextButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        nextButton.layer.cornerRadius = 8
+        nextButton.translatesAutoresizingMaskIntoConstraints = false
+        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+
+        contentView.addSubview(nextButton)
         NSLayoutConstraint.activate([
-            button.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 23),
-            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            button.heightAnchor.constraint(equalToConstant: 44),
+            nextButton.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 23),
+            nextButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            nextButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            nextButton.heightAnchor.constraint(equalToConstant: 52),
         ])
+        updateNextButtonState(for: nextButton)  // 초기 상태 업데이트
     }
+    
+    private func updateNextButtonState(for button: UIButton) {
+        // `texts`와 `selectedCategoriesForImages` 배열 크기를 `images` 크기에 맞추기
+        if texts.count < images.count {
+            texts.append(contentsOf: Array(repeating: "", count: images.count - texts.count))
+        }
+        if selectedCategoriesForImages.count < images.count {
+            selectedCategoriesForImages.append(contentsOf: Array(repeating: [], count: images.count - selectedCategoriesForImages.count))
+        }
 
-//    @objc private func nextButtonTapped() {
-//        guard currentIndex < images.count else {
-//            print("잘못된 인덱스입니다.")
-//            return
-//        }
-//
-//        // 서브 카테고리 선택 확인
-//        guard !selectedSubCategories.isEmpty else {
-//            print("최소 하나의 서브 카테고리를 선택해야 합니다.")
-//            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-//            present(alert, animated: true, completion: nil)
-//            return
-//        }
-//
-//        // 현재 이미지와 텍스트 가져오기
-//        let currentImage = images[currentIndex]
-//        let currentText = textView.text ?? ""
-//
-//
-//        // 이미지 저장
-//        guard let imagePath = DataManager.shared.saveImage(currentImage) else {
-//            print("이미지 저장 실패")
-//            return
-//        }
-//
-//        // PhotoData 생성
-//        let photoData = PhotoData(imagePath: imagePath, text: currentText, category: selectedSubCategories.joined(separator: ", "))
-//
-//        // 저장
-//        DataManager.shared.addNewData(photoData: [photoData])
-//
-//        // `SavedPhotosViewController`로 이동
-//        let savedPhotosVC = SavedPhotosViewController()
-//        savedPhotosVC.modalPresentationStyle = .fullScreen
-//        present(savedPhotosVC, animated: true)
-//    }
-//
-//    @objc private func nextButtonTapped() {
-//        guard let recordUUID = UUID(uuidString: recordID) else {
-//            print("유효하지 않은 Record ID: \(recordID)")
-//            return
-//        }
-//
-//        // 저장된 데이터가 없을 경우 경고 메시지 출력
-//        guard !images.isEmpty else {
-//            print("이미지가 없습니다.")
-//            let alert = UIAlertController(title: "이미지 없음", message: "최소 한 장의 이미지를 추가해주세요.", preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-//            present(alert, animated: true, completion: nil)
-//            return
-//        }
+        // 모든 사진이 유효한지 확인
+        let isAllPhotosValid = images.indices.allSatisfy { index in
+            let text = texts[index].trimmingCharacters(in: .whitespacesAndNewlines)
+            let categories = selectedCategoriesForImages[index]
+            return !text.isEmpty || !categories.isEmpty
+        }
+
+        // 버튼 상태 업데이트
+        if isAllPhotosValid {
+            // 활성화 상태
+            button.isEnabled = true
+            button.setTitleColor(.white, for: .normal)
+            button.backgroundColor = UIColor(red: 0.533, green: 0.538, blue: 0.808, alpha: 1)
+        } else {
+            // 비활성화 상태
+            button.isEnabled = false
+            button.setTitleColor(UIColor(red: 0.54, green: 0.54, blue: 0.54, alpha: 1), for: .normal)
+            button.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
+        }
+    }
+    
+    @objc private func nextButtonTapped() {
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 Record ID: \(recordID)")
+            return
+        }
+
+        // 저장된 데이터가 없을 경우 경고 메시지 출력
+        guard !images.isEmpty else {
+            print("이미지가 없습니다.")
+            let alert = UIAlertController(title: "이미지 없음", message: "최소 한 장의 이미지를 추가해주세요.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return
+        }
+        // 현재 이미지를 저장
+            if currentIndex < texts.count {
+                texts[currentIndex] = textView.text
+            }
+            if currentIndex < selectedCategoriesForImages.count {
+                selectedCategoriesForImages[currentIndex] = selectedSubCategories
+            }
 //        // 현재 이미지와 관련된 텍스트와 카테고리 저장
 //        texts = Array(repeating: "", count: images.count)
 //        selectedCategoriesForImages = Array(repeating: [], count: images.count)
-//
-//        // 카테고리 선택 확인
-//        guard !selectedSubCategories.isEmpty else {
-//            let alert = UIAlertController(title: "카테고리 선택 필요", message: "최소 하나의 서브 카테고리를 선택해주세요.", preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-//            present(alert, animated: true, completion: nil)
-//            return
+        
+        for (index, image) in images.enumerated() {
+            let text = texts[index]
+            let category = selectedCategoriesForImages[index].joined(separator: ", ")
+
+            let success = TravelRecordManager.shared.addPhoto(
+                to: UUID(uuidString: recordID) ?? UUID(),
+                image: image,
+                text: text,
+                category: category
+            )
+            if success {
+                print("사진 \(index + 1) 추가 성공")
+            } else {
+                print("사진 \(index + 1) 추가 실패")
+            }
+        }
+
+        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            print("해당 Record ID (\(recordUUID))의 데이터:")
+            print("Title: \(record.title)")
+//            print("Description: \(record.description)")
+//            print("Date: \(record.date)")
+            print("Location: \(record.location)")
+            print("Photos:")
+            for (index, photo) in record.photos.enumerated() {
+                print("Photo \(index + 1):")
+                print("    Image Path: \(photo.imagePath)")
+                print("    Text: \(photo.text)")
+                print("    Category: \(photo.category)")
+            }
+        } else {
+            print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
+        }
+
+        let savedPhotosVC = SavedPhotosViewController()
+        savedPhotosVC.recordID = recordID
+        savedPhotosVC.modalPresentationStyle = .fullScreen
+        present(savedPhotosVC, animated: true)
+    }
+    
+//    @objc private func nextButtonTapped() {
+//        // 현재 사진 데이터 저장
+//        if currentIndex < texts.count {
+//            texts[currentIndex] = textView.text
+//        }
+//        if currentIndex < selectedCategoriesForImages.count {
+//            selectedCategoriesForImages[currentIndex] = selectedSubCategories
 //        }
 //
+//        // 모든 사진에 대해 데이터 저장
 //        for (index, image) in images.enumerated() {
 //            let text = texts[index]
 //            let category = selectedCategoriesForImages[index].joined(separator: ", ")
@@ -911,29 +968,80 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //            )
 //
 //            if success {
-//                print("사진 \(index + 1) 추가 성공")
+//                print("사진 \(index + 1) 저장 성공")
 //            } else {
-//                print("사진 \(index + 1) 추가 실패")
+//                print("사진 \(index + 1) 저장 실패")
 //            }
 //        }
+//        
+//        // Swagger 형식의 데이터를 생성
+//            var swaggerData: [[String: Any]] = []
+//            for (index, image) in images.enumerated() {
+//                let text = texts[index]
+//                let categories = selectedCategoriesForImages[index]
+//                guard let imagePath = DataManager.shared.saveImage(image) else {
+//                    print("이미지 저장 실패")
+//                    continue
+//                }
 //
-//        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-//            print("해당 Record ID (\(recordUUID))의 데이터:")
-//            print("Title: \(record.title)")
-//            print("Description: \(record.description)")
-//            print("Date: \(record.date)")
-//            print("Location: \(record.location)")
-//            print("Photos:")
-//            for (index, photo) in record.photos.enumerated() {
-//                print("Photo \(index + 1):")
-//                print("    Image Path: \(photo.imagePath)")
-//                print("    Text: \(photo.text)")
-//                print("    Category: \(photo.category)")
+//                let photoData: [String: Any] = [
+//                    "id": index,
+//                    "content": text,
+//                    "categories": categories,
+//                    "imagePath": imagePath,
+//                    "orderIndex": index
+//                ]
+//                swaggerData.append(photoData)
 //            }
-//        } else {
-//            print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
-//        }
 //
+//        // Swagger 데이터 업로드
+//            DataManager.shared.uploadPhotoData(swaggerData) { result in
+//                switch result {
+//                case .success(let response):
+//                    print("Swagger 데이터 업로드 성공: \(response)")
+//                    
+//                    // 다음 화면으로 이동
+//                    let savedPhotosVC = SavedPhotosViewController()
+//                    savedPhotosVC.recordID = self.recordID
+//                    savedPhotosVC.modalPresentationStyle = .fullScreen
+//                    self.present(savedPhotosVC, animated: true)
+//                case .failure(let error):
+//                    if let urlError = error as? URLError {
+//                        switch urlError.code {
+//                        case .notConnectedToInternet:
+//                            self.showAlert(title: "네트워크 오류", message: "인터넷 연결을 확인해주세요.")
+//                        case .cannotFindHost:
+//                            self.showAlert(title: "서버 오류", message: "서버 주소를 확인해주세요.")
+//                        case .cannotConnectToHost:
+//                            self.showAlert(title: "서버 연결 실패", message: "서버가 응답하지 않습니다.")
+//                        default:
+//                            self.showAlert(title: "네트워크 오류", message: urlError.localizedDescription)
+//                        }
+//                    } else {
+//                        self.showAlert(title: "업로드 실패", message: error.localizedDescription)
+//                    }
+//                }
+//            }
+//        
+//        // 서버에 데이터 업로드
+//            let serverURL = "#####"
+//            StoryManager.shared.uploadStories(to: serverURL) { result in
+//                switch result {
+//                case .success(let message):
+//                    print("업로드 성공: \(message)")
+//                    DispatchQueue.main.async {
+//                        // 업로드 성공 후 다음 화면으로 이동
+//                        let savedPhotosVC = SavedPhotosViewController()
+//                        savedPhotosVC.modalPresentationStyle = .fullScreen
+//                        self.present(savedPhotosVC, animated: true)
+//                    }
+//                case .failure(let error):
+//                    print("업로드 실패: \(error.localizedDescription)")
+//                    self.showAlert(title: "업로드 실패", message: "서버로 데이터를 전송하지 못했습니다. 네트워크 상태를 확인해주세요.")
+//                }
+//            }
+//
+//        // 다음 화면으로 이동
 //        let savedPhotosVC = SavedPhotosViewController()
 //        savedPhotosVC.recordID = recordID
 //        savedPhotosVC.modalPresentationStyle = .fullScreen

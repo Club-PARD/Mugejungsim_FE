@@ -99,25 +99,20 @@ class TravelRecordManager {
         if let imageName = DataManager.shared.saveImage(image) {
             let newPhoto = PhotoData(imagePath: imageName, text: text, category: category)
             record.photos.append(newPhoto)
-
             // 업데이트된 기록 저장
             updateRecord(record)
             return true
         }
-
         return false
     }
 
     // MARK: - 사진 삭제
     func deletePhoto(from recordID: UUID, at index: Int) -> Bool {
-        guard var record = getRecord(by: recordID), index < record.photos.count else {
-            return false
-        }
+        guard var record = getRecord(by: recordID), index < record.photos.count else { return false }
 
         // `DataManager`를 사용하여 이미지 삭제
         let photoToDelete = record.photos[index]
 //        DataManager.shared.deleteData(photoData: photoToDelete)
-
         // 사진 목록 업데이트
         record.photos.remove(at: index)
         updateRecord(record)

@@ -50,12 +50,15 @@ class APIService {
         )
     }
     
+    // MARK: - 다중 이미지 업로드
+
     func uploadTravelRecordImages(
         recordId: UUID,
         images: [UIImage],
         metadata: [[String: Any]], // 각 이미지와 관련된 메타데이터
         completion: @escaping (Result<APIResponse, Error>) -> Void
     ) {
+
         let endpoint = "/travelRecords/\(recordId)/upload"
         let url = URLService.shared.baseURL + endpoint
         let headers: HTTPHeaders = [
@@ -109,5 +112,12 @@ class APIService {
                 completion(.failure(error))
             }
         }
+    }
+}
+
+// MARK: - Codable 데이터 변환 헬퍼 메서드
+extension Data {
+    func toDictionary() -> [String: Any]? {
+        try? JSONSerialization.jsonObject(with: self, options: []) as? [String: Any]
     }
 }

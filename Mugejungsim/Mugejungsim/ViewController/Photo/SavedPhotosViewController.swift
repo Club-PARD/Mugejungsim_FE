@@ -103,8 +103,6 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         photoDataList = DataManager.shared.loadData()
         collectionView.reloadData()
     }
-
-    
     
     func setupButtonsConstraints() {
         NSLayoutConstraint.activate([
@@ -163,7 +161,6 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         }
         collectionView.reloadData()
     }
-    
 
     // 프로토콜 메서드 구현
         func didDelete() {
