@@ -7,8 +7,11 @@
 
 import UIKit
 
+
 class ShareViewController: UIViewController {
 
+    var recordID: String = ""
+    
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let ButtontContentView = UIView()
@@ -65,6 +68,24 @@ class ShareViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
+        homeButton.addTarget(self, action: #selector(homeButtonTapped), for: .touchUpInside)
+
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+            
+        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            print("CheckObjeImageViewController에서 데이터 확인:")
+            print("Record ID: \(record.id)")
+            print("Title: \(record.title)")
+            print("oneLine1: \(record.oneLine1)")
+            print("oneLine2: \(record.oneLine2)")
+            updateLabelText()
+            updateImages()
+        } else {
+            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+        }
     }
     
     private func setupUI() {
@@ -86,7 +107,8 @@ class ShareViewController: UIViewController {
         contentView.addSubview(contentLabel)
         contentView.addSubview(glassImage)
         contentView.addSubview(letterImage)
-        contentView.addSubview(homeButton)
+        
+        view.addSubview(homeButton)
         
         setupConstraints()
         setupCustomNavigationBar()
@@ -113,42 +135,12 @@ class ShareViewController: UIViewController {
             letterImage.heightAnchor.constraint(equalToConstant: 610),
             
             homeButton.topAnchor.constraint(equalTo: letterImage.bottomAnchor, constant: 20),
-            homeButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            homeButton.widthAnchor.constraint(equalToConstant: 328),
+            homeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            homeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+//            homeButton.widthAnchor.constraint(equalToConstant: 328),
             homeButton.heightAnchor.constraint(equalToConstant: 52),
         ])
-    }
-    
-    private func updateGlassImage(basedOn condition: String) {
-        // 병 이미지도 여기서 관리하라!
-        //
-        //
-        //
-        //
-        switch condition {
-        case "1":
-            glassImage.image = UIImage(named: "brown")
-        case "2":
-            glassImage.image = UIImage(named: "green")
-        case "3":
-            glassImage.image = UIImage(named: "midnight_depth")
-        case "4":
-            glassImage.image = UIImage(named: "orange")
-        case "5":
-            glassImage.image = UIImage(named: "pink")
-        case "6":
-            glassImage.image = UIImage(named: "red")
-        case "7":
-            glassImage.image = UIImage(named: "serene_sky")
-        case "8":
-            glassImage.image = UIImage(named: "wandarer")
-        case "9":
-            glassImage.image = UIImage(named: "whisper")
-        case "10":
-            glassImage.image = UIImage(named: "yellow")
-        default:
-            glassImage.image = UIImage(named: "brown")
-        }
     }
     
     // MARK: - 네비게이션 바
@@ -189,4 +181,103 @@ class ShareViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
+    @objc private func homeButtonTapped() {
+        print("Home button frame: \(homeButton.frame)")
+        print("Home button isHidden: \(homeButton.isHidden)")
+        print("Home button isUserInteractionEnabled: \(homeButton.isUserInteractionEnabled)")
+        
+        let myRecordsVC = MyRecordsViewController()
+        myRecordsVC.modalPresentationStyle = .fullScreen
+        present(myRecordsVC, animated: true, completion: nil)
+    }
+    
+    private func updateImages() {
+        // 병 이미지도 여기서 관리하라!
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+        
+        // bottle(glass)
+        // letter
+        switch record?.oneLine1 {
+        case "value1":
+            glassImage.image = UIImage(named: "Dreamy Pink")
+            letterImage.image = UIImage(named: "pink")
+        case "value2":
+            glassImage.image = UIImage(named: "Cloud Whisper")
+            letterImage.image = UIImage(named: "whisper")
+        case "value3":
+            glassImage.image = UIImage(named: "Sunburst Yellow")
+            letterImage.image = UIImage(named: "yellow")
+        case "value4":
+            glassImage.image = UIImage(named: "Radiant Orange")
+            letterImage.image = UIImage(named: "orange")
+        case "value5":
+            glassImage.image = UIImage(named: "Serene Sky")
+            letterImage.image = UIImage(named: "serene_sky")
+        case "value6":
+            glassImage.image = UIImage(named: "Midnight Depth")
+            letterImage.image = UIImage(named: "midnight_depth")
+        case "value7":
+            glassImage.image = UIImage(named: "Wanderer's Flame")
+            letterImage.image = UIImage(named: "wandarer")
+        case "value8":
+            glassImage.image = UIImage(named: "Storybook Brown")
+            letterImage.image = UIImage(named: "brown")
+        case "value9":
+            glassImage.image = UIImage(named: "Ember Red")
+            letterImage.image = UIImage(named: "red")
+        case "value10":
+            glassImage.image = UIImage(named: "Meadow Green")
+            letterImage.image = UIImage(named: "green")
+        default:
+            glassImage.image = UIImage(named: "Storybook Brown")
+            letterImage.image = UIImage(named: "brown")
+        }
+    }
+    
+    private func updateLabelText() {
+        // recordID 유효성 확인
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+        // 기록 가져오기
+        guard let record = TravelRecordManager.shared.getRecord(by: recordUUID) else {
+            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+            return
+        }
+        
+        // oneLine1 값을 확인하고 contentLabel 업데이트
+        let labelText: String
+        switch record.oneLine1 {
+        case "value1":
+            labelText = "당신의 여행 컬러는\n\"Dreamy Pink\"입니다."
+        case "value2":
+            labelText = "당신의 여행 컬러는\n\"Cloud Whisper\"입니다."
+        case "value3":
+            labelText = "당신의 여행 컬러는\n\"Sunburst Yellow\"입니다."
+        case "value4":
+            labelText = "당신의 여행 컬러는\n\"Radiant Orange\"입니다."
+        case "value5":
+            labelText = "당신의 여행 컬러는\n\"Serene Sky\"입니다."
+        case "value6":
+            labelText = "당신의 여행 컬러는\n\"Midnight Depth\"입니다."
+        case "value7":
+            labelText = "당신의 여행 컬러는\n\"Wanderer’s Flame\"입니다."
+        case "value8":
+            labelText = "당신의 여행 컬러는\n\"Storybook Brown\"입니다."
+        case "value9":
+            labelText = "당신의 여행 컬러는\n\"Ember Red\"입니다."
+        case "value10":
+            labelText = "당신의 여행 컬러는\n\"Meadow Green\"입니다."
+        default:
+            labelText = "당신의 여행 컬러는\n\"알 수 없음\"입니다."
+        }
+        
+        // 업데이트된 텍스트를 라벨에 설정
+        contentLabel.text = labelText
+    }
 }

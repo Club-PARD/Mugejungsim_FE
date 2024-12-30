@@ -6,7 +6,7 @@ class LoadingViewController: UIViewController {
     // "오브제 만드는 중" 라벨
     private let loadingLabel: UILabel = {
         let label = UILabel()
-        label.text = "나만의 오브제를\n만드는 중이에요!"
+        label.text = "여행의 추억을\n색으로 물들이는 중이에요!"
         label.numberOfLines = 2
         label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
@@ -17,7 +17,7 @@ class LoadingViewController: UIViewController {
     
     // 로딩 중 이미지
     private let loadingImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "moments"))
+        let imageView = UIImageView(image: UIImage(named: "LOADING"))
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -27,6 +27,19 @@ class LoadingViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
+        
+        guard let recordUUID = UUID(uuidString: recordID) else {
+            print("유효하지 않은 recordID: \(recordID)")
+            return
+        }
+            
+        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            print("LoadingViewController에서 데이터 확인:")
+            print("oneLine1: \(record.oneLine1)")
+        } else {
+            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+        }
+        
         startLoading()
     }
     
@@ -45,8 +58,8 @@ class LoadingViewController: UIViewController {
             
             loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
-            loadingImageView.widthAnchor.constraint(equalToConstant: 175),
-            loadingImageView.heightAnchor.constraint(equalToConstant: 175),
+            loadingImageView.widthAnchor.constraint(equalToConstant: 220),
+            loadingImageView.heightAnchor.constraint(equalToConstant: 150),
 
         ])
     }

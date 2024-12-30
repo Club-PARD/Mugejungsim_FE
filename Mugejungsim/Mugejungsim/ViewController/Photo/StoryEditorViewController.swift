@@ -20,6 +20,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private var categoryIndex: Int? = 0
     private var categoryNumber : String = ""
     private var selectedSubCategory: String? // 선택된 서브 카테고리 저장
+    
     // MARK: - 카테고리 관련 Properties
     private var categoryOverlayView: UIView? // Overlay View
     private var selectedSubCategories: [String] = [] // 선택된 세부 카테고리 저장

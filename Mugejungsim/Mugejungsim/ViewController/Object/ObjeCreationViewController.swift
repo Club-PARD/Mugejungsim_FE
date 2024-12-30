@@ -12,16 +12,16 @@ class ObjeCreationViewController: UIViewController {
     var recordID : String = ""
     
     private let items: [(value: String, title: String)] = [
-        ("value1", "🥰 설레는 여행이었어요"),
-        ("value2", "🫧 잊지 못할 여행이었어요"),
-        ("value3", "🎉 즐거운 여행이었어요"),
-        ("value4", "✨ 눈부신 여행이었어요"),
-        ("value5", "️🕊️ 평화로운 여행이었어요"),
-        ("value6", "💎 매력적인 여행이었어요"),
-        ("value7", "🎶 흥미로운 여행이었어요"),
-        ("value8", "🌈 특별한 여행이었어요"),
-        ("value9", "🥹 감동적인 여행이었어요"),
-        ("value10", "🍃 힐링되는 여행이었어요")
+        ("value1", "🥰 마치 사랑에 빠진 것처럼 설레던 여행"),
+        ("value2", "🫧 눈앞에 펼쳐진 모든 것이 꿈같았던 여행"),
+        ("value3", "🎉 웃음소리가 바람을 타고 퍼져 나갔던 여행"),
+        ("value4", "✨ 하늘과 땅이 반짝이며 나를 감싼 여행"),
+        ("value5", "️️💐 책갈피 속 작은 꽃처럼 나를 위로한 여행"),
+        ("value6", "️🎞️ 매 순간 영화처럼 선명하게 차오른 여행"),
+        ("value7", "🪄 모퉁이마다 새로운 세계가 열리던 여행"),
+        ("value8", "📚 평범했던 하루가 따스한 책 한 권이 된 여행"),
+        ("value9", "🥹 가슴 벅찬 아름다움과 진심이 머문 여행"),
+        ("value10", "🍃 고요한 순간들이 나를 평온히 어루만진 여행")
     ]
     
     private let scrollView = UIScrollView()
@@ -276,12 +276,13 @@ class ObjeCreationViewController: UIViewController {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
+        
+        var objeNum: String = selectedItems[0]
 
         // TravelRecordManager에서 기록을 가져오기
         if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            record.oneLine1 = selectedItems[0]
-            record.oneLine2 = selectedItems[1]
-            TravelRecordManager.shared.addRecord(record) // 기존 레코드를 대체하는 방식
+            record.oneLine1 = objeNum
+            TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
             print("Record \(recordUUID) 업데이트 완료:")
             print("Title: \(record.title)")
 //            print("Description: \(record.description)")
@@ -296,6 +297,14 @@ class ObjeCreationViewController: UIViewController {
                 print("    Text: \(photo.text)")
                 print("    Category: \(photo.category)")
             }
+            // 저장 후 데이터 확인
+            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {
+                print("데이터 저장 후 확인:")
+                print("oneLine1: \(updatedRecord.oneLine1)")
+            } else {
+                print("데이터 저장 실패")
+            }
+
             goToNextPage()
         } else {
             print("recordID에 해당하는 기록을 찾을 수 없습니다.")
