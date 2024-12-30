@@ -6,7 +6,7 @@ class NetworkManager {
     private let baseURL = URLService.shared.baseURL
     
     private init() {}
-
+    
     // MARK: - 일반 네트워크 요청 메서드
     func request<T: Codable>(
         _ endpoint: String,
@@ -70,66 +70,64 @@ class NetworkManager {
             print("================")
         }
     }
-
-    // MARK: - 다중 이미지 업로드 메서드
+    
+    func resizeImage(image: UIImage, maxWidth: CGFloat, maxHeight: CGFloat) -> UIImage? {
+        let size = image.size
+        let widthRatio = maxWidth / size.width
+        let heightRatio = maxHeight / size.height
+        let scaleRatio = min(widthRatio, heightRatio)
+        
+        let newSize = CGSize(width: size.width * scaleRatio, height: size.height * scaleRatio)
+        
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+        }
+    }
+    
     func uploadImages(
         _ endpoint: String,
-        parameters: [String: String],
-        images: [UIImage],
+        photos: [[String: Any]],
         completion: @escaping (Result<APIResponse, Error>) -> Void
     ) {
         let url = baseURL + endpoint
         let headers: HTTPHeaders = [
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "application/json"
         ]
-        
-        // Print upload details
-        print("=== Upload Request ===")
-        print("URL: \(url)")
-        print("Headers: \(headers)")
-        print("Parameters: \(parameters)")
-        print("Images Count: \(images.count)")
-        print("======================")
-        
-        AF.upload(
-            multipartFormData: { multipartFormData in
-                // Add parameters
-                for (key, value) in parameters {
-                    multipartFormData.append(Data(value.utf8), withName: key)
-                }
-                // Add images
-                images.enumerated().forEach { index, image in
-                    if let imageData = image.jpegData(compressionQuality: 0.8) {
-                        multipartFormData.append(
-                            imageData,
-                            withName: "image\(index + 1)",
-                            fileName: "image\(index + 1).jpg",
-                            mimeType: "image/jpeg"
-                        )
-                    }
-                }
-            },
-            to: url,
+
+        // JSON 데이터를 생성
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: ["photos": photos], options: []) else {
+            print("Failed to serialize JSON")
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to serialize JSON"])))
+            return
+        }
+
+        // 디버깅용 출력
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            print("JSON Payload: \(jsonString)")
+        }
+
+        // 서버로 요청
+        AF.request(
+            url,
+            method: .post,
+            parameters: nil,
+            encoding: JSONEncoding.default,
             headers: headers
         )
         .validate(statusCode: 200..<300)
         .responseDecodable(of: APIResponse.self) { response in
-            // Print upload response details
-            print("=== Upload Response ===")
-            print("URL: \(response.request?.url?.absoluteString ?? "No URL")")
-            print("Status Code: \(response.response?.statusCode ?? 0)")
-            if let data = response.data {
-                print("Raw Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
-            }
             switch response.result {
-            case .success(let result):
-                print("Decoded Response: \(result)")
-                completion(.success(result))
+            case .success(let apiResponse):
+                print("Upload Success:", apiResponse)
+                completion(.success(apiResponse))
             case .failure(let error):
-                print("Error: \(error.localizedDescription)")
+                print("Upload Failure:", error.localizedDescription)
+                if let data = response.data {
+                    print("Response Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
+                }
                 completion(.failure(error))
             }
-            print("=======================")
         }
     }
 }

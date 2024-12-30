@@ -1,16 +1,15 @@
 import Foundation
 import Alamofire
-import UIKit
 
 struct StoryEditor: Codable {
-    var id: UUID
+    var pid: Int
     var content: String
     var categories: [String]
     var imagePath: String
     var orderIndex: Int
     
-    init(id: UUID=UUID(), content: String, categories: [String], imagePath: String, orderIndex: Int) {
-        self.id = id
+    init(pid: Int, content: String, categories: [String], imagePath: String, orderIndex: Int) {
+        self.pid = pid
         self.content = content
         self.categories = categories
         self.imagePath = imagePath
@@ -20,25 +19,14 @@ struct StoryEditor: Codable {
 
 class StoryManager {
     static let shared = StoryManager()
-    private var stories: [[String: Any]] = [] // Swagger 형식의 데이터 저장
+    private var stories: [StoryEditor] = [] // JSON 형식으로 저장될 데이터
 
     private init() {}
 
     // MARK: - 스토리 추가
-    func addStory(id: UUID=UUID(), content: String, categories: [String], imagePath: String, orderIndex: Int) {
-        let story: [String: Any] = [
-            "id": id,
-            "content": content,
-            "categories": categories,
-            "imagePath": imagePath,
-            "orderIndex": orderIndex
-        ]
+    func addStory(pid: Int, content: String, categories: [String], imagePath: String, orderIndex: Int) {
+        let story = StoryEditor(pid: pid, content: content, categories: categories, imagePath: imagePath, orderIndex: orderIndex)
         stories.append(story)
-    }
-
-    // MARK: - 모든 스토리 가져오기
-    func getAllStories() -> [[String: Any]] {
-        return stories
     }
 
     // MARK: - 서버로 스토리 데이터 전송
@@ -48,19 +36,37 @@ class StoryManager {
             return
         }
 
-        // JSON 배열 데이터를 Data로 변환
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: stories, options: []) else {
-            completion(.failure(NSError(domain: "InvalidData", code: 0, userInfo: [NSLocalizedDescriptionKey: "JSON 변환 실패"])))
-            return
+        // 서버 요구 사항에 맞는 JSON 데이터 생성
+        let payload: [String: Any] = [
+            "data": [
+                "photos": stories.map { story in
+                    [
+                        "pid": story.pid,
+                        "content": story.content,
+                        "categories": story.categories,
+                        "orderIndex": story.orderIndex,
+                        "imagePath": story.imagePath
+                    ]
+                }
+            ]
+        ]
+
+        // JSON 디버깅용 출력
+        if let jsonData = try? JSONSerialization.data(withJSONObject: payload, options: .prettyPrinted),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            print("JSON Payload:\n\(jsonString)")
         }
 
-        var request = URLRequest(url: URL(string: url)!)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = jsonData
-
         // Alamofire 요청
-        AF.request(request).response { response in
+        AF.request(
+            url,
+            method: .post,
+            parameters: payload,
+            encoding: JSONEncoding.default,
+            headers: ["Content-Type": "application/json"]
+        )
+        .validate()
+        .response { response in
             guard let statusCode = response.response?.statusCode else {
                 completion(.failure(NSError(domain: "NoResponse", code: 0, userInfo: [NSLocalizedDescriptionKey: "서버로부터 응답을 받을 수 없습니다."])))
                 return
@@ -79,13 +85,6 @@ class StoryManager {
                 completion(.failure(error))
             }
         }
-        print("스토리 데이터: \(StoryManager.shared.getAllStories())")
-    }
-
-    // MARK: - 특정 스토리 삭제
-    func deleteStory(at index: Int) {
-        guard index >= 0 && index < stories.count else { return }
-        stories.remove(at: index)
     }
 
     // MARK: - 스토리 초기화
