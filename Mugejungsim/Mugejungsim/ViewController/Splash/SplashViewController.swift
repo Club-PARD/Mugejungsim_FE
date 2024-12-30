@@ -41,6 +41,7 @@ class SplashViewController: UIViewController {
 //            let mainVC = DraftViewController()
 //            let mainVC = USDZPreviewViewController()
 //            let mainVC = ShareViewController()
+//            let mainVC = SaveCheckModalViewController()
             
             mainVC.modalTransitionStyle = .crossDissolve
             mainVC.modalPresentationStyle = .fullScreen
