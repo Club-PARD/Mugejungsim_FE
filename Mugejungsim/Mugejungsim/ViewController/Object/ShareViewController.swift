@@ -8,7 +8,6 @@
 import UIKit
 
 
-
 class ShareViewController: UIViewController {
 
     var recordID: String = ""
@@ -69,7 +68,8 @@ class ShareViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
-        
+        homeButton.addTarget(self, action: #selector(homeButtonTapped), for: .touchUpInside)
+
         guard let recordUUID = UUID(uuidString: recordID) else {
             print("유효하지 않은 recordID: \(recordID)")
             return
@@ -107,7 +107,8 @@ class ShareViewController: UIViewController {
         contentView.addSubview(contentLabel)
         contentView.addSubview(glassImage)
         contentView.addSubview(letterImage)
-        contentView.addSubview(homeButton)
+        
+        view.addSubview(homeButton)
         
         setupConstraints()
         setupCustomNavigationBar()
@@ -134,8 +135,10 @@ class ShareViewController: UIViewController {
             letterImage.heightAnchor.constraint(equalToConstant: 610),
             
             homeButton.topAnchor.constraint(equalTo: letterImage.bottomAnchor, constant: 20),
-            homeButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            homeButton.widthAnchor.constraint(equalToConstant: 328),
+            homeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            homeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+//            homeButton.widthAnchor.constraint(equalToConstant: 328),
             homeButton.heightAnchor.constraint(equalToConstant: 52),
         ])
     }
@@ -176,6 +179,16 @@ class ShareViewController: UIViewController {
     @objc private func didTapBackButton() {
         dismiss(animated: true, completion: nil)
         navigationController?.popViewController(animated: true)
+    }
+    
+    @objc private func homeButtonTapped() {
+        print("Home button frame: \(homeButton.frame)")
+        print("Home button isHidden: \(homeButton.isHidden)")
+        print("Home button isUserInteractionEnabled: \(homeButton.isUserInteractionEnabled)")
+        
+        let myRecordsVC = MyRecordsViewController()
+        myRecordsVC.modalPresentationStyle = .fullScreen
+        present(myRecordsVC, animated: true, completion: nil)
     }
     
     private func updateImages() {

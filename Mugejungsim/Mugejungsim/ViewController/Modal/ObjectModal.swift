@@ -10,8 +10,6 @@ class ObjectModalViewController: UIViewController {
         return view
     }()
     
-
-    
     private let containerView: UIView = { // 모달 창 컨테이너
         let view = UIView()
         view.backgroundColor = .white

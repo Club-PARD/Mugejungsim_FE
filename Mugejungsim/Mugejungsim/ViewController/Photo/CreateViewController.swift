@@ -333,7 +333,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             titleUnderline.heightAnchor.constraint(equalToConstant: 1),
             
             clearButton1.topAnchor.constraint(equalTo: titleTextField.topAnchor, constant: 16), // X 버튼을 텍스트 필드 중앙에 배치
-            clearButton1.leadingAnchor.constraint(equalTo: titleTextField.leadingAnchor, constant: 325), // 텍스트 필드의 오른쪽에 배치
+            clearButton1.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor), // 텍스트 필드의 오른쪽에 배치
             
             titleCount.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 5),
             titleCount.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor),
@@ -358,7 +358,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             locationTextField.heightAnchor.constraint(equalToConstant: 40),
             
             clearButton2.topAnchor.constraint(equalTo: locationTextField.topAnchor, constant: 16), // X 버튼을 텍스트 필드 중앙에 배치
-            clearButton2.leadingAnchor.constraint(equalTo: locationTextField.leadingAnchor, constant: 325), // 텍스트 필드의 오른쪽에 배치
+            clearButton2.trailingAnchor.constraint(equalTo: locationTextField.trailingAnchor), // 텍스트 필드의 오른쪽에 배치
           
             locationUnderline.topAnchor.constraint(equalTo: locationTextField.bottomAnchor, constant: 2),
             locationUnderline.leadingAnchor.constraint(equalTo: locationTextField.leadingAnchor),
