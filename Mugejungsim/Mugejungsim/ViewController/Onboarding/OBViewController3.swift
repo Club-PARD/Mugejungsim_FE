@@ -83,14 +83,12 @@ class OBViewController3: UIViewController {
             nextButton.heightAnchor.constraint(equalToConstant: 52)
         ])
 
-        
         // 액션 연결
-            nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
     }
 
     @objc private func nextButtonTapped() {
         let mainViewController = CreateViewController()
-        
         // 새 화면을 기존 뷰와 부드럽게 교체
         UIView.transition(with: self.view.window!, duration: 0.3, options: .transitionCrossDissolve, animations: {
             UIApplication.shared.windows.first?.rootViewController = mainViewController

@@ -97,7 +97,6 @@ class NetworkManager {
                 for (key, value) in parameters {
                     multipartFormData.append(Data(value.utf8), withName: key)
                 }
-                
                 // Add images
                 images.enumerated().forEach { index, image in
                     if let imageData = image.jpegData(compressionQuality: 0.8) {
@@ -135,9 +134,3 @@ class NetworkManager {
     }
 }
 
-// MARK: - Codable 데이터 변환 헬퍼 메서드
-extension Data {
-    func toDictionary() -> [String: Any]? {
-        try? JSONSerialization.jsonObject(with: self, options: []) as? [String: Any]
-    }
-}
