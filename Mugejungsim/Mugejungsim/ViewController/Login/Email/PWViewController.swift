@@ -28,6 +28,9 @@ class PWViewController: UIViewController {
         textField.addShadow() // Drop shadow 추가
         textField.translatesAutoresizingMaskIntoConstraints = false
 
+        // 텍스트 필드 보안 입력 활성화 (패스워드 형태)
+        textField.isSecureTextEntry = true
+
         // 테두리 색상 설정
         textField.layer.borderColor = UIColor(white: 170.0/255.0, alpha: 1.0).cgColor
         textField.layer.borderWidth = 1.0

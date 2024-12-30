@@ -349,13 +349,16 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         scrollableTravelCollectionView.delegate = self
         scrollableTravelCollectionView.dataSource = self
         scrollableTravelCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
+        
         scrollableObjectCollectionView.delegate = self
         scrollableObjectCollectionView.dataSource = self
         scrollableObjectCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
     }
     
     @objc private func segmentedControlChanged() {
+        // 선택된 세그먼트 인덱스에 따라 다른 CollectionView 표시
         print("Segmented control changed to index: \(segmentedControl.selectedSegmentIndex)")
+
         switch segmentedControl.selectedSegmentIndex {
         case 0: // 여행 기록
             scrollableObjectCollectionView.removeFromSuperview()
@@ -400,10 +403,28 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             return travelRecords.count // 여행 기록 데이터 개수
         } else if collectionView == scrollableObjectCollectionView {
             print("O count: \(travelRecords.count)")
+//            return objects.count // 오브제 데이터 개수
             return travelRecords.count // 여행 기록 데이터 개수
+
         }
         return 0
     }
+    
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
+//
+//        if collectionView == scrollableTravelCollectionView {
+//            let imageName = "image\(indexPath.row + 1)"
+//            cell.imageView.image = UIImage(named: imageName)
+//            cell.titleLabel.text = "기록 \(indexPath.row + 1)"
+//        } else if collectionView == scrollableObjectCollectionView {
+//            let imageName = "object\(indexPath.row + 1)"
+//            cell.imageView.image = UIImage(named: imageName)
+//            cell.titleLabel.text = "오브제 \(indexPath.row + 1)"
+//        }
+//
+//        return cell
+//    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
@@ -436,6 +457,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             cell.titleLabel.text = record.title // 여행 기록 제목
             print("pass")
         } else if collectionView == scrollableObjectCollectionView {
+//            print("oneLine1 value: \(record.oneLine1)") // 추가된 디버깅
             switch record.oneLine1 {
             case "value1":
                 cell.imageView.image = UIImage(named: "Dreamy Pink")

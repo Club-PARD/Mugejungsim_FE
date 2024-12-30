@@ -285,8 +285,8 @@ class ObjeCreationViewController: UIViewController {
             TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
             print("Record \(recordUUID) 업데이트 완료:")
             print("Title: \(record.title)")
-            print("Description: \(record.description)")
-            print("Date: \(record.date)")
+//            print("Description: \(record.description)")
+//            print("Date: \(record.date)")
             print("Location: \(record.location)")
             print("oneLine1: \(record.oneLine1)")
             print("oneLine2: \(record.oneLine2)")

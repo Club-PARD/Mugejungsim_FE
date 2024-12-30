@@ -152,12 +152,12 @@ class LoginViewController: UIViewController {
                 print("사용자 정보 가져오기 성공: \(nickname)")
                 print("ID: \(user.id ?? 0)")
                 print("닉네임: \(user.kakaoAccount?.profile?.nickname ?? "없음")")
-                print("프로필 이미지 URL: \(user.kakaoAccount?.profile?.profileImageUrl?.absoluteString ?? "없음")")
-                print("이메일: \(user.kakaoAccount?.email ?? "없음")")
-                print("전화번호: \(user.kakaoAccount?.phoneNumber ?? "없음")")
-                print("성별: \(user.kakaoAccount?.gender?.rawValue ?? "없음")")
-                print("연령대: \(user.kakaoAccount?.ageRange?.rawValue ?? "없음")")
-                print("생일: \(user.kakaoAccount?.birthday ?? "없음")")
+//                print("프로필 이미지 URL: \(user.kakaoAccount?.profile?.profileImageUrl?.absoluteString ?? "없음")")
+//                print("이메일: \(user.kakaoAccount?.email ?? "없음")")
+//                print("전화번호: \(user.kakaoAccount?.phoneNumber ?? "없음")")
+//                print("성별: \(user.kakaoAccount?.gender?.rawValue ?? "없음")")
+//                print("연령대: \(user.kakaoAccount?.ageRange?.rawValue ?? "없음")")
+//                print("생일: \(user.kakaoAccount?.birthday ?? "없음")")
                 
                 // 서버로 데이터 전송
                 self.sendLoginDataToServer(name: self.name, provider: self.provider)
@@ -178,54 +178,37 @@ class LoginViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    // 클백 확인용 코드 : Kakao 연결
     func sendLoginDataToServer(name: String, provider: String) {
-        // 1. 서버 URL 설정
-        guard let url = URL(string: "\(URLService.shared.baseURL)/login") else { // 서버 URL 변경
-            print("Invalid server URL")
-            return
-        }
+        let url = URL(string: "http://172.17.208.113:8080/api/users/save")! // 서버 URL 수정 필요
         
-        // 2. 요청 생성
+        // 요청 생성
         var request = URLRequest(url: url)
-        request.httpMethod = "POST" // HTTP 메서드 설정
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type") // 요청 헤더 설정
-
-        // 3. JSON 데이터 구성
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // 요청 본문 데이터 설정
         let parameters: [String: String] = [
             "name": name,
             "provider": provider
         ]
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: parameters, options: [])
-            request.httpBody = jsonData // HTTP Body에 JSON 데이터 추가
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
-            print("Failed to serialize JSON: \(error.localizedDescription)")
+            print("Error serializing JSON: \(error.localizedDescription)")
             return
         }
-        // 4. 네트워크 요청
+
+        // 네트워크 요청
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            // 에러 처리
             if let error = error {
-                print("Failed to send login data: \(error.localizedDescription)")
-                return
-            }
-            // HTTP 응답 처리
-            if let httpResponse = response as? HTTPURLResponse {
-                if httpResponse.statusCode == 200 {
-                    print("Login data sent successfully")
-                } else {
-                    print("Failed to send login data: HTTP \(httpResponse.statusCode)")
+                print("Error: \(error.localizedDescription)")
+            } else if let httpResponse = response as? HTTPURLResponse {
+                print("HTTP Status Code: \(httpResponse.statusCode)")
+                if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Response: \(responseString)")
                 }
-            }
-            // 응답 데이터 처리
-            if let data = data {
-                do {
-                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("Server Response: \(jsonResponse)")
-                } catch {
-                    print("Failed to parse response: \(error.localizedDescription)")
-                }
+            } else {
+                print("Unknown response")
             }
         }
         task.resume()

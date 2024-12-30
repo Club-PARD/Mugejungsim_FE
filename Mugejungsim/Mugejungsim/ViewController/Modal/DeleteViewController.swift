@@ -180,7 +180,7 @@ class DeleteViewController: UIViewController {
         }
 
         // 삭제 처리
-        DataManager.shared.deleteData(photoData: photoData)
+//        DataManager.shared.deleteData(photoData: photoData)
 
         // 현재 화면을 닫고 SavedPhotosViewController로 돌아갑니다.
         if let presentingVC = presentingViewController as? SavedPhotosViewController {
