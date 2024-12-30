@@ -231,7 +231,7 @@ class ObjeCreationViewController: UIViewController {
     }
     
     private func updateCreateButtonState() {
-        if selectedItems.count == 2 {
+        if selectedItems.count == 1 {
             createButton.isEnabled = true
             createButton.titleLabel?.font = UIFont(name: "Pretendard-Bold", size: 16)
             createButton.setTitleColor(.white, for: .normal)

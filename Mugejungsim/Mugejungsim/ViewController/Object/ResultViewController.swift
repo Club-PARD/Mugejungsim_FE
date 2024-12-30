@@ -7,7 +7,7 @@ class ResultViewController: UIViewController {
 
     let memoryLabel: UILabel = {
         let label = UILabel()
-        label.text = "OOO 님의 여행 오브제가\n완성되었어요!"
+        label.text = "여행 이야기를 담은\n유리병 편지가 완성되었어요!"
         label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
@@ -18,7 +18,7 @@ class ResultViewController: UIViewController {
 
     let touchLabel: UILabel = {
         let label = UILabel()
-        label.text = "오브제를 터치하고 움직여 보세요!"
+        label.text = "유리병을 터치하고 움직여 보세요!"
         label.numberOfLines = 0
         label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
         label.font = UIFont(name: "Pretendard-SemiBold", size: 17)
@@ -29,7 +29,7 @@ class ResultViewController: UIViewController {
 
     let saveButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("오브제 저장하기", for: .normal)
+        button.setTitle("유리병 편지 저장하기", for: .normal)
         button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
@@ -135,13 +135,13 @@ class ResultViewController: UIViewController {
         ])
     }
 
-    // MARK: - Button Action
     @objc func saveButtonTapped() {
         print("성공!")
-        let CheckObjeImageVC = CheckObjeImageViewController()
-        CheckObjeImageVC.recordID = recordID
-        CheckObjeImageVC.modalPresentationStyle = .fullScreen
-        self.present(CheckObjeImageVC, animated: true, completion: nil)
+        let SaveCheckMVC = SaveCheckModalViewController()
+        SaveCheckMVC.recordID = recordID
+        SaveCheckMVC.modalTransitionStyle = .crossDissolve // 오픈 모션
+        SaveCheckMVC.modalPresentationStyle = .overFullScreen
+        self.present(SaveCheckMVC, animated: true, completion: nil)
     }
 
     @objc func openUSDZPreviewController() {
