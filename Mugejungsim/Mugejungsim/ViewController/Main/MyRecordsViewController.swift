@@ -2,6 +2,9 @@ import UIKit
 
 class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
+    private var travelRecords: [TravelRecord] = [] // 여행 기록 데이터
+    private var objects: [String] = []            // 오브제 데이터 (샘플로 String 사용)
+    
     let myPageButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "person.circle"), for: .normal)
@@ -176,10 +179,14 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        
         setupUI()
         setupActions()
         setupCollectionView()
         setupContextMenu() // contextMenuContainer를 설정
+        
+        // 데이터셋 로드
+        loadTravelRecords()
     }
     private func createMenuButton(title: String, iconName: String) -> UIButton {
         let button = UIButton(type: .system)
@@ -357,10 +364,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         scrollableTravelCollectionView.delegate = self
         scrollableTravelCollectionView.dataSource = self
         scrollableTravelCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
-        
-        scrollableObjectCollectionView.delegate = self
-        scrollableObjectCollectionView.dataSource = self
-        scrollableObjectCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
     }
     
     @objc private func segmentedControlChanged() {
@@ -395,24 +398,85 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == scrollableTravelCollectionView {
-            return 12 // 여행 기록 아이템 개수
+            return travelRecords.count // 여행 기록 데이터 개수
         } else if collectionView == scrollableObjectCollectionView {
-            return 8 // 오브제 아이템 개수
+            return objects.count // 오브제 데이터 개수
         }
         return 0
     }
     
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
+//        
+//        if collectionView == scrollableTravelCollectionView {
+//            let imageName = "image\(indexPath.row + 1)"
+//            cell.imageView.image = UIImage(named: imageName)
+//            cell.titleLabel.text = "기록 \(indexPath.row + 1)"
+//        } else if collectionView == scrollableObjectCollectionView {
+//            let imageName = "object\(indexPath.row + 1)"
+//            cell.imageView.image = UIImage(named: imageName)
+//            cell.titleLabel.text = "오브제 \(indexPath.row + 1)"
+//        }
+//        
+//        return cell
+//    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
-        
+        let record = travelRecords[indexPath.row]
         if collectionView == scrollableTravelCollectionView {
-            let imageName = "image\(indexPath.row + 1)"
-            cell.imageView.image = UIImage(named: imageName)
-            cell.titleLabel.text = "기록 \(indexPath.row + 1)"
+            switch record.oneLine1 {
+            case "value1":
+                cell.imageView.image = UIImage(named: "핑크")
+            case "value2":
+                cell.imageView.image = UIImage(named: "클라우디")
+            case "value3":
+                cell.imageView.image = UIImage(named: "밝은 노랑")
+            case "value4":
+                cell.imageView.image = UIImage(named: "골드주황")
+            case "value5":
+                cell.imageView.image = UIImage(named: "하늘색")
+            case "value6":
+                cell.imageView.image = UIImage(named: "네이비")
+            case "value7":
+                cell.imageView.image = UIImage(named: "보라색")
+            case "value8":
+                cell.imageView.image = UIImage(named: "브라운")
+            case "value9":
+                cell.imageView.image = UIImage(named: "레드")
+            case "value10":
+                cell.imageView.image = UIImage(named: "연두색")
+            default:
+                cell.imageView.image = UIImage(named: "브라운") // 기본 이미지
+            }
+            cell.titleLabel.text = record.title // 여행 기록 제목
+            
         } else if collectionView == scrollableObjectCollectionView {
-            let imageName = "object\(indexPath.row + 1)"
-            cell.imageView.image = UIImage(named: imageName)
-            cell.titleLabel.text = "오브제 \(indexPath.row + 1)"
+            switch record.oneLine1 {
+            case "value1":
+                cell.imageView.image = UIImage(named: "Dreamy Pink")
+            case "value2":
+                cell.imageView.image = UIImage(named: "Cloud Whisper")
+            case "value3":
+                cell.imageView.image = UIImage(named: "Sunburst Yellow")
+            case "value4":
+                cell.imageView.image = UIImage(named: "Radiant Orange")
+            case "value5":
+                cell.imageView.image = UIImage(named: "Serene Sky")
+            case "value6":
+                cell.imageView.image = UIImage(named: "Midnight Depth")
+            case "value7":
+                cell.imageView.image = UIImage(named: "Wanderer's Flame")
+            case "value8":
+                cell.imageView.image = UIImage(named: "Storybook Brown")
+            case "value9":
+                cell.imageView.image = UIImage(named: "Ember Red")
+            case "value10":
+                cell.imageView.image = UIImage(named: "Meadow Green")
+            default:
+                cell.imageView.image = UIImage(named: "Storybook Brown") // 기본 이미지
+            }
+            cell.titleLabel.text = record.title // 오브제 이름
         }
         
         return cell
@@ -426,9 +490,12 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == scrollableTravelCollectionView {
             // 여행 기록 클릭 시 CollectionPhotosViewController로 화면 전환
+            let selectedRecord = travelRecords[indexPath.row]
+
             print("여행 기록 셀 클릭됨: \(indexPath.row)")
             let collectionPhotosVC = CollectionPhotosViewController()
             collectionPhotosVC.modalPresentationStyle = .fullScreen
+            collectionPhotosVC.recordID = selectedRecord.id.uuidString // 레코드 ID 전달
             present(collectionPhotosVC, animated: true, completion: nil)
         } else if collectionView == scrollableObjectCollectionView {
             // 오브제 클릭 시 ObjectModalViewController 모달 띄우기
@@ -452,11 +519,11 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         let titleLabel: UILabel = {
             let label = UILabel()
             label.textAlignment = .center
-            label.font = .systemFont(ofSize: 14, weight: .medium)
+            label.font = UIFont(name: "Pretendard-Regular", size: 15)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.numberOfLines = 1
-            label.backgroundColor = UIColor(white: 0, alpha: 0.5)
-            label.textColor = .white
+            label.backgroundColor = .white
+            label.textColor = .black
             return label
         }()
         
@@ -481,5 +548,17 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
+    }
+    
+    private func loadTravelRecords() {
+        // 샘플 데이터를 TravelRecordManager에서 가져오기
+        travelRecords = TravelRecordManager.shared.getAllRecords()
+        print("Loaded travel records count: \(travelRecords.count)")
+    }
+
+    
+    private func reloadTravelRecords() {
+        travelRecords = TravelRecordManager.shared.getAllRecords()
+        scrollableTravelCollectionView.reloadData()
     }
 }
