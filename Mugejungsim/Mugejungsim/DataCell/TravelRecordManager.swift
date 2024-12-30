@@ -46,7 +46,7 @@ struct TravelRecord: Codable {
     var oneLine1: String        // local
     var oneLine2: String // local
 
-    init(id:UUID = UUID(), title: String, description: String, startDate: String, endDate: String, location: String, companion: String, bottle: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
+    init(id:UUID = UUID(), title: String, startDate: String, endDate: String, location: String, companion: String, bottle: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
         self.id = id
         self.title = title
         self.startDate = startDate

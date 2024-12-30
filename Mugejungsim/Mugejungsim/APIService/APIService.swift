@@ -1,21 +1,9 @@
 import Alamofire
 import UIKit
 
-struct User: Codable {
-    let id: Int?
-    let name: String
-    let part: String
-    let age: Int
-}
-
-struct UpdateUserRequest: Codable {
-    let name: String
-    let part: String
-    let age: String
-}
-
 struct APIResponse: Codable {
     let success: Bool
+    let message: String? // 추가적으로 서버의 메시지를 포함할 수 있도록 설정
 }
 
 class APIService {
@@ -23,60 +11,103 @@ class APIService {
     
     private let networkManager = NetworkManager.shared
     private init() {}
-    
-    // MARK: - 사용자 목록 조회
-    func getUsers(part: String, completion: @escaping (Result<[User], Error>) -> Void) {
+
+    // MARK: - 여행 기록 목록 조회
+    func getTravelRecords(completion: @escaping (Result<[TravelRecord], Error>) -> Void) {
         networkManager.request(
-            "/user",
+            "/travelRecords",
             method: .get,
-            parameters: ["part": part],
             completion: completion
         )
     }
     
-    // MARK: - 사용자 생성
-    func createUser(user: User, completion: @escaping (Result<APIResponse, Error>) -> Void) {
+    // MARK: - 여행 기록 생성
+    func createTravelRecord(record: TravelRecord, completion: @escaping (Result<APIResponse, Error>) -> Void) {
         networkManager.request(
-            "/user",
+            "/travelRecords",
             method: .post,
-            parameters: nil,
-            body: user,
+            body: record,
             completion: completion
         )
     }
     
-    // MARK: - 사용자 정보 업데이트
-    func updateUser(id: Int, user: UpdateUserRequest, completion: @escaping (Result<APIResponse, Error>) -> Void) {
+    // MARK: - 여행 기록 업데이트
+    func updateTravelRecord(id: UUID, record: TravelRecord, completion: @escaping (Result<APIResponse, Error>) -> Void) {
         networkManager.request(
-            "/user/\(id)",
+            "/travelRecords/\(id)",
             method: .patch,
-            parameters: nil,
-            body: user,
+            body: record,
             completion: completion
         )
     }
     
-    // MARK: - 사용자 삭제
-    func deleteUser(id: Int, completion: @escaping (Result<APIResponse, Error>) -> Void) {
+    // MARK: - 여행 기록 삭제
+    func deleteTravelRecord(id: UUID, completion: @escaping (Result<APIResponse, Error>) -> Void) {
         networkManager.request(
-            "/user/\(id)",
+            "/travelRecords/\(id)",
             method: .delete,
-            parameters: nil,
             completion: completion
         )
     }
     
-    // MARK: - 다중 이미지 업로드
-    func uploadUserImages(
-        userId: Int,
+    func uploadTravelRecordImages(
+        recordId: UUID,
         images: [UIImage],
+        metadata: [[String: Any]], // 각 이미지와 관련된 메타데이터
         completion: @escaping (Result<APIResponse, Error>) -> Void
     ) {
-        networkManager.uploadImages(
-            "/user/upload",
-            parameters: ["userId": "\(userId)"],
-            images: images,
-            completion: completion
+        let endpoint = "/travelRecords/\(recordId)/upload"
+        let url = URLService.shared.baseURL + endpoint
+        let headers: HTTPHeaders = [
+            "Content-Type": "multipart/form-data"
+        ]
+
+        AF.upload(
+            multipartFormData: { multipartFormData in
+                // Add images and metadata
+                images.enumerated().forEach { index, image in
+                    if let imageData = image.jpegData(compressionQuality: 0.8) {
+                        multipartFormData.append(
+                            imageData,
+                            withName: "photos[\(index)][image]",
+                            fileName: "image\(index + 1).jpg",
+                            mimeType: "image/jpeg"
+                        )
+                    }
+                    
+                    // Add metadata for each image
+                    if let pid = metadata[index]["pid"] as? String {
+                        multipartFormData.append(Data(pid.utf8), withName: "photos[\(index)][pid]")
+                    }
+                    if let content = metadata[index]["content"] as? String {
+                        multipartFormData.append(Data(content.utf8), withName: "photos[\(index)][content]")
+                    }
+                    if let categories = metadata[index]["categories"] as? [String] {
+                        categories.forEach { category in
+                            multipartFormData.append(Data(category.utf8), withName: "photos[\(index)][categories][]")
+                        }
+                    }
+                    if let orderIndex = metadata[index]["orderIndex"] as? Int {
+                        multipartFormData.append(Data("\(orderIndex)".utf8), withName: "photos[\(index)][orderIndex]")
+                    }
+                }
+            },
+            to: url,
+            headers: headers
         )
+        .validate(statusCode: 200..<300)
+        .responseDecodable(of: APIResponse.self) { response in
+            switch response.result {
+            case .success(let apiResponse):
+                print("Upload Success:", apiResponse)
+                completion(.success(apiResponse))
+            case .failure(let error):
+                print("Upload Failure:", error.localizedDescription)
+                if let data = response.data {
+                    print("Response Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
+                }
+                completion(.failure(error))
+            }
+        }
     }
 }

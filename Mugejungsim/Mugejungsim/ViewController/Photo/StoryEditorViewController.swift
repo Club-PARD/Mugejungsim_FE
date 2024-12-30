@@ -1,5 +1,6 @@
 import UIKit
 import PhotosUI
+import Alamofire
 
 class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UITextViewDelegate, PHPickerViewControllerDelegate {
 
@@ -970,7 +971,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         // Swagger 형식의 데이터를 생성
             var swaggerData: [[String: Any]] = []
             for (index, image) in images.enumerated() {
-                let text = texts[index]
+                let text = texts[index].isEmpty ? nil : texts[index]
                 let categories = selectedCategoriesForImages[index]
                 guard let imagePath = DataManager.shared.saveImage(image) else {
                     print("이미지 저장 실패")
@@ -978,13 +979,14 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 }
 
                 let photoData: [String: Any] = [
-                    "id": index,
+                    "pid": index,
                     "content": text,
                     "categories": categories,
                     "imagePath": imagePath,
                     "orderIndex": index
                 ]
                 swaggerData.append(photoData)
+                print("Swagger 데이터: \(swaggerData)")
             }
 
         // Swagger 데이터 업로드
@@ -1016,28 +1018,115 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 }
             }
         
-        // 서버에 데이터 업로드
-            let serverURL = "http://192.168.1.22:8080/api/stories"
-            StoryManager.shared.uploadStories(to: serverURL) { result in
-                switch result {
-                case .success(let message):
-                    print("업로드 성공: \(message)")
-                    DispatchQueue.main.async {
-                        // 업로드 성공 후 다음 화면으로 이동
-                        let savedPhotosVC = SavedPhotosViewController()
-                        savedPhotosVC.modalPresentationStyle = .fullScreen
-                        self.present(savedPhotosVC, animated: true)
-                    }
-                case .failure(let error):
-                    print("업로드 실패: \(error.localizedDescription)")
-                    self.showAlert(title: "업로드 실패", message: "서버로 데이터를 전송하지 못했습니다. 네트워크 상태를 확인해주세요.")
+        // 서버 URL 정의
+        let serverURL = "http://172.17.208.113:8080/api/stories?userId=1&postId=1"
+
+        AF.upload(
+            multipartFormData: { multipartFormData in
+                // Add parameters (JSON 대신 멀티파트 폼 필드로 추가)
+                multipartFormData.append(Data("버억".utf8), withName: "photos[0][content]")
+                multipartFormData.append(Data("Alpha".utf8), withName: "photos[0][categories][]")
+                multipartFormData.append(Data("0".utf8), withName: "photos[0][orderIndex]")
+                multipartFormData.append(Data("0".utf8), withName: "photos[0][pid]")
+                
+                // Add image (이미지 데이터 추가)
+                if let imageData = UIImage(named: "image_28D8FA8A-AB95-4E50-9DCE-8688DC1BB675.jpg")?.jpegData(compressionQuality: 0.8) {
+                    multipartFormData.append(
+                        imageData,
+                        withName: "photos[0][image]",
+                        fileName: "image.jpg",
+                        mimeType: "image/jpeg"
+                    )
+                }
+            },
+            to: "http://172.17.208.113:8080/api/stories?userId=1&postId=1",
+            headers: ["Content-Type": "multipart/form-data"]
+        )
+        .responseJSON { response in
+            switch response.result {
+            case .success(let result):
+                print("Upload Success:", result)
+            case .failure(let error):
+                print("Upload Failure:", error.localizedDescription)
+                if let data = response.data {
+                    print("Response Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
                 }
             }
+        }
 
         // 다음 화면으로 이동
         let savedPhotosVC = SavedPhotosViewController()
         savedPhotosVC.recordID = recordID
         savedPhotosVC.modalPresentationStyle = .fullScreen
         present(savedPhotosVC, animated: true)
+        
+        let jsonData: [String: Any] = ["photos": swaggerData]
+        let firstImage = images.first
+
+        
+        // 업로드 호출
+            uploadStoryWithMultipart(to: serverURL, jsonData: jsonData, photo: firstImage) { result in
+                switch result {
+                case .success(let message):
+                    print("업로드 성공: \(message)")
+                    // 성공 시 다음 화면으로 이동
+                    let savedPhotosVC = SavedPhotosViewController()
+                    savedPhotosVC.recordID = self.recordID
+                    savedPhotosVC.modalPresentationStyle = .fullScreen
+                    self.present(savedPhotosVC, animated: true)
+                case .failure(let error):
+                    print("업로드 실패: \(error.localizedDescription)")
+                    self.showAlert(title: "업로드 실패", message: error.localizedDescription)
+                }
+            }
+    }
+    
+    func uploadStoryWithMultipart(
+        to url: String,
+        jsonData: [String: Any],
+        photo: UIImage?,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
+        let headers: HTTPHeaders = [
+            "Content-Type": "multipart/form-data"
+        ]
+
+        AF.upload(
+            multipartFormData: { multipartFormData in
+                // JSON 데이터 추가
+                if let jsonData = try? JSONSerialization.data(withJSONObject: jsonData, options: []) {
+                    multipartFormData.append(jsonData, withName: "data")
+                } else {
+                    print("JSON 직렬화 실패")
+                }
+
+                // 이미지 추가
+                if let photo = photo, let imageData = photo.jpegData(compressionQuality: 0.8) {
+                    multipartFormData.append(
+                        imageData,
+                        withName: "photo",
+                        fileName: "image.jpg",
+                        mimeType: "image/jpeg"
+                    )
+                }
+            },
+            to: url,
+            headers: headers
+        )
+        .validate(statusCode: 200..<300)
+        .response { response in
+            switch response.result {
+            case .success:
+                if let statusCode = response.response?.statusCode {
+                    completion(.success("업로드 성공: 상태 코드 \(statusCode)"))
+                }
+            case .failure(let error):
+                print("에러: \(error.localizedDescription)")
+                if let data = response.data, let errorResponse = String(data: data, encoding: .utf8) {
+                    print("서버 응답: \(errorResponse)")
+                }
+                completion(.failure(error))
+            }
+        }
     }
 }

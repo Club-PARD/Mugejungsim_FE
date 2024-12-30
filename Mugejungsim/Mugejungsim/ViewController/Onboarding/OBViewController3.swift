@@ -90,10 +90,9 @@ class OBViewController3: UIViewController {
 
     @objc private func nextButtonTapped() {
         let mainViewController = CreateViewController()
-        
-        // 새 화면을 기존 뷰와 부드럽게 교체
-        UIView.transition(with: self.view.window!, duration: 0.3, options: .transitionCrossDissolve, animations: {
-            UIApplication.shared.windows.first?.rootViewController = mainViewController
-        }, completion: nil)
+        mainViewController.modalPresentationStyle = .fullScreen // 전체 화면 표시
+        mainViewController.modalTransitionStyle = .coverVertical // 아래에서 위로 올라오는 스타일
+
+        self.present(mainViewController, animated: true, completion: nil)
     }
 }
