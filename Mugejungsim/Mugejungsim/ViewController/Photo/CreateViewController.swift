@@ -728,48 +728,42 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc func nextButtonTapped() {
+        // 입력값 가져오기
         travelTitle = titleTextField.text ?? "없음"
         companion = selectedCompanion?.title(for: .normal) ?? "없음"
         startDate = "\(startDateYear ?? "0000")-\(startDateMonth ?? "00")-\(startDateDay ?? "00")"
         endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
         location = locationTextField.text ?? "없음"
-        
-//        print("제목: \(travelTitle)")
-//        print("누구와: \(companion)")
-//        print("시작일자: \(startDate)")
-//        print("종료일자: \(endDate)")
-//        print("장소: \(location)")
-        
+
+        // 새로운 여행 기록 생성
         let newRecord = TravelRecord(
-            id: UUID(), // 새로운 UUID 생성
+            id: UUID(),
             title: travelTitle,
-            description: "\(companion) | \(startDate) ~ \(endDate)",
             startDate: startDate,
             endDate: endDate,
             location: location,
             companion: companion,
-            bottle: "", // 적절한 값 전달
+            bottle: "",
             oneLine1: "",
             oneLine2: ""
         )
-        
-        // 기록 추가
+
+        // 로컬에 기록 저장
         TravelRecordManager.shared.addRecord(newRecord)
-        // 데이터 저장
-        var records = DataManager.shared.loadTravelRecords()
-        records.append(newRecord)
-        DataManager.shared.saveTravelRecords(records)
-                
-        // 저장된 기록 출력
-        print("여행 기록이 저장되었습니다.")
-        print("저장된 기록: \(newRecord)")
-        print("기록 ID: \(newRecord.id)")
-        
-        let uploadViewController = UploadViewController()
-        uploadViewController.recordID = newRecord.id.uuidString //
-        uploadViewController.modalPresentationStyle = .fullScreen // 전체 화면 표시
-        uploadViewController.modalTransitionStyle = .crossDissolve // 전환 애니메이션
-        present(uploadViewController, animated: true, completion: nil)
+
+        // 서버에 데이터 전송
+        TravelRecordManager.shared.sendRecordToServer(newRecord) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let message):
+                    print(message)
+                    self.navigateToNextScreen(recordID: newRecord.id.uuidString)
+                case .failure(let error):
+                    print("Error sending record to server: \(error.localizedDescription)")
+                    self.showAlert(title: "오류", message: "서버 전송 중 오류가 발생했습니다.")
+                }
+            }
+        }
     }
     
     private func isValidDate(year: String, month: String, day: String) -> Bool {
@@ -784,6 +778,21 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         ]
         return dayInt <= (daysInMonth[monthInt] ?? 0)
     }
+    
+    private func navigateToNextScreen(recordID: String) {
+        let uploadViewController = UploadViewController()
+        uploadViewController.recordID = recordID
+        uploadViewController.modalPresentationStyle = .fullScreen
+        uploadViewController.modalTransitionStyle = .crossDissolve
+        present(uploadViewController, animated: true, completion: nil)
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true, completion: nil)
+    }
+
     
 }
 
@@ -800,35 +809,52 @@ extension CreateViewController: StopWritingViewControllerDelegate {
 }
 
 extension TravelRecordManager {
-    // MARK: - 서버로 기록 전송
     func sendRecordToServer(_ record: TravelRecord, completion: @escaping (Result<String, Error>) -> Void) {
-        // 서버 URL
-        let serverURL = "http://172.17.208.113:8080/api/posts?userId=1" // 서버 주소 수정 필요
+        let serverURL = "http://172.17.208.113:8080/api/posts?userId=1"
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json"
+        ]
 
-        // JSON 데이터로 변환
+        // JSON-compatible parameters
+        let parameters: [String: Any] = [
+            "pid": record.id.uuidString, // UUID to String
+            "userId": 1,               // Ensure userId is valid
+            "title": record.title,
+            "startDate": record.startDate,
+            "endDate": record.endDate,
+            "location": record.location,
+            "companion": record.companion,
+            "bottle": record.bottle
+        ]
+
+        // Debug JSON
         do {
-            let jsonData = try JSONEncoder().encode(record)
-            let json = try JSONSerialization.jsonObject(with: jsonData, options: [])
-            print("Record JSON:", json) // 디버깅용 출력
-
-            // Alamofire 요청
-            AF.request(
-                serverURL,
-                method: .post,
-                parameters: json as? [String: Any],
-                encoding: JSONEncoding.default,
-                headers: ["Content-Type": "application/json"]
-            ).response { response in
-                switch response.result {
-                case .success:
-                    completion(.success("Record successfully sent to server"))
-                case .failure(let error):
-                    completion(.failure(error))
-                }
-            }
+            let jsonData = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
+            print("Request JSON: \(String(data: jsonData, encoding: .utf8) ?? "Invalid JSON")")
         } catch {
-            print("JSON Encoding Error: \(error.localizedDescription)")
+            print("Error serializing parameters: \(error.localizedDescription)")
             completion(.failure(error))
+            return
+        }
+
+        AF.request(
+            serverURL,
+            method: .post,
+            parameters: parameters,
+            encoding: JSONEncoding.default,
+            headers: headers
+        ).responseJSON { response in
+            print("Request URL: \(response.request?.url?.absoluteString ?? "No URL")")
+            print("Request Body: \(String(data: response.request?.httpBody ?? Data(), encoding: .utf8) ?? "No Body")")
+            print("Response Status Code: \(response.response?.statusCode ?? 0)")
+            print("Response Data: \(String(data: response.data ?? Data(), encoding: .utf8) ?? "No Response")")
+
+            switch response.result {
+            case .success:
+                completion(.success("Record successfully sent to server"))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
 }
