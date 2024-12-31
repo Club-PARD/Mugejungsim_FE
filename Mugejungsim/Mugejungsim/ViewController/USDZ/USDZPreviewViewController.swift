@@ -45,7 +45,7 @@ class USDZPreviewViewController: UIViewController {
         // 백 버튼 생성
         let backButton = UIButton(type: .system)
         backButton.setImage(UIImage(named: "X_Button"), for: .normal) // "X_Button" 이미지 사용
-        backButton.tintColor = .black // 이미지 색상 (시스템 버튼의 경우 적용 가능)
+        backButton.tintColor = .white // 이미지 색상을 흰색으로 설정
         backButton.backgroundColor = .clear
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.addTarget(self, action: #selector(dismissModal), for: .touchUpInside)
