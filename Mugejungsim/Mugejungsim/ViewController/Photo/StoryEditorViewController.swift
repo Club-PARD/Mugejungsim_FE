@@ -963,7 +963,9 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         }
         print(images)
         // 서버 업로드 호출
-
+        
+        
+        // MULTIPART POST
         APIService.shared.uploadImages(
             endpoint: "/stories",
             images: images,
@@ -992,6 +994,30 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         } else {
             print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
         }
+        
+        
+        // MULTIPART GET
+        
+//        var test: [PhotoData] = []
+//        
+//        APIService.shared.getPhotos(endpoint: "/stories") { result in
+//            switch result {
+//            case .success(let photos):
+//                // 성공적으로 데이터를 가져왔을 때 처리
+//                test = photos
+//                for photo in photos {
+//                    print("Content: \(photo.text), Categories: \(photo.categories)")
+//                }
+//            case .failure(let error):
+//                print("Failed to fetch photos: \(error.localizedDescription)")
+//            }
+//        }
+        
+        
+        
+        
+        
+        
 
         let savedPhotosVC = SavedPhotosViewController()
         savedPhotosVC.recordID = recordID
