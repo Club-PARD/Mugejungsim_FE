@@ -35,16 +35,16 @@ import UIKit
 //}
 
 struct TravelRecord: Codable {
-    var id: UUID          // 기록물 id
+    var id: UUID                // 기록물 id
     var title: String           // 기록물 제목 : 여행 제목
-    var startDate: String            // 여행 시작 날짜
-    var endDate: String            // 여행 종료 날짜
+    var startDate: String       // 여행 시작 날짜
+    var endDate: String         // 여행 종료 날짜
     var location: String        // 여행지
-    var companion : String // 동행자
-    var bottle : String // 유리병
-    var photos: [PhotoData] // `PhotoData` 사용
+    var companion : String      // 동행자
+    var bottle : String         // 유리병
+    var photos: [PhotoData]     // `PhotoData` 사용
     var oneLine1: String        // local
-    var oneLine2: String // local
+    var oneLine2: String        // local
 
     init(id:UUID = UUID(), title: String, startDate: String, endDate: String, location: String, companion: String, bottle: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
         self.id = id

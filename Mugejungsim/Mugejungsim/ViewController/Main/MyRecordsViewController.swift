@@ -512,50 +512,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         }
     }
     
-    
-    class TravelRecordCell: UICollectionViewCell {
-        let imageView: UIImageView = {
-            let imageView = UIImageView()
-            imageView.contentMode = .scaleAspectFill
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            imageView.clipsToBounds = true
-            return imageView
-        }()
-        
-        let titleLabel: UILabel = {
-            let label = UILabel()
-            label.textAlignment = .center
-            label.font = UIFont(name: "Pretendard-Regular", size: 15)
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.numberOfLines = 1
-            label.backgroundColor = .white
-            label.textColor = .black
-            return label
-        }()
-        
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            contentView.addSubview(imageView)
-            contentView.addSubview(titleLabel)
-            
-            NSLayoutConstraint.activate([
-                imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-                imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-                imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.75),
-                
-                titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-                titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
-                titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
-                titleLabel.heightAnchor.constraint(equalToConstant: 20)
-            ])
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-    }
-    
     private func loadTravelRecords() {
         // 샘플 데이터를 TravelRecordManager에서 가져오기
         travelRecords = TravelRecordManager.shared.getAllRecords()
@@ -575,7 +531,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     private func updateScrollViewContentSize() {
         let collectionViewHeight = calculateCollectionViewHeight()
         let totalHeight = collectionViewHeight + 300 // 다른 요소 높이 합 (적절히 조정)
-//        scrollView.contentSize = CGSize(width: view.frame.width, height: totalHeight)
+
         scrollView.contentSize = CGSize(width: view.frame.width - 40, height: totalHeight) // width 고정
         print("Updated ScrollView content size: \(scrollView.contentSize)")
     }
@@ -596,5 +552,48 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
 
         let rowCount = ceil(CGFloat(travelRecords.count) / itemsPerRow)
         return (rowCount * itemHeight) + ((rowCount - 1) * spacing)
+    }
+}
+
+class TravelRecordCell: UICollectionViewCell {
+    let imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
+    let titleLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = UIFont(name: "Pretendard-Regular", size: 15)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 1
+        label.backgroundColor = .white
+        label.textColor = .black
+        return label
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        contentView.addSubview(imageView)
+        contentView.addSubview(titleLabel)
+        
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.75),
+            
+            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
+            titleLabel.heightAnchor.constraint(equalToConstant: 20)
+        ])
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
