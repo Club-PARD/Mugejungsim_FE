@@ -12,27 +12,7 @@
 import Alamofire
 import UIKit
 
-//struct TravelRecord: Codable {
-//    var id: UUID                // 기록물 id
-//    var title: String           // 기록물 제목 : 여행 제목
-//    var description: String     //
-//    var date: String            // 여행 날짜
-//    var location: String        // 여행지
-//    var oneLine1: String        //
-//    var oneLine2: String        //
-//    var photos: [PhotoData] // `PhotoData` 사용
-//
-//    init(title: String, description: String, date: String, location: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
-//        self.id = UUID()
-//        self.title = title
-//        self.description = description
-//        self.date = date
-//        self.location = location
-//        self.oneLine1 = oneLine1
-//        self.oneLine2 = oneLine2
-//        self.photos = photos
-//    }
-//}
+
 
 struct TravelRecord: Codable {
     var id: UUID                // 기록물 id
@@ -63,7 +43,8 @@ struct TravelRecord: Codable {
 class TravelRecordManager {
     static let shared = TravelRecordManager()
     private var travelRecords: [TravelRecord] = []
-
+    var userId: Int?
+    var postId: Int?
     
     private init() {
         travelRecords = DataManager.shared.loadTravelRecords()
@@ -86,7 +67,7 @@ class TravelRecordManager {
     }
 
     // MARK: - 사진 추가
-    func addPhoto(to recordID: UUID, image: UIImage, text: String, category: String) -> Bool {
+    func addPhoto(to recordID: UUID, image: UIImage, text: String, categories: String) -> Bool {
         guard var record = getRecord(by: recordID) else { return false }
 
         // 사진 수 제한 체크
@@ -97,7 +78,7 @@ class TravelRecordManager {
 
         // `DataManager`를 사용하여 이미지 저장
         if let imageName = DataManager.shared.saveImage(image) {
-            let newPhoto = PhotoData(imagePath: imageName, text: text, category: category)
+            let newPhoto = PhotoData(imagePath: imageName, text: text, categories: [categories])
             record.photos.append(newPhoto)
             // 업데이트된 기록 저장
             updateRecord(record)

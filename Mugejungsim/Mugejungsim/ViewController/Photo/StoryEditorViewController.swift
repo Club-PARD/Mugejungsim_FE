@@ -81,6 +81,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("Received images: \(images)")  // 전달된 이미지 확인
+
+        
         texts = Array(repeating: "", count: images.count)
         categories = Array(repeating: [], count: images.count) // 카테고리 초기화
 
@@ -556,6 +560,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     @objc private func saveTemporarily() {
         presentSaveDraftModal()
     }
+    
     func presentSaveDraftModal() {
         let saveDraftModal = SaveDraftModal() // 커스텀 모달 뷰 컨트롤러
             saveDraftModal.modalPresentationStyle = .overFullScreen // 화면 전체에 표시
@@ -744,10 +749,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         // 버튼 타이틀에 따라 인덱스 설정
         switch title {
-        case "평화와 안정": categoryIndex = 0
-        case "경이로움과 감동": categoryIndex = 1
-        case "사랑과 따뜻함": categoryIndex = 2
-        case "흥분과 기대": categoryIndex = 3
+            case "평화와 안정": categoryIndex = 0
+            case "경이로움과 감동": categoryIndex = 1
+            case "사랑과 따뜻함": categoryIndex = 2
+            case "흥분과 기대": categoryIndex = 3
         default: return
         }
 
@@ -893,6 +898,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             present(alert, animated: true, completion: nil)
             return
         }
+        
+        
         // 현재 이미지를 저장
         if currentIndex < texts.count {
             texts[currentIndex] = textView.text
@@ -900,10 +907,32 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         if currentIndex < selectedCategoriesForImages.count {
             selectedCategoriesForImages[currentIndex] = selectedSubCategories
         }
-//        // 현재 이미지와 관련된 텍스트와 카테고리 저장
-//        texts = Array(repeating: "", count: images.count)
-//        selectedCategoriesForImages = Array(repeating: [], count: images.count)
+        print(selectedCategoriesForImages)
         
+        // 각 이미지 관련 정보 출력
+        var savedImagePaths: [String] = [] // 로컬에 저장된 이미지 경로들을 담을 배열
+
+        
+        print("현재 Record ID (\(recordID))의 이미지 정보:")
+           for (index, image) in images.enumerated() {
+               let text = texts[index]
+               let categories = selectedCategoriesForImages[index].joined(separator: ", ")
+
+               // 고유한 파일 이름 생성
+               let fileName = "\(UUID().uuidString).jpg"  // UUID를 사용한 고유한 파일 이름
+               if let savedImagePath = saveImageToLocalFile(image: image, fileName: fileName) {
+                   savedImagePaths.append(savedImagePath) // 이미지 경로를 배열에 추가
+                   print("사진 \(index + 1):")
+                   print("  이미지 경로: \(savedImagePath)")
+                   print("  텍스트: \(text)")
+                   print("  카테고리: \(categories)")
+               } else {
+                   print("사진 \(index + 1): 이미지 저장 실패")
+               }
+           }
+        
+        print("저장된 이미지 경로들: \(savedImagePaths)")
+
         for (index, image) in images.enumerated() {
             let text = texts[index]
             let category = selectedCategoriesForImages[index].joined(separator: ", ")
@@ -912,7 +941,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 to: UUID(uuidString: recordID) ?? UUID(),
                 image: image,
                 text: text,
-                category: category
+                categories: category
             )
             if success {
                 print("사진 \(index + 1) 추가 성공")
@@ -920,6 +949,34 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("사진 \(index + 1) 추가 실패")
             }
         }
+        
+        // `metadata` 생성
+        let metadata: [[String: Any]] = images.enumerated().map { index, _ in
+            let imagePath = savedImagePaths[index]  // savedImagePaths에서 가져옴
+            return [
+                "postId": index + 1,
+                "content": texts[index],
+                "categories": selectedCategoriesForImages[index],
+                "pid": "unique_pid_\(index + 1)",
+//                "imagePath": imagePath  // 저장된 이미지 경로 사용
+            ]
+        }
+        print(images)
+        // 서버 업로드 호출
+
+        APIService.shared.uploadImages(
+            endpoint: "/stories",
+            images: images,
+            metadata: metadata
+        ) { result in
+            switch result {
+            case .success(let response):
+                print("이미지 업로드 성공:", response)
+            case .failure(let error):
+                print("이미지 업로드 실패:", error.localizedDescription)
+            }
+        }
+        
 
         if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
             print("해당 Record ID (\(recordUUID))의 데이터:")
@@ -930,7 +987,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("Photo \(index + 1):")
                 print("    Image Path: \(photo.imagePath)")
                 print("    Text: \(photo.text)")
-                print("    Category: \(photo.category)")
+                print("    Category: \(photo.categories)")
             }
         } else {
             print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
@@ -943,193 +1000,24 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
 
     
-//    @objc private func nextButtonTapped() {
-//        // 현재 사진 데이터 저장
-//        if currentIndex < texts.count {
-//            texts[currentIndex] = textView.text
-//        }
-//        if currentIndex < selectedCategoriesForImages.count {
-//            selectedCategoriesForImages[currentIndex] = selectedSubCategories
-//        }
-//
-//        // 모든 사진에 대해 데이터 저장
-//        for (index, image) in images.enumerated() {
-//            let text = texts[index]
-//            let category = selectedCategoriesForImages[index].joined(separator: ", ")
-//
-//            let success = TravelRecordManager.shared.addPhoto(
-//                to: UUID(uuidString: recordID) ?? UUID(),
-//                image: image,
-//                text: text,
-//                category: category
-//            )
-//
-//            if success {
-//                print("사진 \(index + 1) 저장 성공")
-//            } else {
-//                print("사진 \(index + 1) 저장 실패")
-//            }
-//        }
-//        
-//        // Swagger 형식의 데이터를 생성
-//            var swaggerData: [[String: Any]] = []
-//            for (index, image) in images.enumerated() {
-//                let text = texts[index].isEmpty ? nil : texts[index]
-//                let categories = selectedCategoriesForImages[index]
-//                guard let imagePath = DataManager.shared.saveImage(image) else {
-//                    print("이미지 저장 실패")
-//                    continue
-//                }
-//
-//                let photoData: [String: Any] = [
-//                    "pid": index,
-//                    "content": text,
-//                    "categories": categories,
-//                    "imagePath": imagePath,
-//                    "orderIndex": index
-//                ]
-//                swaggerData.append(photoData)
-//                print("Swagger 데이터: \(swaggerData)")
-//            }
-//
-//        // Swagger 데이터 업로드
-//            DataManager.shared.uploadPhotoData(swaggerData) { result in
-//                switch result {
-//                case .success(let response):
-//                    print("Swagger 데이터 업로드 성공: \(response)")
-//                    
-//                    // 다음 화면으로 이동
-//                    let savedPhotosVC = SavedPhotosViewController()
-//                    savedPhotosVC.recordID = self.recordID
-//                    savedPhotosVC.modalPresentationStyle = .fullScreen
-//                    self.present(savedPhotosVC, animated: true)
-//                case .failure(let error):
-//                    if let urlError = error as? URLError {
-//                        switch urlError.code {
-//                        case .notConnectedToInternet:
-//                            self.showAlert(title: "네트워크 오류", message: "인터넷 연결을 확인해주세요.")
-//                        case .cannotFindHost:
-//                            self.showAlert(title: "서버 오류", message: "서버 주소를 확인해주세요.")
-//                        case .cannotConnectToHost:
-//                            self.showAlert(title: "서버 연결 실패", message: "서버가 응답하지 않습니다.")
-//                        default:
-//                            self.showAlert(title: "네트워크 오류", message: urlError.localizedDescription)
-//                        }
-//                    } else {
-//                        self.showAlert(title: "업로드 실패", message: error.localizedDescription)
-//                    }
-//                }
-//            }
-//        
-//        // 서버 URL 정의
-//        let serverURL = "##########"
-//
-//        AF.upload(
-//            multipartFormData: { multipartFormData in
-//                // Add parameters (JSON 대신 멀티파트 폼 필드로 추가)
-//                multipartFormData.append(Data("버억".utf8), withName: "photos[0][content]")
-//                multipartFormData.append(Data("Alpha".utf8), withName: "photos[0][categories][]")
-//                multipartFormData.append(Data("0".utf8), withName: "photos[0][orderIndex]")
-//                multipartFormData.append(Data("0".utf8), withName: "photos[0][pid]")
-//                
-//                // Add image (이미지 데이터 추가)
-//                if let imageData = UIImage(named: "image_28D8FA8A-AB95-4E50-9DCE-8688DC1BB675.jpg")?.jpegData(compressionQuality: 0.8) {
-//                    multipartFormData.append(
-//                        imageData,
-//                        withName: "photos[0][image]",
-//                        fileName: "image.jpg",
-//                        mimeType: "image/jpeg"
-//                    )
-//                }
-//            },
-//            to: "##########",
-//            headers: ["Content-Type": "multipart/form-data"]
-//        )
-//        .responseJSON { response in
-//            switch response.result {
-//            case .success(let result):
-//                print("Upload Success:", result)
-//            case .failure(let error):
-//                print("Upload Failure:", error.localizedDescription)
-//                if let data = response.data {
-//                    print("Response Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
-//                }
-//            }
-//        }
-//
-//        // 다음 화면으로 이동
-//        let savedPhotosVC = SavedPhotosViewController()
-//        savedPhotosVC.recordID = recordID
-//        savedPhotosVC.modalPresentationStyle = .fullScreen
-//        present(savedPhotosVC, animated: true)
-//        
-//        let jsonData: [String: Any] = ["photos": swaggerData]
-//        let firstImage = images.first
-//
-//        
-//        // 업로드 호출
-//            uploadStoryWithMultipart(to: serverURL, jsonData: jsonData, photo: firstImage) { result in
-//                switch result {
-//                case .success(let message):
-//                    print("업로드 성공: \(message)")
-//                    // 성공 시 다음 화면으로 이동
-//                    let savedPhotosVC = SavedPhotosViewController()
-//                    savedPhotosVC.recordID = self.recordID
-//                    savedPhotosVC.modalPresentationStyle = .fullScreen
-//                    self.present(savedPhotosVC, animated: true)
-//                case .failure(let error):
-//                    print("업로드 실패: \(error.localizedDescription)")
-//                    self.showAlert(title: "업로드 실패", message: error.localizedDescription)
-//                }
-//            }
-//    }
-    
-    func uploadStoryWithMultipart(
-        to url: String,
-        jsonData: [String: Any],
-        photo: UIImage?,
-        completion: @escaping (Result<String, Error>) -> Void
-    ) {
-        let headers: HTTPHeaders = [
-            "Content-Type": "multipart/form-data"
-        ]
+    func saveImageToLocalFile(image: UIImage, fileName: String) -> String? {
+        // 이미지 데이터를 JPEG 형식으로 변환
+        guard let imageData = image.jpegData(compressionQuality: 1.0) else {
+            print("이미지 데이터를 생성할 수 없습니다.")
+            return nil
+        }
 
-        AF.upload(
-            multipartFormData: { multipartFormData in
-                // JSON 데이터 추가
-                if let jsonData = try? JSONSerialization.data(withJSONObject: jsonData, options: []) {
-                    multipartFormData.append(jsonData, withName: "data")
-                } else {
-                    print("JSON 직렬화 실패")
-                }
+        let fileManager = FileManager.default
+        let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentDirectory.appendingPathComponent(fileName)
 
-                // 이미지 추가
-                if let photo = photo, let imageData = photo.jpegData(compressionQuality: 0.8) {
-                    multipartFormData.append(
-                        imageData,
-                        withName: "photo",
-                        fileName: "image.jpg",
-                        mimeType: "image/jpeg"
-                    )
-                }
-            },
-            to: url,
-            headers: headers
-        )
-        .validate(statusCode: 200..<300)
-        .response { response in
-            switch response.result {
-            case .success:
-                if let statusCode = response.response?.statusCode {
-                    completion(.success("업로드 성공: 상태 코드 \(statusCode)"))
-                }
-            case .failure(let error):
-                print("에러: \(error.localizedDescription)")
-                if let data = response.data, let errorResponse = String(data: data, encoding: .utf8) {
-                    print("서버 응답: \(errorResponse)")
-                }
-                completion(.failure(error))
-            }
+        do {
+            // 파일을 저장
+            try imageData.write(to: fileURL)
+            return fileURL.path // 저장된 파일의 경로 반환
+        } catch {
+            print("이미지 저장 실패: \(error)")
+            return nil
         }
     }
 }

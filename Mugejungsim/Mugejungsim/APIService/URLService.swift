@@ -10,10 +10,10 @@ import Foundation
 class URLService {
     static let shared = URLService()
     
-    private let baseURLString: String
+    let baseURLString: String
     
     private init() {
-        self.baseURLString = "#"
+        self.baseURLString = "http://172.17.208.113:8080"
     }
     
     var baseURL: String {
