@@ -208,6 +208,7 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
         
         if let image = info[.originalImage] as? UIImage {
             capturedImages.append(image)
+            print("Captured Images: \(capturedImages)")  // 추가된 이미지를 확인
             navigateToStoryEditor(with: capturedImages)
         }
     }
@@ -244,6 +245,8 @@ class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UI
 
     private func navigateToStoryEditor(with images: [UIImage]) {
         let storyEditorVC = StoryEditorViewController()
+        print("Passing images to StoryEditorVC: \(images)")  // 디버깅: 이미지 배열 확인
+
         storyEditorVC.recordID = self.recordID //
         storyEditorVC.images = images
         storyEditorVC.delegate = self // delegate 설정

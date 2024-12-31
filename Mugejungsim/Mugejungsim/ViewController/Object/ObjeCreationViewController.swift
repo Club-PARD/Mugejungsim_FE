@@ -295,7 +295,7 @@ class ObjeCreationViewController: UIViewController {
                 print("  Photo \(index + 1):")
                 print("    Image Path: \(photo.imagePath)")
                 print("    Text: \(photo.text)")
-                print("    Category: \(photo.category)")
+                print("Categories: \(photo.categories.joined(separator: ", "))") // 배열을 문자열로 결합
             }
             // 저장 후 데이터 확인
             if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {

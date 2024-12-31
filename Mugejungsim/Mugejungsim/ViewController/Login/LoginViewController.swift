@@ -6,6 +6,7 @@ class LoginViewController: UIViewController {
     
     var name : String = ""
     var provider : String = ""
+    var userId: Int? // 서버에서 받은 userId를 저장
     
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -147,21 +148,21 @@ class LoginViewController: UIViewController {
                 self.showAlert(title: "에러", message: "사용자 정보를 가져오는 데 실패했습니다.")
             } else if let user = user {
                 let nickname = user.kakaoAccount?.profile?.nickname ?? "사용자"
-                self.name = nickname
-                self.provider = "kakao"
-                print("사용자 정보 가져오기 성공: \(nickname)")
-                print("ID: \(user.id ?? 0)")
-                print("닉네임: \(user.kakaoAccount?.profile?.nickname ?? "없음")")
-//                print("프로필 이미지 URL: \(user.kakaoAccount?.profile?.profileImageUrl?.absoluteString ?? "없음")")
-//                print("이메일: \(user.kakaoAccount?.email ?? "없음")")
-//                print("전화번호: \(user.kakaoAccount?.phoneNumber ?? "없음")")
-//                print("성별: \(user.kakaoAccount?.gender?.rawValue ?? "없음")")
-//                print("연령대: \(user.kakaoAccount?.ageRange?.rawValue ?? "없음")")
-//                print("생일: \(user.kakaoAccount?.birthday ?? "없음")")
+                let provider = "kakao"
                 
-                // 서버로 데이터 전송
-                self.sendLoginDataToServer(name: self.name, provider: self.provider)
-                self.navigateToOnboarding(with: nickname)
+                // 서버로 로그인 정보 전송 후 userId 받아오기
+                self.sendLoginDataToServer(name: nickname, provider: provider) { userId in
+                    if let userId = userId {
+                        TravelRecordManager.shared.userId = userId // userId 저장
+                        print("서버에서 받은 userId: \(userId)")
+                        
+                        // 다음 화면으로 이동
+                        self.navigateToOnboarding(with: nickname)
+                    } else {
+                        print("userId를 받지 못했습니다.")
+                        self.showAlert(title: "오류", message: "서버에서 사용자 정보를 처리할 수 없습니다.")
+                    }
+                }
             }
         }
     }
@@ -178,15 +179,13 @@ class LoginViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    func sendLoginDataToServer(name: String, provider: String) {
-        let url = URL(string: "http://172.17.208.113:8080/api/login")! // 서버 URL 수정 필요
-        
-        // 요청 생성
+    private func sendLoginDataToServer(name: String, provider: String, completion: @escaping (Int?) -> Void) {
+        let url = URL(string: "\(URLService.shared.baseURL)/api/users/save")!
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        // 요청 본문 데이터 설정
+
         let parameters: [String: String] = [
             "name": name,
             "provider": provider
@@ -195,20 +194,30 @@ class LoginViewController: UIViewController {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
             print("Error serializing JSON: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                completion(nil)
+            }
             return
         }
 
-        // 네트워크 요청
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error: \(error.localizedDescription)")
-            } else if let httpResponse = response as? HTTPURLResponse {
-                print("HTTP Status Code: \(httpResponse.statusCode)")
-                if let data = data, let responseString = String(data: data, encoding: .utf8) {
-                    print("Response: \(responseString)")
+                DispatchQueue.main.async {
+                    completion(nil)
                 }
-            } else {
-                print("Unknown response")
+            } else if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                print("Response: \(responseString)")
+                if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let userId = json["userId"] as? Int {
+                    DispatchQueue.main.async {
+                        completion(userId)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                }
             }
         }
         task.resume()

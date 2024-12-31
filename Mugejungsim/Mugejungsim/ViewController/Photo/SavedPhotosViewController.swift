@@ -63,6 +63,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         
         // 데이터 로드
 //        savedData = DataManager.shared.loadData()
+
+        
         loadPhotosForRecord()
         
         // 이미지 개수 레이블 업데이트
@@ -86,6 +88,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 //        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
+        
+        
         loadPhotosForRecord()
         collectionView.reloadData() // 컬렉션 뷰 갱신
         updateImageCountLabel() // 이미지 카운트 업데이트
