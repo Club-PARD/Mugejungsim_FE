@@ -1,7 +1,6 @@
 {
   "images" : [
     {
-      "filename" : "한줄남기기X.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -10,7 +9,7 @@
       "scale" : "2x"
     },
     {
-      "filename" : "한줄남기기X 1.png",
+      "filename" : "한줄남기기X 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

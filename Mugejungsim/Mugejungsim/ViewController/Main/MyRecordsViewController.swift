@@ -60,13 +60,14 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     // 커스텀 스타일의 Segmented Control
     let segmentedControlContainer: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 8
         view.clipsToBounds = false
         view.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0)
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOpacity = 0.25
         view.layer.shadowOffset = CGSize(width: 0, height: 4)
         view.layer.shadowRadius = 4
+        
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -76,18 +77,17 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         control.selectedSegmentIndex = 0
         control.backgroundColor = .clear
         control.selectedSegmentTintColor = .white
-        control.layer.cornerRadius = 12
         control.clipsToBounds = true // 필수 설정
         
         // 기본 및 선택된 텍스트 스타일 설정
         let normalAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.white,
-            .font: UIFont.systemFont(ofSize: 14, weight: .medium)
+            .font: UIFont.systemFont(ofSize: 16, weight: .medium)
         ]
         
         let selectedAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0),
-            .font: UIFont.systemFont(ofSize: 14, weight: .bold)
+            .font: UIFont.systemFont(ofSize: 16, weight: .bold)
         ]
         
         control.setTitleTextAttributes(normalAttributes, for: .normal)
@@ -102,7 +102,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     
     @objc private func updateSegmentedControlCorners() {
         for subview in segmentedControl.subviews {
-            subview.layer.cornerRadius = 12 // 전체 RoundedCorners와 동일하게 설정
             subview.clipsToBounds = true
         }
     }
@@ -112,6 +111,8 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         let scrollView = UIScrollView()
         scrollView.backgroundColor = .white
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.isScrollEnabled = true
+        scrollView.alwaysBounceHorizontal = false
         return scrollView
     }()
     
@@ -123,9 +124,11 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .white
+        collectionView.isScrollEnabled = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
+    
     let scrollableObjectCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 16
@@ -133,6 +136,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .white
+        collectionView.isScrollEnabled = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -184,7 +188,12 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         setupContextMenu() // contextMenuContainer를 설정
         
         loadTravelRecords() // 데이터셋 로드
+        updateCollectionViewHeight()
+        updateScrollViewContentSize()
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
     }
+    
     private func createMenuButton(title: String, iconName: String) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(" \(title)", for: .normal) // 텍스트와 아이콘 사이 간격을 위한 공백 추가
@@ -258,12 +267,12 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         self.present(createViewController, animated: false, completion: nil)
     }
     
-    
     @objc private func toggleContextMenu() {
         UIView.animate(withDuration: 0.3) {
             self.contextMenuContainer.isHidden.toggle()
         }
     }
+    
     private func setupUI() {
         view.addSubview(logoImageView)
         view.addSubview(titleCardView)
@@ -301,15 +310,15 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             
             // Segmented Control Container
             segmentedControlContainer.topAnchor.constraint(equalTo: titleCardView.bottomAnchor, constant: 30),
-            segmentedControlContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 108),
-            segmentedControlContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -108),
+            segmentedControlContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
+            segmentedControlContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
             segmentedControlContainer.heightAnchor.constraint(equalToConstant: 40),
             
             // Segmented Control
-            segmentedControl.centerXAnchor.constraint(equalTo: segmentedControlContainer.centerXAnchor),
-            segmentedControl.centerYAnchor.constraint(equalTo: segmentedControlContainer.centerYAnchor),
-            segmentedControl.widthAnchor.constraint(equalTo: segmentedControlContainer.widthAnchor, multiplier: 0.95),
-            segmentedControl.heightAnchor.constraint(equalTo: segmentedControlContainer.heightAnchor, multiplier: 0.9),
+            segmentedControl.leadingAnchor.constraint(equalTo: segmentedControlContainer.leadingAnchor),
+            segmentedControl.trailingAnchor.constraint(equalTo: segmentedControlContainer.trailingAnchor),
+            segmentedControl.topAnchor.constraint(equalTo: segmentedControlContainer.topAnchor),
+            segmentedControl.bottomAnchor.constraint(equalTo: segmentedControlContainer.bottomAnchor),
             
             // My Page Button
             myPageButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
@@ -329,7 +338,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             scrollableTravelCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             scrollableTravelCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             scrollableTravelCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: 800),
+            scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: calculateCollectionViewHeight()),
             
             // Floating Button
             floatingButton.widthAnchor.constraint(equalToConstant: 60),
@@ -369,7 +378,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 scrollableTravelCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
                 scrollableTravelCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
                 scrollableTravelCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-                scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: 800)
+                scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: calculateCollectionViewHeight()),
             ])
             reloadTravelRecords() // 여행 기록 데이터를 다시 로드
             print("Reloaded Travel Records. Count: \(travelRecords.count)")
@@ -385,7 +394,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 scrollableObjectCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
                 scrollableObjectCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
                 scrollableObjectCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-                scrollableObjectCollectionView.heightAnchor.constraint(equalToConstant: 800)
+                scrollableObjectCollectionView.heightAnchor.constraint(equalToConstant: calculateCollectionViewHeight()),
             ])
             reloadTravelRecords() // 여행 기록 데이터를 다시 로드
             print("Reloaded Travel Records. Count: \(travelRecords.count)")
@@ -409,22 +418,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         }
         return 0
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
-//
-//        if collectionView == scrollableTravelCollectionView {
-//            let imageName = "image\(indexPath.row + 1)"
-//            cell.imageView.image = UIImage(named: imageName)
-//            cell.titleLabel.text = "기록 \(indexPath.row + 1)"
-//        } else if collectionView == scrollableObjectCollectionView {
-//            let imageName = "object\(indexPath.row + 1)"
-//            cell.imageView.image = UIImage(named: imageName)
-//            cell.titleLabel.text = "오브제 \(indexPath.row + 1)"
-//        }
-//
-//        return cell
-//    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
@@ -490,7 +483,11 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.frame.width - 48) / 3
+//        let width = (collectionView.frame.width - 48) / 3
+//        return CGSize(width: width, height: 150)
+        let itemsPerRow: CGFloat = 3
+        let totalSpacing: CGFloat = 48 // 16 * 3 (두 셀 사이의 간격)
+        let width = (collectionView.frame.width - totalSpacing) / itemsPerRow
         return CGSize(width: width, height: 150)
     }
     
@@ -568,9 +565,36 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         }
     }
 
-    
     private func reloadTravelRecords() {
         travelRecords = TravelRecordManager.shared.getAllRecords()
         scrollableTravelCollectionView.reloadData()
+        updateCollectionViewHeight()
+        updateScrollViewContentSize()
+    }
+    
+    private func updateScrollViewContentSize() {
+        let collectionViewHeight = calculateCollectionViewHeight()
+        let totalHeight = collectionViewHeight + 300 // 다른 요소 높이 합 (적절히 조정)
+//        scrollView.contentSize = CGSize(width: view.frame.width, height: totalHeight)
+        scrollView.contentSize = CGSize(width: view.frame.width - 40, height: totalHeight) // width 고정
+        print("Updated ScrollView content size: \(scrollView.contentSize)")
+    }
+    
+    private func updateCollectionViewHeight() {
+        let newHeight = calculateCollectionViewHeight()
+        print("Calculated CollectionView height: \(newHeight)")
+
+        
+        scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: newHeight).isActive = true
+        scrollableObjectCollectionView.heightAnchor.constraint(equalToConstant: newHeight).isActive = true
+    }
+    
+    func calculateCollectionViewHeight() -> CGFloat {
+        let itemsPerRow: CGFloat = 3 // 한 줄에 표시할 셀 수
+        let itemHeight: CGFloat = 150 // 각 셀의 높이
+        let spacing: CGFloat = 16 // 셀 간 간격
+
+        let rowCount = ceil(CGFloat(travelRecords.count) / itemsPerRow)
+        return (rowCount * itemHeight) + ((rowCount - 1) * spacing)
     }
 }
