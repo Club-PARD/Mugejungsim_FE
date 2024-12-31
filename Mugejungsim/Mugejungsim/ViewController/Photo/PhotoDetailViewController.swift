@@ -24,13 +24,8 @@ class PhotoDetailViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        // 내비게이션 바 설정
         setupCustomNavigationBar()
-        
-        // UI 구성
         setupUI()
-        
-        // 데이터 설정
         populateData()
     }
     
@@ -99,24 +94,29 @@ class PhotoDetailViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         blackBoxView.addSubview(imageView)
 
+        let categoryScrollView = UIScrollView()
+        categoryScrollView.showsHorizontalScrollIndicator = false
+        categoryScrollView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(categoryScrollView)
+        
         // 카테고리 버튼들을 담을 스택뷰 설정
         categoryButtonsStackView = UIStackView()
-        categoryButtonsStackView.axis = .vertical
+        categoryButtonsStackView.axis = .horizontal
         categoryButtonsStackView.alignment = .center
         categoryButtonsStackView.distribution = .equalSpacing
         categoryButtonsStackView.spacing = 10
         categoryButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(categoryButtonsStackView)
+        categoryScrollView.addSubview(categoryButtonsStackView)
 
         // 텍스트뷰 설정
         descriptionTextView = UITextView()
-        descriptionTextView.backgroundColor = UIColor.systemGray6
-        descriptionTextView.font = UIFont.systemFont(ofSize: 16)
+        descriptionTextView.backgroundColor = .white
+        descriptionTextView.font = UIFont(name: "Pretendard-Regular", size: 15)
         descriptionTextView.textColor = .black
         descriptionTextView.isEditable = false
-        descriptionTextView.layer.cornerRadius = 10
+        descriptionTextView.layer.cornerRadius = 7
         descriptionTextView.layer.borderWidth = 1
-        descriptionTextView.layer.borderColor = UIColor.systemGray4.cgColor
+        descriptionTextView.layer.borderColor = UIColor(red: 0.824, green: 0.824, blue: 0.961, alpha: 1).cgColor
         descriptionTextView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         descriptionTextView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(descriptionTextView)
@@ -140,8 +140,8 @@ class PhotoDetailViewController: UIViewController {
             // 검정 박스
             blackBoxView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             blackBoxView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            blackBoxView.widthAnchor.constraint(equalToConstant: 327),
-            blackBoxView.heightAnchor.constraint(equalToConstant: 366),
+            blackBoxView.widthAnchor.constraint(equalToConstant: 444),
+            blackBoxView.heightAnchor.constraint(equalToConstant: 324),
 
             // 이미지 뷰 (검정 박스 안에서 중앙 정렬)
             imageView.centerXAnchor.constraint(equalTo: blackBoxView.centerXAnchor),
@@ -149,16 +149,24 @@ class PhotoDetailViewController: UIViewController {
             imageView.widthAnchor.constraint(lessThanOrEqualTo: blackBoxView.widthAnchor),
             imageView.heightAnchor.constraint(lessThanOrEqualTo: blackBoxView.heightAnchor),
 
+            // 카테고리 스크롤 뷰
+            categoryScrollView.topAnchor.constraint(equalTo: blackBoxView.bottomAnchor, constant: 20),
+            categoryScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            categoryScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            categoryScrollView.heightAnchor.constraint(equalToConstant: 50),
+
             // 카테고리 스택뷰
-            categoryButtonsStackView.topAnchor.constraint(equalTo: blackBoxView.bottomAnchor, constant: 20),
-            categoryButtonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            categoryButtonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            categoryButtonsStackView.topAnchor.constraint(equalTo: categoryScrollView.topAnchor),
+            categoryButtonsStackView.leadingAnchor.constraint(equalTo: categoryScrollView.leadingAnchor),
+            categoryButtonsStackView.trailingAnchor.constraint(equalTo: categoryScrollView.trailingAnchor),
+            categoryButtonsStackView.bottomAnchor.constraint(equalTo: categoryScrollView.bottomAnchor),
+            categoryButtonsStackView.heightAnchor.constraint(equalTo: categoryScrollView.heightAnchor),
 
             // 텍스트 뷰
             descriptionTextView.topAnchor.constraint(equalTo: categoryButtonsStackView.bottomAnchor, constant: 20),
             descriptionTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             descriptionTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            descriptionTextView.heightAnchor.constraint(equalToConstant: 200),
+            descriptionTextView.heightAnchor.constraint(equalToConstant: 135),
 
             // 마지막 콘텐츠 제약 조건 (스크롤 뷰의 높이를 확장)
             descriptionTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
@@ -194,11 +202,11 @@ class PhotoDetailViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
         button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = UIColor.systemGray4
-        button.layer.cornerRadius = 18.5
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+        button.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
+        button.layer.cornerRadius = 4
+        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.widthAnchor.constraint(equalToConstant: 120).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 173).isActive = true
         button.heightAnchor.constraint(equalToConstant: 37).isActive = true
         return button
     }

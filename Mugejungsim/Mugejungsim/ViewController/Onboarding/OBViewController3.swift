@@ -83,9 +83,8 @@ class OBViewController3: UIViewController {
             nextButton.heightAnchor.constraint(equalToConstant: 52)
         ])
 
-        
         // 액션 연결
-            nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
     }
 
     @objc private func nextButtonTapped() {
@@ -94,5 +93,6 @@ class OBViewController3: UIViewController {
         mainViewController.modalTransitionStyle = .coverVertical // 아래에서 위로 올라오는 스타일
 
         self.present(mainViewController, animated: true, completion: nil)
+
     }
 }

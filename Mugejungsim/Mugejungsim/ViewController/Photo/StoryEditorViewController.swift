@@ -373,8 +373,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     private func setupMainImageView() {
         let containerView = UIView()
         containerView.backgroundColor = .white
-//        containerView.layer.borderWidth = 1
-//        containerView.layer.borderColor = UIColor.black.cgColor
         containerView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(containerView)
         
@@ -496,7 +494,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         ])
     }
     
-    // Check
     private func setupButtonsAboutCategoryButton() {
         guard let categoryIndex = self.categoryIndex,
               let buttonTitles = MockData.shared.rows[categoryIndex] else {
@@ -523,16 +520,15 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         for title in buttonTitles {
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
-            button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14)
+            button.titleLabel?.font = selectedSubCategories.contains(title) ? UIFont(name: "Pretendard-SemiBold", size: 14) : UIFont(name: "Pretendard-Regular", size: 14)
             button.setTitleColor(.black, for: .normal)
             button.layer.borderWidth = 1
             button.layer.cornerRadius = 4
             button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16) // 버튼 내부 패딩 설정
-            button.layer.borderColor = UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
-            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(hex: "#6E6EDE") : UIColor.white
+            button.layer.borderColor = selectedSubCategories.contains(title) ? UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor : UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor //!!!!!
+            button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1) : UIColor.white
             button.layer.cornerRadius = 18.5
             button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
-            
             button.heightAnchor.constraint(equalToConstant: 39).isActive = true
             stackView.addArrangedSubview(button)
         }
@@ -541,7 +537,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 140),
             stackView.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor),
-//            stackView.trailingAnchor.constraint(equalTo: categoryContainer.trailingAnchor),
         ])
     }
 
@@ -677,8 +672,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         selectedSubCategories = selectedCategoriesForImages[currentIndex] // 선택한 사진의 카테고리 불러오기
 
         // UI 업데이트
-        updateCategoryButtonsAppearance()
+        updateCategoryButtonsAppearance() // 하위 카테고리 버튼 UI 업데이트
+        setupButtonsAboutCategoryButton() // 세부 카테고리 버튼 다시 설정
         updateImageCountLabels()
+        updateNextButtonState(for: nextButton)
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -702,6 +699,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         images.remove(at: index)
         texts.remove(at: index)
+        
         if currentIndex == index {
             currentIndex = max(0, currentIndex - 1)
         }
@@ -717,10 +715,11 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         characterCountLabel.text = "\(characterCount) / \(maxCharacterCount)"
         characterCountLabel.textColor = characterCount > maxCharacterCount ? .systemRed : .systemGray
 
-        // 현재 사진의 텍스트 실시간 업데이트
-        if currentIndex < texts.count {
+        if currentIndex < texts.count {         // 현재 사진의 텍스트 실시간 업데이트
             texts[currentIndex] = textView.text
         }
+        
+        updateNextButtonState(for: nextButton)  // 버튼 상태 업데이트
     }
     var selectedButton: UIButton?
 
@@ -745,45 +744,53 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         stackView.spacing = 10
         stackView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(stackView)
-
-        // 버튼 데이터
+        
         let buttonTitles = ["문화 · 경험", "AAAAA", "BBBBB", "CCCCC"] // 필요한 버튼 제목
-        for title in buttonTitles {
+        for (index, title) in buttonTitles.enumerated() { // `enumerated`로 인덱스 추가
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
             button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
             button.setTitleColor(.black, for: .normal)
             button.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             button.layer.cornerRadius = 18.5
-            button.layer.borderWidth = 1
-            button.layer.borderColor = #colorLiteral(red: 0.9098039216, green: 0.9098039216, blue: 0.9098039216, alpha: 1)
+//            button.layer.borderWidth = 1
+//            button.layer.borderColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1).cgColor
             button.translatesAutoresizingMaskIntoConstraints = false
-            
+
             button.widthAnchor.constraint(equalToConstant: 86).isActive = true
             button.heightAnchor.constraint(equalToConstant: 37).isActive = true
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
+
+            // 초기화 시 첫 번째 버튼을 선택 상태로 설정
+            if index == 0 {
+                selectedButton = button
+                button.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
+                button.setTitleColor(.white, for: .normal)
+                
+                categoryIndex = 0 // 첫 번째 카테고리 선택
+            }
         }
-        
         // ScrollView와 StackView 제약 조건
         NSLayoutConstraint.activate([
-        // ScrollView 제약 조건
+            // ScrollView 제약 조건
             scrollView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 22.5),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 
-        // StackView 제약 조건
+            // StackView 제약 조건
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
         ])
-//        scrollView.layer.zPosition = -1 // 썸네일 컬렉션 뷰와 addButton보다 계층이 낮음
-//        view.sendSubviewToBack(scrollView)
+
+        categoryIndex = 0  //첫 번째 카테고리 인덱스
+        setupButtonsAboutCategoryButton() // 세부 카테고리 초기화
         // 터치 이벤트 설정
-            scrollView.isUserInteractionEnabled = true
-            view.bringSubviewToFront(scrollView) // 스크롤 뷰 터치 활성화를 위해 계
+        scrollView.isUserInteractionEnabled = true
+        view.bringSubviewToFront(scrollView) // 스크롤 뷰 터치 활성화를 위해 계
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
@@ -791,18 +798,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             previousButton.setTitleColor(.black, for: .normal)
         }
-                   
         // 새로 선택된 버튼 색상 변경
         sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
         sender.setTitleColor(.white, for: .normal)
-
-        if let previousButton = selectedButton {
-                previousButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
-                previousButton.setTitleColor(.black, for: .normal)
-            }
-        // 새로 선택된 버튼 색상 변경
-        sender.backgroundColor = UIColor(#colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1))
-        sender.setTitleColor(.white, for: .normal)
+        sender.layer.borderWidth = 0
         // 현재 버튼을 선택된 버튼으로 설정
         selectedButton = sender
 
@@ -823,10 +822,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             print("데이터 없음")
             return
         }
-        
 //        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 현재 이미지에 저장된 선택된 카테고리 불러오기
         setupButtonsAboutCategoryButton()
-
     }
     
     // 서브 카테고리 선택 및 저장 기능
@@ -837,8 +834,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         if selectedSubCategories.contains(title) {
             // 이미 선택된 카테고리를 다시 누르면 해제
             selectedSubCategories.removeAll { $0 == title }
-            sender.backgroundColor = UIColor.white
-            sender.layer.borderColor = UIColor.lightGray.cgColor
+            sender.backgroundColor = UIColor.black
+            sender.layer.borderColor = UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
+            sender.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
+            sender.setTitleColor(.black, for: .normal)
         } else {
             // 최대 선택 개수 제한 (예: 3개)
             guard selectedSubCategories.count < 3 else {
@@ -846,8 +845,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 return
             }
             selectedSubCategories.append(title) // 새로운 서브 카테고리 추가
-            sender.backgroundColor = UIColor.systemBlue
-            sender.layer.borderColor = UIColor.systemBlue.cgColor
+            sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
+            sender.layer.borderColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor
+            sender.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14)
+            sender.setTitleColor(.black, for: .normal)
         }
 
         // 현재 사진의 카테고리 저장
@@ -864,15 +865,18 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         // UI 업데이트
         updateCategoryButtonsAppearance()
+        updateNextButtonState(for: nextButton)
     }
-    // UI 업데이트 함수
+
+
+    // 하위 카테고리 버튼 UI 업데이트 함수
     private func updateCategoryButtonsAppearance() {
         guard let stackView = contentView.subviews.first(where: { $0 is UIStackView }) as? UIStackView else { return }
 
         for case let button as UIButton in stackView.arrangedSubviews {
             if let title = button.title(for: .normal) {
-                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor.systemBlue : UIColor.white
-                button.setTitleColor(selectedSubCategories.contains(title) ? .white : .black, for: .normal)
+                button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1) : UIColor.white
+                button.setTitleColor(.black, for: .normal)
             }
         }
     }
@@ -884,23 +888,42 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     private func setupNextButton() {
-        let button = UIButton(type: .system)
-        button.setTitle("다음", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        nextButton = UIButton(type: .system)
+        nextButton.setTitle("다음", for: .normal)
 
-        contentView.addSubview(button)
+        // 비활성화
+        nextButton.isEnabled = false
+        nextButton.setTitleColor(UIColor(red: 0.54, green: 0.54, blue: 0.54, alpha: 1), for: .normal)
+        nextButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
+        
+//        // 활성화
+//        button.setTitleColor(.white, for: .normal)
+//        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
+        
+        
+        nextButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        nextButton.layer.cornerRadius = 8
+        nextButton.translatesAutoresizingMaskIntoConstraints = false
+        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+
+        contentView.addSubview(nextButton)
         NSLayoutConstraint.activate([
-            button.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 23),
-            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            button.heightAnchor.constraint(equalToConstant: 44),
+            nextButton.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 23),
+            nextButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            nextButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            nextButton.heightAnchor.constraint(equalToConstant: 52),
         ])
+        updateNextButtonState(for: nextButton)  // 초기 상태 업데이트
     }
+    
+    private func updateNextButtonState(for button: UIButton) {
+        // `texts`와 `selectedCategoriesForImages` 배열 크기를 `images` 크기에 맞추기
+        if texts.count < images.count {
+            texts.append(contentsOf: Array(repeating: "", count: images.count - texts.count))
+        }
+        if selectedCategoriesForImages.count < images.count {
+            selectedCategoriesForImages.append(contentsOf: Array(repeating: [], count: images.count - selectedCategoriesForImages.count))
+        }
 
     func fetchServerData(userId: Int, postId: Int, completion: @escaping (Int?, Int?) -> Void) {
         guard userId > 0, postId > 0 else {

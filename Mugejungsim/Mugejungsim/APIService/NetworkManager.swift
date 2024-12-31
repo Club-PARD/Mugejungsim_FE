@@ -132,9 +132,3 @@ class NetworkManager {
     }
 }
 
-// MARK: - Codable 데이터 변환 헬퍼 메서드
-extension Data {
-    func toDictionary() -> [String: Any]? {
-        try? JSONSerialization.jsonObject(with: self, options: []) as? [String: Any]
-    }
-}
