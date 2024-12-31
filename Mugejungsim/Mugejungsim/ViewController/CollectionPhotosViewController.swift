@@ -4,7 +4,7 @@ class CollectionPhotosViewController: UIViewController, UICollectionViewDelegate
 
     var savedData: [PhotoData] = [] // 저장된 사진 데이터
     var collectionView: UICollectionView!
-    var recordID: String = "" // 전달받은 레코드 ID
+    var recordID: String = "1" // 전달받은 레코드 ID
 
     private var titleLabel: UILabel = {
         let label = UILabel()
@@ -27,14 +27,13 @@ class CollectionPhotosViewController: UIViewController, UICollectionViewDelegate
     }
 
     private func loadPhotosForRecord() {
-        guard let uuid = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
+        // recordID를 고정 값 "1"로 설정
+        let recordID = "1"
 
-        if let record = TravelRecordManager.shared.getRecord(by: uuid) {
+        // UUID 변환 제거, 문자열로 바로 사용
+        if let record = TravelRecordManager.shared.getRecord(by: recordID) {
+            // record.photos 데이터를 savedData에 저장
             savedData = record.photos
-            titleLabel.text = record.title // 여행 제목 설정
             print("Loaded \(savedData.count) photos for record ID: \(recordID)")
         } else {
             print("recordID (\(recordID))에 해당하는 데이터를 찾을 수 없습니다.")

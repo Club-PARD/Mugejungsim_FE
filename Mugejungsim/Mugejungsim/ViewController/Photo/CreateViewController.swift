@@ -798,12 +798,19 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         return dayInt <= (daysInMonth[monthInt] ?? 0)
     }
     
-    private func navigateToNextScreen(recordID: String) {
-        let uploadViewController = UploadViewController()
-        uploadViewController.recordID = recordID
-        uploadViewController.modalPresentationStyle = .fullScreen
-        uploadViewController.modalTransitionStyle = .crossDissolve
-        present(uploadViewController, animated: true, completion: nil)
+//    private func navigateToNextScreen(recordID: String) {
+//        let uploadViewController = UploadViewController()
+//        uploadViewController.recordID = recordID
+//        uploadViewController.modalPresentationStyle = .fullScreen
+//        uploadViewController.modalTransitionStyle = .crossDissolve
+//        present(uploadViewController, animated: true, completion: nil)
+//    }
+    
+    private func navigateToStoryEditor() {
+        let storyEditorVC = UploadViewController()
+        storyEditorVC.modalPresentationStyle = .fullScreen
+        storyEditorVC.modalTransitionStyle = .crossDissolve
+        self.present(storyEditorVC, animated: true, completion: nil)
     }
     
     private func navigateToStoryEditor() {

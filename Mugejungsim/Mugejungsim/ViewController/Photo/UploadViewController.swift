@@ -7,7 +7,7 @@ protocol UploadViewControllerDelegate: AnyObject {
 
 class UploadViewController: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UploadViewControllerDelegate {
     weak var delegate: UploadViewControllerDelegate?
-    var recordID: String = ""
+    var recordID: String = "1" 
     
     private let titleLabel: UILabel = {
         let label = UILabel()

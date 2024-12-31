@@ -3,7 +3,7 @@ import UIKit
 class CheckObjeImageViewController: UIViewController {
     
     // MARK: - UI Elements
-    var recordID: String = ""
+    var recordID: String = "1"
     
     let textLabel: UILabel = {
         let label = UILabel()
@@ -67,12 +67,12 @@ class CheckObjeImageViewController: UIViewController {
         readButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
         setConstraints()
         
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
+//        guard let recordUUID = UUID(uuidString: recordID) else {
+//            print("유효하지 않은 recordID: \(recordID)")
+//            return
+//        }
             
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+        if let record = TravelRecordManager.shared.getRecord(by: recordID) {
             print("CheckObjeImageViewController에서 데이터 확인:")
             print("Record ID: \(record.id)")
             print("Title: \(record.title)")

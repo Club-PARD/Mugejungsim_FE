@@ -10,7 +10,7 @@ import UIKit
 
 class ShareViewController: UIViewController {
 
-    var recordID: String = ""
+    var recordID: String = "1"
     
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -75,7 +75,7 @@ class ShareViewController: UIViewController {
             return
         }
             
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+        if let record = TravelRecordManager.shared.getRecord(by: recordID) {
             print("CheckObjeImageViewController에서 데이터 확인:")
             print("Record ID: \(record.id)")
             print("Title: \(record.title)")
@@ -197,7 +197,7 @@ class ShareViewController: UIViewController {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+        var record = TravelRecordManager.shared.getRecord(by: recordID)
         
         // bottle(glass)
         // letter
@@ -245,7 +245,7 @@ class ShareViewController: UIViewController {
             return
         }
         // 기록 가져오기
-        guard let record = TravelRecordManager.shared.getRecord(by: recordUUID) else {
+        guard let record = TravelRecordManager.shared.getRecord(by: recordID) else {
             print("recordID에 해당하는 기록을 찾을 수 없습니다.")
             return
         }
