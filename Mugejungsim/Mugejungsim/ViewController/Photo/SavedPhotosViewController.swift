@@ -4,10 +4,12 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     
     var savedData: [PhotoData] = []
     var collectionView: UICollectionView!
-    var recordID : String = ""
+    var recordID : String?
+    var userId: Int! // userId 추가
+    var postId: Int! // userId 추가
     
     private var photoDataList: [PhotoData] = []
-
+    
     private var imageCountLabel: UILabel = {
         let label = UILabel()
         label.text = "0 / 25"
@@ -62,7 +64,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         setupCollectionView()
         
         // 데이터 로드
-//        savedData = DataManager.shared.loadData()
+                savedData = DataManager.shared.loadData()
         loadPhotosForRecord()
         
         // 이미지 개수 레이블 업데이트
@@ -78,14 +80,22 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         saveAndHomeButton.addTarget(self, action: #selector(saveAndHomeButtonTapped), for: .touchUpInside)
         
         setupButtonsConstraints()
-//        photoDataList = DataManager.shared.loadData()
+        //        photoDataList = DataManager.shared.loadData()
         collectionView.reloadData()
-//        DataManager.shared.resetData() // 데이터 초기화 시키는 함수
+        //        DataManager.shared.resetData() // 데이터 초기화 시키는 함수
+        
+        // recordID 확인
+                if let recordID = recordID {
+                    print("Received recordID: \(recordID)")
+                } else {
+                    print("recordID가 전달되지 않았습니다.")
+                }
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
+        //        savedData = DataManager.shared.loadData() // DataManager에서 데이터 로드
         loadPhotosForRecord()
         collectionView.reloadData() // 컬렉션 뷰 갱신
         updateImageCountLabel() // 이미지 카운트 업데이트
@@ -98,12 +108,12 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         updateImageCountLabel()
         print("SavedPhotosViewController가 리로드되었습니다.")
     }
-
+    
     private func loadDataAndRefresh() {
         photoDataList = DataManager.shared.loadData()
         collectionView.reloadData()
     }
-
+    
     
     
     func setupButtonsConstraints() {
@@ -138,8 +148,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             navBar.heightAnchor.constraint(equalToConstant: 65),
-
-
+            
+            
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             
@@ -164,28 +174,28 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         collectionView.reloadData()
     }
     
-
+    
     // 프로토콜 메서드 구현
-        func didDelete() {
-            // 데이터 삭제 후 처리
-            savedData = DataManager.shared.loadData() // 예: 삭제 후 데이터 재로드
-            collectionView.reloadData() // UI 업데이트
-        }
+    func didDelete() {
+        // 데이터 삭제 후 처리
+        savedData = DataManager.shared.loadData() // 예: 삭제 후 데이터 재로드
+        collectionView.reloadData() // UI 업데이트
+    }
     
     // MARK: - Collection View Setup
     func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-            
+        
         // Cell 크기 설정 (64.59)
         layout.itemSize = CGSize(width: 64.59, height: 64.59)
-            
+        
         // Cell 간격 설정 (1.01)
         layout.minimumLineSpacing = 1.01 // 줄 간격
         layout.minimumInteritemSpacing = 1.01 // 열 간격
-            
+        
         // Section Insets 설정 (좌우 여백)
         layout.sectionInset = UIEdgeInsets(top: 10, left: 24, bottom: 10, right: 24)
-            
+        
         // layout.sectionInset = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 24)
         // CollectionView 생성
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -195,7 +205,7 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         collectionView.backgroundColor = .white
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
-            
+        
         // CollectionView 제약조건 설정
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
@@ -205,12 +215,12 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         ])
     }
     
-        
+    
     // MARK: - UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return savedData.count
     }
-        
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SavedPhotoCell", for: indexPath) as! SavedPhotoCell
         let photoData = savedData[indexPath.row]
@@ -232,57 +242,52 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         //        navigationController?.popViewController(animated: true)
         dismiss(animated: true, completion: nil)
     }
-        
+    
     // MARK: - Button Actions
     
     @objc func lineButtonTapped() {
         print("Line Button Tapped!")
         // 저장하고 한 줄 넘기기 페이지로 이동
         let OCVC = ObjeCreationViewController() // 이동할 ViewController 인스턴스 생성
-        OCVC.recordID = recordID
+        OCVC.recordID = recordID!
         OCVC.modalTransitionStyle = .crossDissolve
         OCVC.modalPresentationStyle = .fullScreen
         self.present(OCVC, animated: true, completion: nil)
         print("OCVC로 이동 성공")
     }
-        
-        @objc func saveAndHomeButtonTapped() {
-            print("Save and Home Button Tapped!")
-            
-            // 네비게이션 컨트롤러 확인
-            guard let navigationController = self.navigationController else {
-                print("NavigationController가 없습니다. 네비게이션 스택에 추가 후 다시 시도하세요.")
-                
-                // 네비게이션 컨트롤러가 없을 경우 루트 뷰 컨트롤러 변경
-                let mainViewController = CreateViewController()
-                let window = UIApplication.shared.windows.first { $0.isKeyWindow }
-                window?.rootViewController = UINavigationController(rootViewController: CreateViewController())
-                window?.makeKeyAndVisible()
-                return
-            }
-            
-            // MainViewController로 이동
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? CreateViewController {
-                navigationController.setViewControllers([mainViewController], animated: true)
-            } else {
-                print("MainViewController를 초기화할 수 없습니다. 스토리보드 ID를 확인하세요.")
-            }
-        }
     
-    private func loadPhotosForRecord() {
-        guard let uuid = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
+    @objc func saveAndHomeButtonTapped() {
+        print("Save and Home Button Tapped!")
+        
+        // 네비게이션 컨트롤러 확인
+        guard let navigationController = self.navigationController else {
+            print("NavigationController가 없습니다. 네비게이션 스택에 추가 후 다시 시도하세요.")
+            
+            // 네비게이션 컨트롤러가 없을 경우 루트 뷰 컨트롤러 변경
+            let mainViewController = CreateViewController()
+            let window = UIApplication.shared.windows.first { $0.isKeyWindow }
+            window?.rootViewController = UINavigationController(rootViewController: CreateViewController())
+            window?.makeKeyAndVisible()
             return
         }
-
-        if let record = TravelRecordManager.shared.getRecord(by: uuid) {
-            // record.photos 데이터를 savedData에 저장
-            savedData = record.photos
-            print("Loaded \(savedData.count) photos for record ID: \(recordID)")
+        
+        // MainViewController로 이동
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? CreateViewController {
+            navigationController.setViewControllers([mainViewController], animated: true)
         } else {
-            print("recordID (\(recordID))에 해당하는 데이터를 찾을 수 없습니다.")
+            print("MainViewController를 초기화할 수 없습니다. 스토리보드 ID를 확인하세요.")
         }
     }
     
+    private func loadPhotosForRecord() {
+        let record = "1" // 항상 "1"
+        
+        if let record = TravelRecordManager.shared.getRecord(by: record) {
+            savedData = record.photos
+            print("Loaded \(savedData.count) photos for record ID: \(record)")
+        } else {
+            print("recordID (\(record))에 해당하는 데이터를 찾을 수 없습니다.")
+        }
+    }
 }

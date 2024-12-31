@@ -22,6 +22,14 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     let startDateStackView = CreateViewController.createDateStackView(title: "시작일자")
     let endDateStackView = CreateViewController.createDateStackView(title: "종료일자")
     
+    // TravelRecordManager를 통해 userId 설정
+        var userId: Int? {
+            didSet {
+                TravelRecordManager.shared.userId = userId
+            }
+        }
+    var recordID : String = "1"
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "여행기 제목"
@@ -202,6 +210,13 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             locationTextField.delegate = self
             
             titleCount.translatesAutoresizingMaskIntoConstraints = false
+        
+        // userId 확인 (로그인에서 받은 userId가 잘 넘어왔는지 확인)
+            if let userId = TravelRecordManager.shared.userId {
+                print("CreateViewController에서 확인된 userId: \(userId)")
+            } else {
+                print("userId가 설정되지 않았습니다.")
+            }
         }
     
     @objc private func titleTextFieldDidChange(_ textField: UITextField) {
@@ -728,14 +743,12 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc func nextButtonTapped() {
-        // 입력값 가져오기
         travelTitle = titleTextField.text ?? "없음"
         companion = selectedCompanion?.title(for: .normal) ?? "없음"
         startDate = "\(startDateYear ?? "0000")-\(startDateMonth ?? "00")-\(startDateDay ?? "00")"
         endDate = "\(endDateYear ?? "0000")-\(endDateMonth ?? "00")-\(endDateDay ?? "00")"
         location = locationTextField.text ?? "없음"
 
-        // 새로운 여행 기록 생성
         let newRecord = TravelRecord(
             id: UUID(),
             title: travelTitle,
@@ -748,16 +761,18 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             oneLine2: ""
         )
 
-        // 로컬에 기록 저장
-        TravelRecordManager.shared.addRecord(newRecord)
-
         // 서버에 데이터 전송
         TravelRecordManager.shared.sendRecordToServer(newRecord) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let message):
-                    print(message)
-                    self.navigateToNextScreen(recordID: newRecord.id.uuidString)
+                case .success(let json):
+                    if let postId = json["postId"] as? Int {
+                        TravelRecordManager.shared.postId = postId
+                        print("Received postId: \(postId)")
+                        self.navigateToStoryEditor()
+                    } else {
+                        self.showAlert(title: "오류", message: "postId를 응답에서 찾을 수 없습니다.")
+                    }
                 case .failure(let error):
                     print("Error sending record to server: \(error.localizedDescription)")
                     self.showAlert(title: "오류", message: "서버 전송 중 오류가 발생했습니다.")
@@ -765,6 +780,8 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             }
         }
     }
+    
+    
     
     private func isValidDate(year: String, month: String, day: String) -> Bool {
         guard let yearInt = Int(year), yearInt >= 1000, yearInt <= 9999 else { return false }
@@ -779,12 +796,19 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         return dayInt <= (daysInMonth[monthInt] ?? 0)
     }
     
-    private func navigateToNextScreen(recordID: String) {
-        let uploadViewController = UploadViewController()
-        uploadViewController.recordID = recordID
-        uploadViewController.modalPresentationStyle = .fullScreen
-        uploadViewController.modalTransitionStyle = .crossDissolve
-        present(uploadViewController, animated: true, completion: nil)
+//    private func navigateToNextScreen(recordID: String) {
+//        let uploadViewController = UploadViewController()
+//        uploadViewController.recordID = recordID
+//        uploadViewController.modalPresentationStyle = .fullScreen
+//        uploadViewController.modalTransitionStyle = .crossDissolve
+//        present(uploadViewController, animated: true, completion: nil)
+//    }
+    
+    private func navigateToStoryEditor() {
+        let storyEditorVC = UploadViewController()
+        storyEditorVC.modalPresentationStyle = .fullScreen
+        storyEditorVC.modalTransitionStyle = .crossDissolve
+        self.present(storyEditorVC, animated: true, completion: nil)
     }
     
     private func showAlert(title: String, message: String) {
@@ -809,16 +833,22 @@ extension CreateViewController: StopWritingViewControllerDelegate {
 }
 
 extension TravelRecordManager {
-    func sendRecordToServer(_ record: TravelRecord, completion: @escaping (Result<String, Error>) -> Void) {
-        let serverURL = "http://172.17.208.113:8080/api/posts?userId=1"
+    // 서버로 기록 전송
+    func sendRecordToServer(_ record: TravelRecord, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        guard let userId = userId else {
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "userId가 설정되지 않았습니다."])))
+            print("Error: userId가 설정되지 않았습니다.")
+            return
+        }
+
+        let serverURL = "http://172.17.208.113:8080/api/posts?userId=\(userId)"
         let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
 
-        // JSON-compatible parameters
         let parameters: [String: Any] = [
-            "pid": record.id.uuidString, // UUID to String
-            "userId": 1,               // Ensure userId is valid
+            "pid": record.id.uuidString,
+            "userId": userId,
             "title": record.title,
             "startDate": record.startDate,
             "endDate": record.endDate,
@@ -827,16 +857,6 @@ extension TravelRecordManager {
             "bottle": record.bottle
         ]
 
-        // Debug JSON
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
-            print("Request JSON: \(String(data: jsonData, encoding: .utf8) ?? "Invalid JSON")")
-        } catch {
-            print("Error serializing parameters: \(error.localizedDescription)")
-            completion(.failure(error))
-            return
-        }
-
         AF.request(
             serverURL,
             method: .post,
@@ -844,15 +864,20 @@ extension TravelRecordManager {
             encoding: JSONEncoding.default,
             headers: headers
         ).responseJSON { response in
-            print("Request URL: \(response.request?.url?.absoluteString ?? "No URL")")
-            print("Request Body: \(String(data: response.request?.httpBody ?? Data(), encoding: .utf8) ?? "No Body")")
-            print("Response Status Code: \(response.response?.statusCode ?? 0)")
-            print("Response Data: \(String(data: response.data ?? Data(), encoding: .utf8) ?? "No Response")")
-
             switch response.result {
-            case .success:
-                completion(.success("Record successfully sent to server"))
+            case .success(let value):
+                if let json = value as? [String: Any] {
+                    print("Server Response JSON: \(json)")
+                    completion(.success(json))
+                } else {
+                    print("Invalid response format: \(value)")
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
+                }
             case .failure(let error):
+                print("Error sending record to server: \(error.localizedDescription)")
+                if let data = response.data {
+                    print("Server Error Response: \(String(data: data, encoding: .utf8) ?? "No Data")")
+                }
                 completion(.failure(error))
             }
         }
@@ -866,7 +891,7 @@ extension TravelRecordManager {
 //        let serverURL = "http://192.168.1.22:8080/api/stories/\(postId.uuidString)/stories" // 서버 주소 수정 필요
 //
 //        // Alamofire 요청
-//        AF.request(
+//        request(
 //            serverURL,
 //            method: .get,
 //            headers: ["Content-Type": "application/json"]

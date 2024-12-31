@@ -9,7 +9,7 @@ import UIKit
 
 class ObjeCreationViewController: UIViewController {
     
-    var recordID : String = ""
+    var recordID : String = "1"
     
     private let items: [(value: String, title: String)] = [
         ("value1", "🥰 마치 사랑에 빠진 것처럼 설레던 여행"),
@@ -280,7 +280,7 @@ class ObjeCreationViewController: UIViewController {
         var objeNum: String = selectedItems[0]
 
         // TravelRecordManager에서 기록을 가져오기
-        if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+        if var record = TravelRecordManager.shared.getRecord(by: recordID) {
             record.oneLine1 = objeNum
             TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
             print("Record \(recordUUID) 업데이트 완료:")
@@ -295,10 +295,18 @@ class ObjeCreationViewController: UIViewController {
                 print("  Photo \(index + 1):")
                 print("    Image Path: \(photo.imagePath)")
                 print("    Text: \(photo.text)")
-                print("    Category: \(photo.category)")
-            }
+                // Option 1: 첫 번째 카테고리 출력
+                print("    Category: \(photo.categories.first ?? "No Category")")
+
+                // Option 2: 모든 카테고리를 쉼표로 구분하여 출력
+                print("    Categories: \(photo.categories.joined(separator: ", "))")
+
+                // Option 3: 각 카테고리를 개별적으로 출력
+                for category in photo.categories {
+                    print("    Category: \(category)")
+                }            }
             // 저장 후 데이터 확인
-            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordID) {
                 print("데이터 저장 후 확인:")
                 print("oneLine1: \(updatedRecord.oneLine1)")
             } else {

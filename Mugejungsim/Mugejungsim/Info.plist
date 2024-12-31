@@ -57,11 +57,11 @@
     <dict>
         <key>NSExceptionDomains</key>
         <dict>
-            <key>49.142.120.93</key>
+            <key>mugejunsim.store</key> <!-- 서버의 IP 주소 -->
             <dict>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
                 <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
                 <true/>
             </dict>
         </dict>

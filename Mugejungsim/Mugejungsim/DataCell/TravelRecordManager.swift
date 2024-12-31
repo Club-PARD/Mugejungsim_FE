@@ -2,7 +2,7 @@
 //  TravelRecordManager.swift
 //  Mugejungsim
 //
-//  Created by 도현학 on 12/28/24.
+//  Created by 도현학, 김지원 on 12/28/24.
 //
 
 /*
@@ -11,28 +11,6 @@
  */
 import Alamofire
 import UIKit
-
-//struct TravelRecord: Codable {
-//    var id: UUID                // 기록물 id
-//    var title: String           // 기록물 제목 : 여행 제목
-//    var description: String     //
-//    var date: String            // 여행 날짜
-//    var location: String        // 여행지
-//    var oneLine1: String        //
-//    var oneLine2: String        //
-//    var photos: [PhotoData] // `PhotoData` 사용
-//
-//    init(title: String, description: String, date: String, location: String, photos: [PhotoData] = [], oneLine1: String, oneLine2: String) {
-//        self.id = UUID()
-//        self.title = title
-//        self.description = description
-//        self.date = date
-//        self.location = location
-//        self.oneLine1 = oneLine1
-//        self.oneLine2 = oneLine2
-//        self.photos = photos
-//    }
-//}
 
 struct TravelRecord: Codable {
     var id: UUID          // 기록물 id
@@ -62,79 +40,131 @@ struct TravelRecord: Codable {
 
 class TravelRecordManager {
     static let shared = TravelRecordManager()
+    
+    var userId: Int?
+    var postId: Int?
+    private let recordID: String = "1" // recordID를 항상 "1"로 고정
+    
     private var travelRecords: [TravelRecord] = []
-
     
     private init() {
         travelRecords = DataManager.shared.loadTravelRecords()
     }
-
-    // MARK: - 데이터 저장
+    
     private func saveData() {
         DataManager.shared.saveTravelRecords(travelRecords)
     }
-
-    // MARK: - 모든 기록 가져오기
+    
     func getAllRecords() -> [TravelRecord] {
         return travelRecords
     }
-
-    // MARK: - 기록 추가
+    
+    
     func addRecord(_ record: TravelRecord) {
-        travelRecords.append(record)
+        // 기존 고정된 recordID 데이터가 있다면 덮어씌움
+        if let existingIndex = travelRecords.firstIndex(where: { $0.id.uuidString == recordID }) {
+            travelRecords[existingIndex] = record
+        } else {
+            travelRecords.append(record)
+        }
         saveData()
     }
+    
+    func addPhoto(to recordID: String, image: UIImage, text: String, categories: [String]) -> Bool {
+        let recordID = "1" // recordID를 항상 "1"로 고정
+//        let record = ensureDefaultRecordExists() // 레코드가 없으면 생성
 
-    // MARK: - 사진 추가
-    func addPhoto(to recordID: UUID, image: UIImage, text: String, category: String) -> Bool {
-        guard var record = getRecord(by: recordID) else { return false }
-
-        // 사진 수 제한 체크
+        guard let record = getRecord(by: recordID) else {
+            print("recordID (\(recordID))에 해당하는 데이터를 찾을 수 없습니다. 사진 추가 실패.")
+            return false
+        }
+        
         if record.photos.count >= 25 {
             print("사진 추가 실패: 최대 25개 제한")
             return false
         }
-
-        // `DataManager`를 사용하여 이미지 저장
+        
         if let imageName = DataManager.shared.saveImage(image) {
-            let newPhoto = PhotoData(imagePath: imageName, text: text, category: category)
-            record.photos.append(newPhoto)
-
-            // 업데이트된 기록 저장
-            updateRecord(record)
+            var updatedRecord = record
+            let newPhoto = PhotoData(imagePath: imageName, text: text, categories: categories)
+            updatedRecord.photos.append(newPhoto)
+            updateRecord(updatedRecord)
+            print("사진 추가 성공: recordID \(recordID)")
             return true
         }
-
+        
+        print("사진 저장 실패")
         return false
     }
-
-    // MARK: - 사진 삭제
-    func deletePhoto(from recordID: UUID, at index: Int) -> Bool {
-        guard var record = getRecord(by: recordID), index < record.photos.count else {
+    
+    func deletePhoto(from recordID: String, at index: Int) -> Bool {
+        // recordID를 무시하고 항상 고정된 ID "1"을 사용
+        guard var record = getRecord(by: self.recordID), index < record.photos.count else {
+            print("Invalid index or record not found")
             return false
         }
-
-        // `DataManager`를 사용하여 이미지 삭제
-        let photoToDelete = record.photos[index]
-//        DataManager.shared.deleteData(photoData: photoToDelete)
-
-        // 사진 목록 업데이트
+        
         record.photos.remove(at: index)
         updateRecord(record)
         return true
     }
-
-    // MARK: - 기록 업데이트
+    
     func updateRecord(_ updatedRecord: TravelRecord) {
         if let index = travelRecords.firstIndex(where: { $0.id == updatedRecord.id }) {
             travelRecords[index] = updatedRecord
             saveData()
+        } else {
+            print("Failed to update record: Record not found")
         }
     }
-
-    // MARK: - 특정 기록 불러오기
-    func getRecord(by id: UUID) -> TravelRecord? {
-        return travelRecords.first { $0.id == id }
-    }
     
+    func getRecord(by id: String) -> TravelRecord? {
+        // recordID가 "1"로 고정
+        let recordID = "1"
+        return travelRecords.first { $0.id.uuidString == recordID }
+    }
+
+//    func ensureDefaultRecordExists() -> TravelRecord {
+//        let recordID = "1"
+//        if let record = getRecord(by: recordID) {
+//            return record
+//        }
+//
+//        // 기본 레코드 생성
+//        let defaultRecord = TravelRecord(
+//            id: UUID(uuidString: recordID) ?? UUID(),
+//            title: "Default Title",
+//            startDate: "2024-01-01",
+//            endDate: "2024-01-02",
+//            location: "Default Location",
+//            companion: "Default Companion",
+//            bottle: "Default Bottle",
+//            oneLine1: "",
+//            oneLine2: ""
+//        )
+//        addRecord(defaultRecord)
+//        return defaultRecord
+//    }
+
+    // recordID "1"에 대한 레코드 반환 (없으면 기본 레코드 생성)
+    func getFixedRecord() -> TravelRecord {
+        if let record = getRecord(by: recordID) {
+            return record
+        } else {
+            let defaultRecord = TravelRecord(
+                id: UUID(uuidString: recordID) ?? UUID(),
+                title: "Default Title",
+                startDate: "2024-01-01",
+                endDate: "2024-12-31",
+                location: "Default Location",
+                companion: "Alone",
+                bottle: "",
+                photos: [],
+                oneLine1: "Default Line 1",
+                oneLine2: "Default Line 2"
+            )
+            addRecord(defaultRecord)
+            return defaultRecord
+        }
+    }
 }

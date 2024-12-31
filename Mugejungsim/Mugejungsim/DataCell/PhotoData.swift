@@ -1,7 +1,23 @@
 import Foundation
 
 struct PhotoData: Codable {
-    var imagePath: String // 저장된 이미지의 경로
-    var text: String      // 사진에 연결된 텍스트
-    var category: String  // 사진에 연결된 카테고리
+    var imagePath: String
+    var text: String
+    var categories: [String]
+    
+    init(imagePath: String, text: String, categories: [String]) {
+        self.imagePath = imagePath
+        self.text = text
+        self.categories = categories
+    }
+
+    init?(from dictionary: [String: Any]) {
+        guard let imageUrl = dictionary["imageUrl"] as? String,
+              let text = dictionary["text"] as? String,
+              let categories = dictionary["categories"] as? [String] else { return nil }
+        
+        self.imagePath = imageUrl
+        self.text = text
+        self.categories = categories
+    }
 }

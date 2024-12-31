@@ -2,7 +2,7 @@ import UIKit
 
 class LoadingViewController: UIViewController {
     
-    var recordID : String = ""
+    var recordID : String = "1"
     // "오브제 만드는 중" 라벨
     private let loadingLabel: UILabel = {
         let label = UILabel()
@@ -27,13 +27,8 @@ class LoadingViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
-        
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
             
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+        if let record = TravelRecordManager.shared.getRecord(by: recordID) {
             print("LoadingViewController에서 데이터 확인:")
             print("oneLine1: \(record.oneLine1)")
         } else {

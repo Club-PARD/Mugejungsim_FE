@@ -13,7 +13,7 @@ class URLService {
     private let baseURLString: String
     
     private init() {
-        self.baseURLString = "#" // 실제 URL로 변경
+        self.baseURLString = "http://172.17.208.113:8080/" // 실제 URL로 변경
     }
     
     var baseURL: String {

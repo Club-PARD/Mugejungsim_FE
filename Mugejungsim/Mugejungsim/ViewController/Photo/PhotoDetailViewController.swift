@@ -176,9 +176,10 @@ class PhotoDetailViewController: UIViewController {
         }
 
         // 카테고리 버튼 추가
-        let categories = photoData.category.split(separator: ",").map { String($0) }
+        let categories = photoData.categories.joined(separator: ", ")
+        print("Categories: \(categories)")
         for category in categories {
-            let button = createCategoryButton(with: category)
+            let button = createCategoryButton(with: categories)
             categoryButtonsStackView.addArrangedSubview(button)
         }
 

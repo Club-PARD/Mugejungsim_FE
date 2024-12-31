@@ -66,6 +66,7 @@ class APIService {
             multipartFormData: { multipartFormData in
                 // Add images and metadata
                 images.enumerated().forEach { index, image in
+                    multipartFormData.append(Data("1".utf8), withName: "recordID")  // recordID 포함
                     if let imageData = image.jpegData(compressionQuality: 0.8) {
                         multipartFormData.append(
                             imageData,
@@ -86,9 +87,6 @@ class APIService {
                         categories.forEach { category in
                             multipartFormData.append(Data(category.utf8), withName: "photos[\(index)][categories][]")
                         }
-                    }
-                    if let orderIndex = metadata[index]["orderIndex"] as? Int {
-                        multipartFormData.append(Data("\(orderIndex)".utf8), withName: "photos[\(index)][orderIndex]")
                     }
                 }
             },

@@ -3,7 +3,7 @@ import UIKit
 class ResultViewController: UIViewController {
 
     // MARK: - Properties (UI Elements)
-    var recordID: String = ""
+    var recordID: String = "1"
 
     let memoryLabel: UILabel = {
         let label = UILabel()
@@ -61,7 +61,7 @@ class ResultViewController: UIViewController {
             return
         }
             
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+        if let record = TravelRecordManager.shared.getRecord(by: recordID) {
             print("ResultViewController에서 데이터 확인:")
             print("oneLine1: \(record.oneLine1)")
         } else {
@@ -156,7 +156,7 @@ class ResultViewController: UIViewController {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+        var record = TravelRecordManager.shared.getRecord(by: recordID)
         
         // bottle(glass)
         switch record?.oneLine1 {
