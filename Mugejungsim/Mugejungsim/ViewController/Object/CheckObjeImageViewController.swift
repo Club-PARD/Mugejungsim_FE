@@ -81,7 +81,7 @@ class CheckObjeImageViewController: UIViewController {
         } else {
             print("recordID에 해당하는 기록을 찾을 수 없습니다.")
         }
-        
+        updateImages()
     }
     
     // MARK: - Constraints Setup

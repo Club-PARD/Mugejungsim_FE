@@ -179,7 +179,7 @@ class LoginViewController: UIViewController {
     }
     
     func sendLoginDataToServer(name: String, provider: String) {
-        let url = URL(string: "#####")! // 서버 URL 수정 필요
+        let url = URL(string: "http://172.17.208.113:8080/api/login")! // 서버 URL 수정 필요
         
         // 요청 생성
         var request = URLRequest(url: url)

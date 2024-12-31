@@ -723,18 +723,19 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         TravelRecordManager.shared.addRecord(newRecord)
 
         // 서버에 데이터 전송
-        TravelRecordManager.shared.sendRecordToServer(newRecord) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let message):
-                    print(message)
-                    self.navigateToNextScreen(recordID: newRecord.id.uuidString)
-                case .failure(let error):
-                    print("Error sending record to server: \(error.localizedDescription)")
-                    self.showAlert(title: "오류", message: "서버 전송 중 오류가 발생했습니다.")
-                }
-            }
-        }
+//        TravelRecordManager.shared.sendRecordToServer(newRecord) { result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let message):
+//                    print(message)
+//                    self.navigateToNextScreen(recordID: newRecord.id.uuidString)
+//                case .failure(let error):
+//                    print("Error sending record to server: \(error.localizedDescription)")
+//                    self.showAlert(title: "오류", message: "서버 전송 중 오류가 발생했습니다.")
+//                }
+//            }
+//        }
+        self.navigateToNextScreen(recordID: newRecord.id.uuidString)
     }
     
     private func isValidDate(year: String, month: String, day: String) -> Bool {
