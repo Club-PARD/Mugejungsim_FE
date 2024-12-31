@@ -6,14 +6,12 @@ struct StoryEditor: Codable {
     var content: String
     var categories: [String]
     var imagePath: String
-    var orderIndex: Int
     
-    init(pid: Int, content: String, categories: [String], imagePath: String, orderIndex: Int) {
+    init(pid: Int, content: String, categories: [String], imagePath: String) {
         self.pid = pid
         self.content = content
         self.categories = categories
         self.imagePath = imagePath
-        self.orderIndex = orderIndex
     }
 }
 
@@ -24,31 +22,30 @@ class StoryManager {
     private init() {}
 
     // MARK: - 스토리 추가
-    func addStory(pid: Int, content: String, categories: [String], imagePath: String, orderIndex: Int) {
-        let story = StoryEditor(pid: pid, content: content, categories: categories, imagePath: imagePath, orderIndex: orderIndex)
+    func addStory(pid: Int, content: String, categories: [String], imagePath: String) {
+        let story = StoryEditor(pid: pid, content: content, categories: categories, imagePath: imagePath)
         stories.append(story)
     }
 
     // MARK: - 서버로 스토리 데이터 전송
-    func uploadStories(to url: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func uploadStories(userId: Int, postId: Int, completion: @escaping (Result<String, Error>) -> Void) {
         guard !stories.isEmpty else {
             completion(.failure(NSError(domain: "NoData", code: 0, userInfo: [NSLocalizedDescriptionKey: "스토리 데이터가 없습니다."])))
             return
         }
 
+        let serverURL = "http://172.17.208.113:8080/api/posts?userId=\(userId)&postId=\(postId)"
+
         // 서버 요구 사항에 맞는 JSON 데이터 생성
         let payload: [String: Any] = [
-            "data": [
-                "photos": stories.map { story in
-                    [
-                        "pid": story.pid,
-                        "content": story.content,
-                        "categories": story.categories,
-                        "orderIndex": story.orderIndex,
-                        "imagePath": story.imagePath
-                    ]
-                }
-            ]
+            "photos": stories.map { story in
+                [
+                    "pid": story.pid,
+                    "content": story.content,
+                    "categories": story.categories,
+                    "imagePath": story.imagePath
+                ]
+            }
         ]
 
         // JSON 디버깅용 출력
@@ -59,7 +56,7 @@ class StoryManager {
 
         // Alamofire 요청
         AF.request(
-            url,
+            serverURL,
             method: .post,
             parameters: payload,
             encoding: JSONEncoding.default,
@@ -86,7 +83,6 @@ class StoryManager {
             }
         }
     }
-
     // MARK: - 스토리 초기화
     func clearStories() {
         stories.removeAll()

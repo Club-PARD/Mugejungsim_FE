@@ -69,6 +69,7 @@ class APIService {
             multipartFormData: { multipartFormData in
                 // Add images
                 images.enumerated().forEach { index, image in
+                    multipartFormData.append(Data("1".utf8), withName: "recordID")  // recordID 포함
                     if let imageData = image.jpegData(compressionQuality: 0.8) {
                         print("Sending image: image\(index + 1).jpg") // 디버깅용 출력
                         multipartFormData.append(
