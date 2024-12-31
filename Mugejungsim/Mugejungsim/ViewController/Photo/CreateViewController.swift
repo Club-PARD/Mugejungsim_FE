@@ -157,30 +157,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     }()
     
     // MARK: - View Life Cycle
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        view.backgroundColor = .white
-//        view.addSubview(titleCount)
-//        configureTextFieldDelegates(in: startDateStackView)
-//        configureTextFieldDelegates(in: endDateStackView)
-//
-//        titleTextField.delegate = self
-//        locationTextField.delegate = self
-//
-//        setupCustomNavigationBar()
-//        setupUI()
-//        setupCompanionButtons()
-//        setupObservers()
-//
-//        titleCount.translatesAutoresizingMaskIntoConstraints = false
-//        titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
-//        titleTextField.delegate = self
-//        locationTextField.delegate = self
-//
-//        titleCount.translatesAutoresizingMaskIntoConstraints = false
-//
-//
-//    }
     override func viewDidLoad() {
             super.viewDidLoad()
             view.backgroundColor = .white
@@ -291,8 +267,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         present(stopWritingVC, animated: false, completion: nil) // 애니메이션 제거
     }
     
-    
-
     private func setupUI() {
         view.addSubview(titleLabel)
         view.addSubview(titleTextField)
@@ -385,7 +359,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         ])
     }
 
-    
     private func setupCompanionButtons() {
         let options = ["혼자", "가족과", "친구와", "연인과", "기타"]
         var previousButton: UIButton?
@@ -562,8 +535,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             }
         }
     }
-   
-
 
     @objc private func doneButtonTapped() {
         view.endEditing(true) // 키보드 닫기

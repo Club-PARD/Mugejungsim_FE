@@ -94,16 +94,13 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 .font: UIFont.systemFont(ofSize: 18, weight: .bold)
             ]
         }
-
         view.backgroundColor = .white
-
+        
         addButton.addTarget(self, action: #selector(openGallery), for: .touchUpInside)
-
+        
         setupCustomNavigationBar()
         updateImageCountLabels()
         setupUI()
-
-        
         setupToolbar() // 키보드 위 툴바 설정
         setupKeyboardObservers() // 키보드 이벤트 감지 설정
         setupCategoryButtons()
@@ -204,7 +201,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 950)
+            contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 700)
         ])
         self.contentView = contentView // 스크롤 뷰 안에 카테고리, 텍스트뷰 등을 배치하기 위해 contentView를 사용
         setupCategorySection()
@@ -361,15 +358,15 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             containerView.topAnchor.constraint(equalTo: mainImageView.bottomAnchor),
             containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            containerView.heightAnchor.constraint(equalToConstant: 70),
+            containerView.heightAnchor.constraint(equalToConstant: 85),
 
             addButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
             addButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             addButton.widthAnchor.constraint(equalToConstant: 62.86),
             addButton.heightAnchor.constraint(equalToConstant: 62.86),
 
-            thumbnailCollectionView.leadingAnchor.constraint(equalTo: addButton.trailingAnchor, constant: 11.45),
             thumbnailCollectionView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            thumbnailCollectionView.leadingAnchor.constraint(equalTo: addButton.trailingAnchor, constant: 11.45),
             thumbnailCollectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
             thumbnailCollectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
@@ -445,7 +442,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         // StackView 생성
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.alignment = .fill
+        stackView.alignment = .leading
         stackView.distribution = .equalSpacing
         stackView.spacing = 10
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -460,12 +457,15 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.layer.borderWidth = 1
             button.layer.cornerRadius = 4
             button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16) // 버튼 내부 패딩 설정
-            button.layer.borderColor = selectedSubCategories.contains(title) ? UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor : UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor //!!!!!
+            button.layer.borderColor = selectedSubCategories.contains(title) ? UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor : UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
             button.backgroundColor = selectedSubCategories.contains(title) ? UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1) : UIColor.white
-            button.layer.cornerRadius = 18.5
             button.addTarget(self, action: #selector(categoryItemSelected(_:)), for: .touchUpInside)
-            button.heightAnchor.constraint(equalToConstant: 39).isActive = true
+            
+            button.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview(button)
+            NSLayoutConstraint.activate([
+                button.heightAnchor.constraint(equalToConstant: 39)
+            ])
         }
 
         // 서브 카테고리 버튼을 기존 categoryContainer 아래에 배치
@@ -490,7 +490,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         NSLayoutConstraint.activate([
             // "글로 표현해보세요!"를 categoryButtons 아래에 위치
-            expressionLabel.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 650),
+            expressionLabel.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 400),
             expressionLabel.leadingAnchor.constraint(equalTo: categoryContainer.leadingAnchor),
             expressionLabel.trailingAnchor.constraint(equalTo: categoryContainer.trailingAnchor)
 
@@ -527,7 +527,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         NSLayoutConstraint.activate([
             // Text Input Background
-            backgroundView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 680),
+            backgroundView.topAnchor.constraint(equalTo: categoryContainer.bottomAnchor, constant: 430),
             backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             backgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             backgroundView.heightAnchor.constraint(equalToConstant: 163),
@@ -680,7 +680,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         stackView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(stackView)
         
-        let buttonTitles = ["문화 · 경험", "AAAAA", "BBBBB", "CCCCC"] // 필요한 버튼 제목
+        let buttonTitles = ["평화와 안정", "경이로움과 감동", "사랑과 따뜻함", "흥분과 기대"] // 필요한 버튼 제목
         for (index, title) in buttonTitles.enumerated() { // `enumerated`로 인덱스 추가
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
@@ -688,12 +688,11 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.setTitleColor(.black, for: .normal)
             button.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             button.layer.cornerRadius = 18.5
-//            button.layer.borderWidth = 1
-//            button.layer.borderColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1).cgColor
+            button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 13, bottom: 10, right: 13)
             button.translatesAutoresizingMaskIntoConstraints = false
 
-            button.widthAnchor.constraint(equalToConstant: 86).isActive = true
-            button.heightAnchor.constraint(equalToConstant: 37).isActive = true
+//            button.widthAnchor.constraint(equalToConstant: 86).isActive = true
+//            button.heightAnchor.constraint(equalToConstant: 37).isActive = true
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
 
@@ -745,11 +744,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         // 버튼 타이틀에 따라 인덱스 설정
         switch title {
-        case "문화 · 경험": categoryIndex = 0
-        case "AAAAA": categoryIndex = 1
-        case "BBBBB": categoryIndex = 2
-        case "CCCCC": categoryIndex = 3
-        case "DDDDD": categoryIndex = 4
+        case "평화와 안정": categoryIndex = 0
+        case "경이로움과 감동": categoryIndex = 1
+        case "사랑과 따뜻함": categoryIndex = 2
+        case "흥분과 기대": categoryIndex = 3
         default: return
         }
 
@@ -757,7 +755,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             print("데이터 없음")
             return
         }
-//        selectedSubCategories = selectedCategoriesForImages[currentIndex] // 현재 이미지에 저장된 선택된 카테고리 불러오기
+        
         setupButtonsAboutCategoryButton()
     }
     
@@ -896,12 +894,12 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             return
         }
         // 현재 이미지를 저장
-            if currentIndex < texts.count {
-                texts[currentIndex] = textView.text
-            }
-            if currentIndex < selectedCategoriesForImages.count {
-                selectedCategoriesForImages[currentIndex] = selectedSubCategories
-            }
+        if currentIndex < texts.count {
+            texts[currentIndex] = textView.text
+        }
+        if currentIndex < selectedCategoriesForImages.count {
+            selectedCategoriesForImages[currentIndex] = selectedSubCategories
+        }
 //        // 현재 이미지와 관련된 텍스트와 카테고리 저장
 //        texts = Array(repeating: "", count: images.count)
 //        selectedCategoriesForImages = Array(repeating: [], count: images.count)
@@ -926,8 +924,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
             print("해당 Record ID (\(recordUUID))의 데이터:")
             print("Title: \(record.title)")
-//            print("Description: \(record.description)")
-//            print("Date: \(record.date)")
             print("Location: \(record.location)")
             print("Photos:")
             for (index, photo) in record.photos.enumerated() {
