@@ -1022,7 +1022,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //            }
 //        
 //        // 서버 URL 정의
-//        let serverURL = "http://172.17.208.113:8080/api/stories?userId=1&postId=1"
+//        let serverURL = "##########"
 //
 //        AF.upload(
 //            multipartFormData: { multipartFormData in
@@ -1042,7 +1042,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 //                    )
 //                }
 //            },
-//            to: "http://172.17.208.113:8080/api/stories?userId=1&postId=1",
+//            to: "##########",
 //            headers: ["Content-Type": "multipart/form-data"]
 //        )
 //        .responseJSON { response in

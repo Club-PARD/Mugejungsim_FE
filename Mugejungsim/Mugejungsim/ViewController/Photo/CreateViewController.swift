@@ -769,12 +769,21 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
 
 extension CreateViewController: StopWritingViewControllerDelegate {
     func didStopWriting() {
-        // MainViewController로 이동
-        if let window = UIApplication.shared.windows.first {
-            let mainVC = CreateViewController()
-            let navController = UINavigationController(rootViewController: mainVC)
-            window.rootViewController = navController
-            window.makeKeyAndVisible()
+        if let navigationController = self.navigationController {
+            for controller in navigationController.viewControllers {
+                if controller is MyRecordsViewController {
+                    navigationController.popToViewController(controller, animated: true)
+                    return
+                }
+            }
+            // MyRecordsViewController가 없으면 새로 열기
+            let myRecordsVC = MyRecordsViewController()
+            navigationController.pushViewController(myRecordsVC, animated: true)
+        } else {
+            // Navigation Controller가 없을 경우
+            let myRecordsVC = MyRecordsViewController()
+            myRecordsVC.modalPresentationStyle = .fullScreen
+            present(myRecordsVC, animated: true, completion: nil)
         }
     }
 }
@@ -797,7 +806,7 @@ extension TravelRecordManager {
             "companion": record.companion,
             "bottle": record.bottle
         ]
-
+        
         // Debug JSON
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)

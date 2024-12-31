@@ -1,11 +1,12 @@
 import UIKit
+
+
 protocol StopWritingViewControllerDelegate: AnyObject {
     func didStopWriting()
 }
 
 class StopWritingViewController: UIViewController {
     weak var delegate: StopWritingViewControllerDelegate?
-
 
     // MARK: - UI Elements
     
@@ -180,7 +181,27 @@ class StopWritingViewController: UIViewController {
 
     @objc private func CloseButtonTapped() {
         print("Close 버튼 클릭됨")
-        dismiss(animated: false, completion: nil) // 애니메이션 제거
+        
+        view.endEditing(true) // 키보드 닫기
+        
+        if let navigationController = self.navigationController {
+            for controller in navigationController.viewControllers {
+                if controller is MyRecordsViewController {
+                    navigationController.popToViewController(controller, animated: true)
+                    return
+                }
+            }
+            // MyRecordsViewController가 스택에 없으면 pop
+            navigationController.popViewController(animated: true)
+        } else {    // Navigation Controller가 없으면 dismiss 후 새로 표시
+            dismiss(animated: true) {
+                let myRecordVC = MyRecordsViewController()
+                myRecordVC.modalPresentationStyle = .overFullScreen
+                myRecordVC.modalTransitionStyle = .crossDissolve // 페이드 효과
+                self.present(myRecordVC, animated: false, completion: nil)
+            }
+        }
     }
 }
+
 
