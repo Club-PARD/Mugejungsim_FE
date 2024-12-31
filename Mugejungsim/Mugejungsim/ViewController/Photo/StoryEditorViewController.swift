@@ -3,7 +3,8 @@ import PhotosUI
 import Alamofire
 
 class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UITextViewDelegate, PHPickerViewControllerDelegate {
-
+    var userId: Int = 0 // 로그인 후 받은 userId
+    var postId: Int = 0 // 포스트 작성 후 받은 postId
     // MARK: - Properties
     var images: [UIImage] = [] // 선택된 이미지 배열
     var texts: [String] = []   // 각 이미지에 대응하는 텍스트 배열
@@ -29,9 +30,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
     weak var delegate: UploadViewControllerDelegate? // 이전 화면과 연결하기 위한 delegate
     
-    var recordID : String = ""
-    
-    private var nextButton: UIButton!
+    var recordID : String = "1"
 
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
@@ -108,7 +107,23 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         setupToolbar() // 키보드 위 툴바 설정
         setupKeyboardObservers() // 키보드 이벤트 감지 설정
         setupCategoryButtons()
+        
+        // TravelRecordManager를 통해 userId와 postId 가져오기
+            if let userId = TravelRecordManager.shared.userId {
+                self.userId = userId
+                print("StoryEditorViewController - userId: \(userId)")
+            } else {
+                print("userId가 설정되지 않았습니다.")
+            }
+
+            if let postId = TravelRecordManager.shared.postId {
+                self.postId = postId
+                print("StoryEditorViewController - postId: \(postId)")
+            } else {
+                print("postId가 설정되지 않았습니다.")
+            }
     }
+    
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -161,6 +176,56 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             }
         }
     }
+    
+    func uploadStoryWithMultipart(
+            to url: String,
+            jsonData: [String: Any],
+            photo: UIImage?,
+            completion: @escaping (Result<String, Error>) -> Void
+        ) {
+            let headers: HTTPHeaders = [
+                "Content-Type": "multipart/form-data"
+            ]
+
+            AF.upload(
+                multipartFormData: { multipartFormData in
+                    // JSON 데이터 추가
+                    multipartFormData.append(Data("1".utf8), withName: "recordID")  // recordID 포함
+                    if let jsonData = try? JSONSerialization.data(withJSONObject: jsonData, options: []) {
+                        multipartFormData.append(jsonData, withName: "data")
+                    } else {
+                        print("JSON 직렬화 실패")
+                    }
+
+                    // 이미지 추가
+                    if let photo = photo, let imageData = photo.jpegData(compressionQuality: 0.8) {
+                        multipartFormData.append(
+                            imageData,
+                            withName: "photo",
+                            fileName: "image.jpg",
+                            mimeType: "image/jpeg"
+                        )
+                    }
+                },
+                to: url,
+                headers: headers
+            )
+            .validate(statusCode: 200..<300)
+            .response { response in
+                switch response.result {
+                case .success:
+                    if let statusCode = response.response?.statusCode {
+                        completion(.success("업로드 성공: 상태 코드 \(statusCode)"))
+                    }
+                case .failure(let error):
+                    print("에러: \(error.localizedDescription)")
+                    if let data = response.data, let errorResponse = String(data: data, encoding: .utf8) {
+                        print("서버 응답: \(errorResponse)")
+                    }
+                    completion(.failure(error))
+                }
+            }
+        }
 
     private func addSelectedImages(_ newImages: [UIImage]) {
         images.append(contentsOf: newImages)
@@ -863,39 +928,19 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             selectedCategoriesForImages.append(contentsOf: Array(repeating: [], count: images.count - selectedCategoriesForImages.count))
         }
 
-        // 모든 사진이 유효한지 확인
-        let isAllPhotosValid = images.indices.allSatisfy { index in
-            let text = texts[index].trimmingCharacters(in: .whitespacesAndNewlines)
-            let categories = selectedCategoriesForImages[index]
-            return !text.isEmpty || !categories.isEmpty
-        }
-
-        // 버튼 상태 업데이트
-        if isAllPhotosValid {
-            // 활성화 상태
-            button.isEnabled = true
-            button.setTitleColor(.white, for: .normal)
-            button.backgroundColor = UIColor(red: 0.533, green: 0.538, blue: 0.808, alpha: 1)
-        } else {
-            // 비활성화 상태
-            button.isEnabled = false
-            button.setTitleColor(UIColor(red: 0.54, green: 0.54, blue: 0.54, alpha: 1), for: .normal)
-            button.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
-        }
-    }
-    
-    @objc private func nextButtonTapped() {
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 Record ID: \(recordID)")
+    func fetchServerData(userId: Int, postId: Int, completion: @escaping (Int?, Int?) -> Void) {
+        guard userId > 0, postId > 0 else {
+            print("Invalid userId or postId")
+            completion(nil, nil)
             return
         }
 
-        // 저장된 데이터가 없을 경우 경고 메시지 출력
-        guard !images.isEmpty else {
-            print("이미지가 없습니다.")
-            let alert = UIAlertController(title: "이미지 없음", message: "최소 한 장의 이미지를 추가해주세요.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-            present(alert, animated: true, completion: nil)
+        let urlString = "http://172.17.208.113:8080/api/stories?postId=\(postId)"
+        print("Requesting URL: \(urlString)")
+        
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL: \(urlString)")
+            completion(nil, nil)
             return
         }
         
@@ -1046,4 +1091,5 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             return nil
         }
     }
-}
+    }
+

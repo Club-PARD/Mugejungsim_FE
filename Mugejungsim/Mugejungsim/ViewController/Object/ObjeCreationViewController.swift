@@ -9,7 +9,7 @@ import UIKit
 
 class ObjeCreationViewController: UIViewController {
     
-    var recordID : String = ""
+    var recordID : String = "1"
     
     private let items: [(value: String, title: String)] = [
         ("value1", "🥰 마치 사랑에 빠진 것처럼 설레던 여행"),
@@ -280,7 +280,7 @@ class ObjeCreationViewController: UIViewController {
         var objeNum: String = selectedItems[0]
 
         // TravelRecordManager에서 기록을 가져오기
-        if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+        if var record = TravelRecordManager.shared.getRecord(by: recordID) {
             record.oneLine1 = objeNum
             TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
             print("Record \(recordUUID) 업데이트 완료:")
@@ -298,7 +298,7 @@ class ObjeCreationViewController: UIViewController {
                 print("Categories: \(photo.categories.joined(separator: ", "))") // 배열을 문자열로 결합
             }
             // 저장 후 데이터 확인
-            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {
+            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordID) {
                 print("데이터 저장 후 확인:")
                 print("oneLine1: \(updatedRecord.oneLine1)")
             } else {
