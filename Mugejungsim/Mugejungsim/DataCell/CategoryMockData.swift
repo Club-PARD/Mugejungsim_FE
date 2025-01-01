@@ -4,6 +4,8 @@
 //
 //  Created by 도현학 on 12/27/24.
 //
+
+
 import UIKit
 
 struct MockData {

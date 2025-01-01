@@ -75,6 +75,7 @@ class LoadingViewController: UIViewController {
     private func goToNextPage() {
         // 다음 화면 이동 코드
         let resultVC = ResultViewController()
+//        print(recordID)
         resultVC.recordID = recordID
         resultVC.modalTransitionStyle = .crossDissolve // 오픈 모션
         resultVC.modalPresentationStyle = .fullScreen

@@ -11,7 +11,6 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         let label = UILabel()
         label.text = "0 / 25"
         label.textColor = .black
-        
         label.font = UIFont(name: "Pretendard-Medium", size: 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -81,14 +80,6 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
 //        collectionView.reloadData() // 컬렉션 뷰 갱신
 //        updateImageCountLabel() // 이미지 카운트 업데이트
 //    }
-    
-    // 굳이 필요 없음
-    func refreshData() {
-        savedData = DataManager.shared.loadData()
-        collectionView?.reloadData()
-        updateImageCountLabel()
-        print("SavedPhotosViewController가 리로드되었습니다.")
-    }
 
     func setupButtonsConstraints() {
         NSLayoutConstraint.activate([
@@ -214,15 +205,15 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         guard let navigationController = self.navigationController else {
             print("NavigationController가 없습니다. 네비게이션 스택에 추가 후 다시 시도하세요.")
             // 네비게이션 컨트롤러가 없을 경우 루트 뷰 컨트롤러 변경
-            let mainViewController = CreateViewController()
+            let mainViewController = MyRecordsViewController()
             let window = UIApplication.shared.windows.first { $0.isKeyWindow }
-            window?.rootViewController = UINavigationController(rootViewController: CreateViewController())
+            window?.rootViewController = UINavigationController(rootViewController: MyRecordsViewController())
             window?.makeKeyAndVisible()
             return
         }
         // MainViewController로 이동
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? CreateViewController {
+        if let mainViewController = storyboard.instantiateViewController(withIdentifier: "MainViewController") as? MyRecordsViewController {
             navigationController.setViewControllers([mainViewController], animated: true)
         } else {
             print("MainViewController를 초기화할 수 없습니다. 스토리보드 ID를 확인하세요.")

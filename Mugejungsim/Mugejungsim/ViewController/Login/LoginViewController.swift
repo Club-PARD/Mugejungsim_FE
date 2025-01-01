@@ -4,9 +4,10 @@ import KakaoSDKUser
 
 class LoginViewController: UIViewController {
     
-    var name : String = ""
+    static var name : String = ""
     var provider : String = ""
     var userId: Int? // 서버에서 받은 userId를 저장
+    
     
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -148,6 +149,7 @@ class LoginViewController: UIViewController {
                 self.showAlert(title: "에러", message: "사용자 정보를 가져오는 데 실패했습니다.")
             } else if let user = user {
                 let nickname = user.kakaoAccount?.profile?.nickname ?? "사용자"
+                LoginViewController.name = user.kakaoAccount?.profile?.nickname ?? "사용자"
                 let provider = "kakao"
                 
                 // 서버로 로그인 정보 전송 후 userId 받아오기
@@ -168,9 +170,12 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToOnboarding(with nickname: String) {
-        let onboardingVC = OBViewController1()
+        let onboardingVC = MyRecordsViewController()
         onboardingVC.modalPresentationStyle = .fullScreen
         present(onboardingVC, animated: true, completion: nil)
+//        let onboardingVC = OBViewController1()
+//        onboardingVC.modalPresentationStyle = .fullScreen
+//        present(onboardingVC, animated: true, completion: nil)
     }
     
     private func showAlert(title: String, message: String) {

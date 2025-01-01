@@ -10,6 +10,7 @@ import UIKit
 class ObjeCreationViewController: UIViewController {
     
     var recordID : String = ""
+    var travelRecord : TravelRecord?
     
     private let items: [(value: String, title: String)] = [
         ("value1", "🥰 마치 사랑에 빠진 것처럼 설레던 여행"),
@@ -118,12 +119,6 @@ class ObjeCreationViewController: UIViewController {
     }
     
     @objc private func didTapCloseButton() {
-        guard let recordUUID = Int(recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        
-        
         let stopSelectingVC = StopSelectingViewController()
         stopSelectingVC.modalTransitionStyle = .crossDissolve
         stopSelectingVC.modalPresentationStyle = .overFullScreen
@@ -272,17 +267,20 @@ class ObjeCreationViewController: UIViewController {
     
     @objc private func didTapCreateButton() {
         print("선택된 값: \(selectedItems)")
-        guard let recordUUID = Int(recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        // 로컬 변수에 저장
+
         var objeNum: String = selectedItems[0]
-        
         // userId 확인 및 범위 검증
         guard let userId = TravelRecordManager.shared.userId else {
             print("유효하지 않은 사용자 ID")
             return
+        }
+        
+        if let travelRecord = travelRecord, travelRecord.id != 0 {
+            TravelRecordManager.shared.postId = travelRecord.id
+            print("===============\(travelRecord.id)=================")
+            print("===============\(TravelRecordManager.shared.postId ?? -1)=================")
+        } else {
+            print("travelRecord가 nil이거나 ID가 0입니다.")
         }
         
         // getUserPosts 호출
@@ -318,37 +316,46 @@ class ObjeCreationViewController: UIViewController {
                 print("데이터 가져오기 실패: \(error.localizedDescription)")
             }
         }
+        goToNextPage()
         
         // TravelRecordManager에서 기록을 가져오기
-        if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            record.oneLine1 = objeNum
-            TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
-            print("Record: \(record)")
-            print("oneLine1: \(record.oneLine1!)")
-            print("oneLine2: \(record.oneLine2!)")
-            print("Photos: \(record.stories.count)장")
-            for (index, photo) in record.stories.enumerated() {
-                print("    Photo \(index + 1):")
-                print("    Image Path: \(photo.imagePath)")
-                print("    Content: \(photo.content)")
-                print("    Categories: \(photo.categories.joined(separator: ", "))") // 배열을 문자열로 결합
-            }
-
-            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {
-                print("데이터 저장 후 확인:")
-                print("oneLine1: \(updatedRecord.oneLine1!)")
-            } else {
-                print("데이터 저장 실패")
-            }
-
-            goToNextPage()
-        } else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-        }
+//        if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+//            record.oneLine1 = objeNum
+//            TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
+//            print("Record: \(record)")
+//            print("oneLine1: \(record.oneLine1!)")
+//            print("oneLine2: \(record.oneLine2!)")
+//            print("Photos: \(record.stories.count)장")
+//            for (index, photo) in record.stories.enumerated() {
+//                print("    Photo \(index + 1):")
+//                print("    Image Path: \(photo.imagePath)")
+//                print("    Content: \(photo.content)")
+//                print("    Categories: \(photo.categories.joined(separator: ", "))") // 배열을 문자열로 결합
+//            }
+//
+//            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {
+//                print("데이터 저장 후 확인:")
+//                print("oneLine1: \(updatedRecord.oneLine1!)")
+//            } else {
+//                print("데이터 저장 실패")
+//            }
+//
+//            goToNextPage()
+//        } else {
+//            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+//        }
     }
     
     private func goToNextPage() {
         let loadingVC = LoadingViewController() // 이동할 ViewController 인스턴스 생성
+        if let travelRecord = travelRecord, travelRecord.id != 0 {
+            recordID = "0"
+            print("===============\(travelRecord.id)=================")
+            print("===============\(TravelRecordManager.shared.postId ?? -1)=================")
+        } else {
+            print("travelRecord가 nil이거나 ID가 0입니다.")
+        }
+
         loadingVC.recordID = recordID
         print("recordID: \(recordID)")
         loadingVC.modalTransitionStyle = .crossDissolve // 화면 전환 스타일 설정 (페이드 효과)

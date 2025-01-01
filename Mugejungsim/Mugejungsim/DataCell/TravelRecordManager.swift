@@ -13,7 +13,6 @@ import Alamofire
 import UIKit
 
 
-
 struct TravelRecord: Codable {
     var id: Int                 // 기록물 id
     var pid: String
