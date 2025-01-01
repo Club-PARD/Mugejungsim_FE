@@ -429,6 +429,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         } else {
             return UICollectionViewCell() // 기본적으로 빈 셀을 리턴
         }
+        
         if collectionView == scrollableTravelCollectionView {
             switch record.bottle {
             case "value1":
@@ -452,10 +453,10 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             case "value10":
                 cell.imageView.image = UIImage(named: "연두색")
             default:
-                cell.imageView.image = UIImage(named: "브라운") // 기본 이미지
+                cell.imageView.image = UIImage(named: "한줄남기기X") // 기본 이미지
             }
             cell.titleLabel.text = record.title // 여행 기록 제목
-            print("pass")
+            print("Cell \(indexPath.row): \(record)")
         } else if collectionView == scrollableObjectCollectionView {
             switch record.bottle {
             case "value1":
@@ -482,6 +483,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 cell.imageView.image = UIImage(named: "Storybook Brown")
             }
             cell.titleLabel.text = record.title // 오브제 이름
+            print("OBJ Cell \(indexPath.row): \(record)")
         }
         return cell
     }
@@ -575,9 +577,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     
     private func updateScrollViewContentSize() {
         let collectionViewHeight = calculateCollectionViewHeight()
-//        let totalHeight = collectionViewHeight + 300 // 다른 요소 높이 합 (적절히 조정)
-
-//        scrollView.contentSize = CGSize(width: view.frame.width - 40, height: totalHeight) // width 고정
         print("Updated ScrollView content size: \(scrollView.contentSize)")
     }
     
@@ -638,6 +637,11 @@ class TravelRecordCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
+
+    // 셀 재사용 전에 초기화
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.text = nil
+        imageView.image = nil
+    }
 }

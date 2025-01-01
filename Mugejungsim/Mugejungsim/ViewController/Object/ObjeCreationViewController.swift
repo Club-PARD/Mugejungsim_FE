@@ -279,6 +279,8 @@ class ObjeCreationViewController: UIViewController {
             TravelRecordManager.shared.postId = travelRecord.id
             print("===============\(travelRecord.id)=================")
             print("===============\(TravelRecordManager.shared.postId ?? -1)=================")
+            print("===============\(travelRecord.title)=================")
+//            print("===============\(travelRecord.date)=================")
         } else {
             print("travelRecord가 nil이거나 ID가 0입니다.")
         }
@@ -287,15 +289,22 @@ class ObjeCreationViewController: UIViewController {
         APIService.shared.getUserPosts(userId: userId) { [weak self] result in
             switch result {
             case .success(let records):
-                TravelRecordManager.shared.travelRecords = records
+//                TravelRecordManager.shared.travelRecords = records
+//                print("불러온 게시물 개수: \(records.count)")
+//                guard var temp = records.first else {
+//                    print("업데이트할 레코드가 없습니다.")
+//                    return
+//                }
                 print("불러온 게시물 개수: \(records.count)")
-                guard var temp = records.first else {
-                    print("업데이트할 레코드가 없습니다.")
+                guard let targetRecordID = self?.travelRecord?.id,
+                    var temp = records.first(where: { $0.id == targetRecordID }) else {
+                    print("업데이트할 레코드를 찾을 수 없습니다.")
                     return
                 }
                 temp.bottle = objeNum
                 TravelRecordManager.shared.temporaryOneline = objeNum
                 TravelRecordManager.shared.TemporaryCount = records.count
+                print("         Title : \(temp.title)")
                 print("         Bottle : \(temp.bottle)")
                 print("         records Count: \(records.count)")
                 print("         Temp Bottle : \(temp.bottle)")
@@ -304,7 +313,8 @@ class ObjeCreationViewController: UIViewController {
                     print("유효하지 않은 postId")
                     return
                 }
-                TravelRecordManager.shared.updateRecordOnServer(postId: postId, record: temp) { result in
+                
+                TravelRecordManager.shared.updateRecordOnServer(postId: temp.id, record: temp) { result in // 여기서 POST
                     switch result {
                     case .success(let response):
                         print("Successfully updated record: \(response)")

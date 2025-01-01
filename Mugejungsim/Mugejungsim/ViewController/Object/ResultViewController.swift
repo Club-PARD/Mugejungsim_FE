@@ -159,8 +159,8 @@ class ResultViewController: UIViewController {
         
         // bottle(glass)
 //        print("      oneline1 in ResultVC: \(record?.oneLine1)")
-        print(TravelRecordManager.shared.temporaryOneline!)
-        switch TravelRecordManager.shared.temporaryOneline! {
+//        print(TravelRecordManager.shared.temporaryOneline!)
+        switch TravelRecordManager.shared.temporaryOneline {
         case "value1":
             openPreviewButton.setImage(UIImage(named: "Dreamy Pink"), for: .normal)
         case "value2":
