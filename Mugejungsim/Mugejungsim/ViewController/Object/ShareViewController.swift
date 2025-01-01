@@ -9,7 +9,7 @@ import UIKit
 
 
 class ShareViewController: UIViewController {
-
+    
     var recordID: String = ""
     
     private let scrollView = UIScrollView()
@@ -66,6 +66,7 @@ class ShareViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationManager.shared.requestNotificationAuthorization()
         view.backgroundColor = .white
         updateImages()
         updateLabelText()
@@ -169,14 +170,17 @@ class ShareViewController: UIViewController {
         print("Home button isHidden: \(homeButton.isHidden)")
         print("Home button isUserInteractionEnabled: \(homeButton.isUserInteractionEnabled)")
         
+        print("알림 예약 시작")
+        NotificationManager.shared.scheduleNotificationAfter(seconds: 10, navigateTo: "LoginViewController")
+
         let myRecordsVC = MyRecordsViewController()
         myRecordsVC.modalPresentationStyle = .fullScreen
         present(myRecordsVC, animated: true, completion: nil)
     }
     
     private func updateImages() {
-        print(TravelRecordManager.shared.temporaryOneline!)
-        switch TravelRecordManager.shared.temporaryOneline! {
+//        print(TravelRecordManager.shared.temporaryOneline!)
+        switch TravelRecordManager.shared.temporaryOneline {
         case "value1":
             glassImage.image = UIImage(named: "Dreamy Pink")
             letterImage.image = UIImage(named: "pink")

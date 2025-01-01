@@ -126,7 +126,7 @@ class CheckObjeImageViewController: UIViewController {
 //        var record = TravelRecordManager.shared.getRecord(by: recordID)
 //        
         // bottle(glass)
-        switch TravelRecordManager.shared.temporaryOneline! {
+        switch TravelRecordManager.shared.temporaryOneline {
         case "value1":
             bottleImageView.image = UIImage(named: "Dreamy Pink")
         case "value2":
