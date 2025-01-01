@@ -120,6 +120,19 @@ class CollectionPhotosViewController: UIViewController, UICollectionViewDelegate
         print("이미지 경로: \(photoData.imagePath)")
         return cell
     }
-    
-    
+
+}
+
+// MARK: CollectionPhotosViewController
+extension CollectionPhotosViewController {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedPhoto = savedData[indexPath.row]
+
+        let detailVC = PhotoDetailViewController()
+        detailVC.selectedPhotoData = selectedPhoto // 선택된 데이터 전달
+        
+        // 모달로 보여주기
+        detailVC.modalPresentationStyle = .fullScreen
+        present(detailVC, animated: true, completion: nil)
+    }
 }

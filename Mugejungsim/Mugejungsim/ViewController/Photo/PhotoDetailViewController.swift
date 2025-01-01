@@ -42,12 +42,12 @@ class PhotoDetailViewController: UIViewController {
         backButton.translatesAutoresizingMaskIntoConstraints = false
 
         // 삭제 버튼
-        let deleteButton = UIButton(type: .system)
-        deleteButton.setTitle("삭제", for: .normal)
-        deleteButton.setTitleColor(.red, for: .normal) // 텍스트 색상 빨간색
-        deleteButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        deleteButton.addTarget(self, action: #selector(deletePhoto), for: .touchUpInside)
-        deleteButton.translatesAutoresizingMaskIntoConstraints = false
+//        let deleteButton = UIButton(type: .system)
+//        deleteButton.setTitle("삭제", for: .normal)
+//        deleteButton.setTitleColor(.red, for: .normal) // 텍스트 색상 빨간색
+//        deleteButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+//        deleteButton.addTarget(self, action: #selector(deletePhoto), for: .touchUpInside)
+//        deleteButton.translatesAutoresizingMaskIntoConstraints = false
 
         // 내비게이션 바에 뷰 추가
         navBar.addSubview(backButton)
@@ -183,11 +183,15 @@ class PhotoDetailViewController: UIViewController {
             print("이미지를 로드할 수 없습니다: \(photoData.imagePath)")
         }
 
-        // 카테고리 버튼 추가
-//        let categories = photoData.categories.split(separator: ",").map { String($0) }
-        for category in photoData.categories {
-            let button = createCategoryButton(with: category)
-            categoryButtonsStackView.addArrangedSubview(button)
+        categoryButtonsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        let categories = photoData.categories.flatMap { $0.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) } }
+        print("카테고리 배열: \(categories)") // 디버깅용 출력
+
+        for category in categories {
+            print("버튼에 추가할 카테고리: \(category)") // 각 카테고리 확인
+            let button = createCategoryButton(with: category) // 각 카테고리에 대해 버튼 생성
+            categoryButtonsStackView.addArrangedSubview(button) // 스택뷰에 추가
         }
 
         // 텍스트뷰에 설명 설정
@@ -205,8 +209,9 @@ class PhotoDetailViewController: UIViewController {
         button.layer.cornerRadius = 4
         button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.widthAnchor.constraint(equalToConstant: 173).isActive = true
         button.heightAnchor.constraint(equalToConstant: 37).isActive = true
+        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 12, bottom: 5, right: 12)
+
         return button
     }
     
@@ -218,51 +223,51 @@ class PhotoDetailViewController: UIViewController {
         }
     }
     
-    func presentDeleteModal(for photo: PhotoData) {
-        let deleteVC = DeleteViewController()
-        deleteVC.delegate = self
-        present(deleteVC, animated: true, completion: nil)
-    }
+//    func presentDeleteModal(for photo: PhotoData) {
+//        let deleteVC = DeleteViewController()
+//        deleteVC.delegate = self
+//        present(deleteVC, animated: true, completion: nil)
+//    }
     
     @objc private func goBack() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc private func deletePhoto() {
-        guard let photoData = selectedPhotoData else {
-            print("삭제할 데이터가 없습니다.")
-            return
-        }
-
-        let deleteVC = DeleteViewController()
-        deleteVC.photoData = photoData
-        deleteVC.delegate = self
-        present(deleteVC, animated: true, completion: nil)
-    }
-}
-
-extension PhotoDetailViewController: DeleteViewControllerDelegate {
-    func didDelete() {
-        print("사진과 기록이 삭제되었습니다.")
-
-        // `SavedPhotosViewController`로 돌아가기
-//        if let navigationController = self.navigationController,
-//           let savedVC = navigationController.viewControllers.first(where: { $0 is SavedPhotosViewController }) as? SavedPhotosViewController {
-//            savedVC.refreshData() // `SavedPhotosViewController`에서 데이터 갱신
-//            navigationController.popViewController(animated: true) // 이전 화면으로 이동
-//        } else {
-//            dismiss(animated: true, completion: nil)
+//    @objc private func deletePhoto() {
+//        guard let photoData = selectedPhotoData else {
+//            print("삭제할 데이터가 없습니다.")
+//            return
 //        }
-        
-        
-        print("사진과 기록이 삭제되었습니다.")
 //
-//        if let presentingVC = presentingViewController as? SavedPhotosViewController {
-//            dismiss(animated: true) {
-//                presentingVC.refreshData() // 데이터 갱신
-//            }
-//        } else {
-            dismiss(animated: true, completion: nil)
-//        }
-    }
+//        let deleteVC = DeleteViewController()
+//        deleteVC.photoData = photoData
+//        deleteVC.delegate = self
+//        present(deleteVC, animated: true, completion: nil)
+//    }
 }
+
+//extension PhotoDetailViewController: DeleteViewControllerDelegate {
+//    func didDelete() {
+//        print("사진과 기록이 삭제되었습니다.")
+//
+//        // `SavedPhotosViewController`로 돌아가기
+////        if let navigationController = self.navigationController,
+////           let savedVC = navigationController.viewControllers.first(where: { $0 is SavedPhotosViewController }) as? SavedPhotosViewController {
+////            savedVC.refreshData() // `SavedPhotosViewController`에서 데이터 갱신
+////            navigationController.popViewController(animated: true) // 이전 화면으로 이동
+////        } else {
+////            dismiss(animated: true, completion: nil)
+////        }
+//        
+//        
+//        print("사진과 기록이 삭제되었습니다.")
+////
+////        if let presentingVC = presentingViewController as? SavedPhotosViewController {
+////            dismiss(animated: true) {
+////                presentingVC.refreshData() // 데이터 갱신
+////            }
+////        } else {
+//            dismiss(animated: true, completion: nil)
+////        }
+//    }
+//}

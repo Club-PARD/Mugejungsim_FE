@@ -141,7 +141,6 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             navBar.heightAnchor.constraint(equalToConstant: 65),
 
-
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             

@@ -362,6 +362,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "앱이 카메라에 접근하려면 권한이 필요합니다.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크에 접근하기 위해 사용됩니다.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진 갤러리에서 이미지를 선택하기 위해 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -393,6 +394,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "앱이 카메라에 접근하려면 권한이 필요합니다.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크에 접근하기 위해 사용됩니다.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진 갤러리에서 이미지를 선택하기 위해 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
