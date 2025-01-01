@@ -13,7 +13,7 @@ class URLService {
     let baseURLString: String
     
     private init() {
-        self.baseURLString = "#####"
+        self.baseURLString = "BASE_URL"
     }
     
     var baseURL: String {

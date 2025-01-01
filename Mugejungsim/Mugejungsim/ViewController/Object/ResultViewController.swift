@@ -2,7 +2,6 @@ import UIKit
 
 class ResultViewController: UIViewController {
 
-    // MARK: - Properties (UI Elements)
     var recordID: String = ""
 
     let memoryLabel: UILabel = {
@@ -56,18 +55,18 @@ class ResultViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
 
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-            
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            print("ResultViewController에서 데이터 확인:")
-            print("oneLine1: \(record.oneLine1)")
-        } else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-        }
-        
+//        guard let recordUUID = Int(recordID) else {
+//            print("유효하지 않은 recordID: \(recordID)")
+//            return
+//        }
+//            
+//        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+//            print("ResultViewController에서 데이터 확인:")
+//            print("oneLine1: \(record.oneLine1!)")
+//        } else {
+//            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+//        }
+//        
         // 버튼 액션 연결
         openPreviewButton.addTarget(self, action: #selector(openUSDZPreviewController), for: .touchUpInside)
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
@@ -152,14 +151,16 @@ class ResultViewController: UIViewController {
     
     private func updateImages() {
         // 병 이미지도 여기서 관리하라!
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+//        guard let recordUUID = Int(recordID) else {
+//            print("유효하지 않은 recordID: \(recordID)")
+//            return
+//        }
+//        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
         
         // bottle(glass)
-        switch record?.oneLine1 {
+//        print("      oneline1 in ResultVC: \(record?.oneLine1)")
+        print(TravelRecordManager.shared.temporaryOneline!)
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             openPreviewButton.setImage(UIImage(named: "Dreamy Pink"), for: .normal)
         case "value2":

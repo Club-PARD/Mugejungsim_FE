@@ -35,7 +35,6 @@ class StoryManager {
             completion(.failure(NSError(domain: "NoData", code: 0, userInfo: [NSLocalizedDescriptionKey: "스토리 데이터가 없습니다."])))
             return
         }
-
         // 서버 요구 사항에 맞는 JSON 데이터 생성
         let payload: [String: Any] = [
             "data": [

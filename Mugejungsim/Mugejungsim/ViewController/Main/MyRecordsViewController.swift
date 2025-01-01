@@ -498,7 +498,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             print("여행 기록 셀 클릭됨: \(indexPath.row)")
             let collectionPhotosVC = CollectionPhotosViewController()
             collectionPhotosVC.modalPresentationStyle = .fullScreen
-            collectionPhotosVC.recordID = selectedRecord.id.uuidString // 레코드 ID 전달
+            collectionPhotosVC.recordID = String(selectedRecord.id) // 레코드 ID 전달
             present(collectionPhotosVC, animated: true, completion: nil)
         } else if collectionView == scrollableObjectCollectionView {
             let selectedRecord = travelRecords[indexPath.row]
@@ -506,7 +506,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             print("오브제 셀 클릭됨: \(indexPath.row)")
             
             let objectModalVC = ObjectModal()
-            objectModalVC.recordID = selectedRecord.id.uuidString
+            objectModalVC.recordID = String(selectedRecord.id)
             objectModalVC.modalPresentationStyle = .fullScreen
             present(objectModalVC, animated: false, completion: nil)
         }
@@ -514,11 +514,63 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     
     private func loadTravelRecords() {
         // 샘플 데이터를 TravelRecordManager에서 가져오기
+        // Local Base
         travelRecords = TravelRecordManager.shared.getAllRecords()
         print("Loaded travel records count: \(travelRecords.count)")
         travelRecords.forEach { record in
             print("TravelRecord - Title: \(record.title), OneLine1: \(record.oneLine1)")
         }
+        
+        // API 호출
+        APIService.shared.getUserPosts(userId: TravelRecordManager.shared.userId!) { [weak self] result in
+            switch result {
+            case .success(let records):
+                print("=== 성공적으로 받은 데이터 ===")
+                records.forEach { record in
+                    print("""
+                    ID: \(record.id)
+                    Title: \(record.title)
+                    StartDate: \(record.startDate)
+                    EndDate: \(record.endDate)
+                    Location: \(record.location)
+                    Companion: \(record.companion)
+                    Bottle: \(record.bottle ?? "없음")
+                    Photos: \(record.stories.map { $0.imagePath })
+                    Categories: \(record.stories.map { $0.categories })
+                    """)
+                }
+                let updatedRecords: [TravelRecord] = records.compactMap { record in
+                    let uuid: Int
+                    if let idString = record.id as? String, let generatedUUID = Int(idString) {
+                        uuid = generatedUUID
+                    } else {
+                        uuid = Int() // ID가 유효하지 않을 경우 새 UUID 생성
+                        print("Created new UUID for invalid record ID: \(record.id)")
+                    }
+                    return TravelRecord(
+                        id: uuid,
+                        pid: "",
+                        title: record.title,
+                        startDate: record.startDate,
+                        endDate: record.endDate,
+                        location: record.location,
+                        companion: record.companion,
+                        bottle: record.bottle,
+                        stories: record.stories,
+                        oneLine1: record.bottle,
+                        oneLine2: ""
+                    )
+                }
+                DispatchQueue.main.async {
+                    self?.travelRecords = updatedRecords
+                    self?.scrollableTravelCollectionView.reloadData()
+                    print("불러온 여행 기록 개수: \(updatedRecords.count)")
+                }
+            case .failure(let error):
+                print("여행 기록을 불러오는 중 오류 발생: \(error.localizedDescription)")
+            }
+        }
+        
     }
 
     private func reloadTravelRecords() {
@@ -539,8 +591,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     private func updateCollectionViewHeight() {
         let newHeight = calculateCollectionViewHeight()
         print("Calculated CollectionView height: \(newHeight)")
-
-        
         scrollableTravelCollectionView.heightAnchor.constraint(equalToConstant: newHeight).isActive = true
         scrollableObjectCollectionView.heightAnchor.constraint(equalToConstant: newHeight).isActive = true
     }
@@ -549,7 +599,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         let itemsPerRow: CGFloat = 3 // 한 줄에 표시할 셀 수
         let itemHeight: CGFloat = 150 // 각 셀의 높이
         let spacing: CGFloat = 16 // 셀 간 간격
-
         let rowCount = ceil(CGFloat(travelRecords.count) / itemsPerRow)
         return (rowCount * itemHeight) + ((rowCount - 1) * spacing)
     }

@@ -1,4 +1,6 @@
 import UIKit
+import SDWebImage // 네트워크 이미지 로드를 위해 필요
+
 
 class SavedPhotoCell: UICollectionViewCell {
     let imageView: UIImageView = {
@@ -55,16 +57,25 @@ class SavedPhotoCell: UICollectionViewCell {
     }
     
     func configure(with photoData: PhotoData) {
-        // Document Directory 경로 가져오기
-        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fullPath = documentDirectory.appendingPathComponent(photoData.imagePath).path
-        print("이미지 전체 경로: \(fullPath)")
-        // 이미지 로드
-        if let image = UIImage(contentsOfFile: fullPath) {
-            imageView.image = image
-        } else {
-            imageView.image = UIImage(named: "placeholder") // 대체 이미지
-            print("이미지를 로드할 수 없습니다. 경로: \(fullPath)")
+        // 이미지 로드할 URL
+        guard let imageUrl = URL(string: photoData.imagePath) else {
+            print("Invalid URL: \(photoData.imagePath)")  // URL이 잘못된 경우
+            imageView.image = UIImage(named: "placeholder") // 유효한 URL이 아니면 기본 이미지
+            return
         }
+
+        // SDWebImage로 이미지 로드
+        imageView.sd_setImage(with: imageUrl, placeholderImage: UIImage(named: "placeholder")) { (image, error, cacheType, url) in
+            if let error = error {
+                print("이미지 로드 실패: \(error.localizedDescription)")
+            } else {
+                print("이미지 로드 성공: \(String(describing: url))")
+            }
+        }
+               
+        // 텍스트와 카테고리 설정
+//        textLabel.text = photoData.content
+//        categoryLabel.text = photoData.categories.joined(separator: ", ")
+        
     }
 }

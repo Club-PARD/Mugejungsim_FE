@@ -27,13 +27,13 @@ class CollectionPhotosViewController: UIViewController, UICollectionViewDelegate
     }
 
     private func loadPhotosForRecord() {
-        guard let uuid = UUID(uuidString: recordID) else {
+        guard let uuid = Int(recordID) else {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
 
         if let record = TravelRecordManager.shared.getRecord(by: uuid) {
-            savedData = record.photos
+            savedData = record.stories
             titleLabel.text = record.title // 여행 제목 설정
             print("Loaded \(savedData.count) photos for record ID: \(recordID)")
         } else {

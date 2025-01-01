@@ -67,25 +67,10 @@ class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        updateImages()
+        updateLabelText()
         setupUI()
         homeButton.addTarget(self, action: #selector(homeButtonTapped), for: .touchUpInside)
-
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-            
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            print("CheckObjeImageViewController에서 데이터 확인:")
-            print("Record ID: \(record.id)")
-            print("Title: \(record.title)")
-            print("oneLine1: \(record.oneLine1)")
-            print("oneLine2: \(record.oneLine2)")
-            updateLabelText()
-            updateImages()
-        } else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-        }
     }
     
     private func setupUI() {
@@ -137,8 +122,6 @@ class ShareViewController: UIViewController {
             homeButton.topAnchor.constraint(equalTo: letterImage.bottomAnchor, constant: 20),
             homeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             homeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
-//            homeButton.widthAnchor.constraint(equalToConstant: 328),
             homeButton.heightAnchor.constraint(equalToConstant: 52),
         ])
     }
@@ -192,16 +175,8 @@ class ShareViewController: UIViewController {
     }
     
     private func updateImages() {
-        // 병 이미지도 여기서 관리하라!
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
-        
-        // bottle(glass)
-        // letter
-        switch record?.oneLine1 {
+        print(TravelRecordManager.shared.temporaryOneline!)
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             glassImage.image = UIImage(named: "Dreamy Pink")
             letterImage.image = UIImage(named: "pink")
@@ -239,20 +214,9 @@ class ShareViewController: UIViewController {
     }
     
     private func updateLabelText() {
-        // recordID 유효성 확인
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        // 기록 가져오기
-        guard let record = TravelRecordManager.shared.getRecord(by: recordUUID) else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-            return
-        }
-        
         // oneLine1 값을 확인하고 contentLabel 업데이트
         let labelText: String
-        switch record.oneLine1 {
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             labelText = "당신의 여행 컬러는\n\"Dreamy Pink\"입니다."
         case "value2":
@@ -276,8 +240,6 @@ class ShareViewController: UIViewController {
         default:
             labelText = "당신의 여행 컬러는\n\"알 수 없음\"입니다."
         }
-        
-        // 업데이트된 텍스트를 라벨에 설정
         contentLabel.text = labelText
     }
 }

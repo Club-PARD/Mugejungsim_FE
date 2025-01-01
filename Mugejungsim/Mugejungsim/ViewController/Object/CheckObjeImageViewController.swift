@@ -67,12 +67,12 @@ class CheckObjeImageViewController: UIViewController {
         readButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
         setConstraints()
         
-        guard let recordUUID = UUID(uuidString: recordID) else {
+        guard let recordID = Int(recordID) else {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
             
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+        if let record = TravelRecordManager.shared.getRecord(by: recordID) {
             print("CheckObjeImageViewController에서 데이터 확인:")
             print("Record ID: \(record.id)")
             print("Title: \(record.title)")
@@ -119,14 +119,14 @@ class CheckObjeImageViewController: UIViewController {
     
     private func updateImages() {
         // 병 이미지도 여기서 관리하라!
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
-        
+//        guard let recordID = Int(recordID) else {
+//            print("유효하지 않은 recordID: \(recordID)")
+//            return
+//        }
+//        var record = TravelRecordManager.shared.getRecord(by: recordID)
+//        
         // bottle(glass)
-        switch record?.oneLine1 {
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             bottleImageView.image = UIImage(named: "Dreamy Pink")
         case "value2":

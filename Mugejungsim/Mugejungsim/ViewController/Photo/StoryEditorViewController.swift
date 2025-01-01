@@ -695,9 +695,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.layer.cornerRadius = 18.5
             button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 13, bottom: 10, right: 13)
             button.translatesAutoresizingMaskIntoConstraints = false
-
-//            button.widthAnchor.constraint(equalToConstant: 86).isActive = true
-//            button.heightAnchor.constraint(equalToConstant: 37).isActive = true
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
 
@@ -834,11 +831,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         nextButton.setTitleColor(UIColor(red: 0.54, green: 0.54, blue: 0.54, alpha: 1), for: .normal)
         nextButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
         
-//        // 활성화
-//        button.setTitleColor(.white, for: .normal)
-//        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
-        
-        
         nextButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         nextButton.layer.cornerRadius = 8
         nextButton.translatesAutoresizingMaskIntoConstraints = false
@@ -885,7 +877,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     @objc private func nextButtonTapped() {
-        guard let recordUUID = UUID(uuidString: recordID) else {
+        guard let recordUUID = Int(recordID) else {
             print("유효하지 않은 Record ID: \(recordID)")
             return
         }
@@ -899,7 +891,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             return
         }
         
-        
         // 현재 이미지를 저장
         if currentIndex < texts.count {
             texts[currentIndex] = textView.text
@@ -911,7 +902,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         
         // 각 이미지 관련 정보 출력
         var savedImagePaths: [String] = [] // 로컬에 저장된 이미지 경로들을 담을 배열
-
         
         print("현재 Record ID (\(recordID))의 이미지 정보:")
            for (index, image) in images.enumerated() {
@@ -938,7 +928,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             let category = selectedCategoriesForImages[index].joined(separator: ", ")
 
             let success = TravelRecordManager.shared.addPhoto(
-                to: UUID(uuidString: recordID) ?? UUID(),
+                to: Int(recordID)!,
                 image: image,
                 text: text,
                 categories: category
@@ -949,20 +939,16 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("사진 \(index + 1) 추가 실패")
             }
         }
-        
         // `metadata` 생성
         let metadata: [[String: Any]] = images.enumerated().map { index, _ in
             let imagePath = savedImagePaths[index]  // savedImagePaths에서 가져옴
             return [
-                "postId": index + 1,
+                "postId": TravelRecordManager.shared.postId!,
                 "content": texts[index],
                 "categories": selectedCategoriesForImages[index],
                 "pid": "unique_pid_\(index + 1)",
-//                "imagePath": imagePath  // 저장된 이미지 경로 사용
             ]
         }
-        print(images)
-        // 서버 업로드 호출
 
         APIService.shared.uploadImages(
             endpoint: "/stories",
@@ -972,34 +958,24 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             switch result {
             case .success(let response):
                 print("이미지 업로드 성공:", response)
+                let savedPhotosVC = SavedPhotosViewController()
+                savedPhotosVC.recordID = self.recordID
+                savedPhotosVC.modalPresentationStyle = .fullScreen
+                self.present(savedPhotosVC, animated: true)
             case .failure(let error):
                 print("이미지 업로드 실패:", error.localizedDescription)
             }
         }
-        
-
         if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            print("해당 Record ID (\(recordUUID))의 데이터:")
-            print("Title: \(record.title)")
-            print("Location: \(record.location)")
-            print("Photos:")
-            for (index, photo) in record.photos.enumerated() {
+            for (index, photo) in record.stories.enumerated() {
                 print("Photo \(index + 1):")
                 print("    Image Path: \(photo.imagePath)")
-                print("    Text: \(photo.text)")
+                print("    content: \(photo.content)")
                 print("    Category: \(photo.categories)")
             }
-        } else {
-            print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
         }
-
-        let savedPhotosVC = SavedPhotosViewController()
-        savedPhotosVC.recordID = recordID
-        savedPhotosVC.modalPresentationStyle = .fullScreen
-        present(savedPhotosVC, animated: true)
     }
 
-    
     func saveImageToLocalFile(image: UIImage, fileName: String) -> String? {
         // 이미지 데이터를 JPEG 형식으로 변환
         guard let imageData = image.jpegData(compressionQuality: 1.0) else {
@@ -1011,8 +987,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileURL = documentDirectory.appendingPathComponent(fileName)
 
-        do {
-            // 파일을 저장
+        do {// 파일을 저장
             try imageData.write(to: fileURL)
             return fileURL.path // 저장된 파일의 경로 반환
         } catch {

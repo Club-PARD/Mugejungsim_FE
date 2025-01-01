@@ -750,7 +750,8 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         location = locationTextField.text ?? "없음"
 
         let newRecord = TravelRecord(
-            id: UUID(),
+            id: 0,
+            pid: "",
             title: travelTitle,
             startDate: startDate,
             endDate: endDate,
@@ -768,10 +769,10 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 switch result {
                 case .success(let json):
                     if let postId = json["postId"] as? Int {
-                        TravelRecordManager.shared.postId = postId
+                        TravelRecordManager.shared.postId = postId  // 포스트 저장
                         print("Received postId: \(postId)")
 //                        self.navigateToStoryEditor()
-                        self.navigateToNextScreen(recordID: newRecord.id.uuidString)
+                        self.navigateToNextScreen(recordID: String(newRecord.id))
                     } else {
                         self.showAlert(title: "오류", message: "postId를 응답에서 찾을 수 없습니다.")
                     }
@@ -781,7 +782,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 }
             }
         }
-        self.navigateToNextScreen(recordID: newRecord.id.uuidString)
+        self.navigateToNextScreen(recordID: String(newRecord.id))
     }
     
     
@@ -836,55 +837,4 @@ extension CreateViewController: StopWritingViewControllerDelegate {
     }
 }
 
-extension TravelRecordManager {
-    // 서버로 기록 전송
-    func sendRecordToServer(_ record: TravelRecord, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-        guard let userId = userId else {
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "userId가 설정되지 않았습니다."])))
-            print("Error: userId가 설정되지 않았습니다.")
-            return
-        }
-
-        let serverURL = "http://172.17.208.113:8080/api/posts?userId=\(userId)"
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-
-        let parameters: [String: Any] = [
-            "pid": record.id.uuidString,
-            "userId": userId,
-            "title": record.title,
-            "startDate": record.startDate,
-            "endDate": record.endDate,
-            "location": record.location,
-            "companion": record.companion,
-            "bottle": record.bottle
-        ]
-
-        AF.request(
-            serverURL,
-            method: .post,
-            parameters: parameters,
-            encoding: JSONEncoding.default,
-            headers: headers
-        ).responseJSON { response in
-            switch response.result {
-            case .success(let value):
-                if let json = value as? [String: Any] {
-                    print("Server Response JSON: \(json)")
-                    completion(.success(json))
-                } else {
-                    print("Invalid response format: \(value)")
-                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
-                }
-            case .failure(let error):
-                print("Error sending record to server: \(error.localizedDescription)")
-                if let data = response.data {
-                    print("Server Error Response: \(String(data: data, encoding: .utf8) ?? "No Data")")
-                }
-                completion(.failure(error))
-            }
-        }
-    }
-}
 

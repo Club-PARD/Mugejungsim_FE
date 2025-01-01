@@ -195,11 +195,11 @@ class ObjectModal: UIViewController {
     
     private func updateImages() {
         // 병 이미지도 여기서 관리하라!
-        guard let recordUUID = UUID(uuidString: recordID) else {
+        guard let recordID = Int(recordID) else {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
-        let record = TravelRecordManager.shared.getRecord(by: recordUUID)
+        let record = TravelRecordManager.shared.getRecord(by: recordID)
         
         // bottle(glass)
         // letter
@@ -242,7 +242,7 @@ class ObjectModal: UIViewController {
     
     private func updateLabelText() {
         // recordID 유효성 확인
-        guard let recordUUID = UUID(uuidString: recordID) else {
+        guard let recordUUID = Int(recordID) else {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
