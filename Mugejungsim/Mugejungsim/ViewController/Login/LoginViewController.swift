@@ -170,12 +170,12 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToOnboarding(with nickname: String) {
-        let onboardingVC = MyRecordsViewController()
-        onboardingVC.modalPresentationStyle = .fullScreen
-        present(onboardingVC, animated: true, completion: nil)
-//        let onboardingVC = OBViewController1()
+//        let onboardingVC = MyRecordsViewController()
 //        onboardingVC.modalPresentationStyle = .fullScreen
 //        present(onboardingVC, animated: true, completion: nil)
+        let onboardingVC = OBViewController1()
+        onboardingVC.modalPresentationStyle = .fullScreen
+        present(onboardingVC, animated: true, completion: nil)
     }
     
     private func showAlert(title: String, message: String) {
