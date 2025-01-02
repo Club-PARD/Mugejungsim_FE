@@ -110,15 +110,8 @@ class APIService {
                 }
             }
         }
-
-//    func getUploadedImages(postId: Int, completion: @escaping (Result<[PhotoData], Error>) -> Void) {
-//        let endpoint = "/stories/\(postId)/stories" // 서버에서 이미지를 제공하는 엔드포인트
-//        networkManager.request(
-//            endpoint,
-//            method: .get,
-//            completion: completion
-//        )
-//    }
+    
+    // MARK: - 업로드된 이미지 조회
     func getUploadedImages(postId: Int, completion: @escaping (Result<[PhotoData], Error>) -> Void) {
         let endpoint = "/stories/\(postId)/stories" // 서버에서 이미지를 제공하는 엔드포인트
         networkManager.request(

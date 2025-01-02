@@ -155,7 +155,6 @@ class ObjeCreationViewController: UIViewController {
         createButton.addTarget(self, action: #selector(didTapCreateButton), for: .touchUpInside)
     }
     
-    // MARK: - 제약조건
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
@@ -267,59 +266,68 @@ class ObjeCreationViewController: UIViewController {
     
     @objc private func didTapCreateButton() {
         print("선택된 값: \(selectedItems)")
+        let objeNum: String = selectedItems[0]
 
-        var objeNum: String = selectedItems[0]
         // userId 확인 및 범위 검증
         guard let userId = TravelRecordManager.shared.userId else {
             print("유효하지 않은 사용자 ID")
             return
         }
-        
+
+        // 중도 진행 여부 확인
         if let travelRecord = travelRecord, travelRecord.id != 0 {
             TravelRecordManager.shared.postId = travelRecord.id
             print("===============\(travelRecord.id)=================")
             print("===============\(TravelRecordManager.shared.postId ?? -1)=================")
             print("===============\(travelRecord.title)=================")
-//            print("===============\(travelRecord.date)=================")
         } else {
             print("travelRecord가 nil이거나 ID가 0입니다.")
         }
-        
+
         // getUserPosts 호출
         APIService.shared.getUserPosts(userId: userId) { [weak self] result in
             switch result {
             case .success(let records):
-//                TravelRecordManager.shared.travelRecords = records
-//                print("불러온 게시물 개수: \(records.count)")
-//                guard var temp = records.first else {
-//                    print("업데이트할 레코드가 없습니다.")
-//                    return
-//                }
                 print("불러온 게시물 개수: \(records.count)")
-                guard let targetRecordID = self?.travelRecord?.id,
-                    var temp = records.first(where: { $0.id == targetRecordID }) else {
-                    print("업데이트할 레코드를 찾을 수 없습니다.")
-                    return
+                
+                var temp: TravelRecord? // `temp` 변수를 함수 범위에서 선언
+
+                if let targetRecordID = self?.travelRecord?.id,
+                   let matchedRecord = records.first(where: { $0.id == targetRecordID }) {
+                    // 중도 참여용: targetRecordID와 매칭되는 레코드를 찾은 경우
+                    print("업데이트할 레코드를 찾았습니다: \(matchedRecord)")
+                    temp = matchedRecord
+                    TravelRecordManager.shared.postId = temp?.id
+                }else if let postId = TravelRecordManager.shared.postId,
+                         let matchedByPostId = records.first(where: { $0.id == postId }) {
+                   print("postId를 기준으로 레코드를 찾았습니다: \(matchedByPostId)")
+                   temp = matchedByPostId
+                } else {    // records가 비어 있는 경우 처리
+                    print("레코드가 없습니다.")
                 }
-                temp.bottle = objeNum
-                TravelRecordManager.shared.temporaryOneline = objeNum
-                TravelRecordManager.shared.TemporaryCount = records.count
-                print("         Title : \(temp.title)")
-                print("         Bottle : \(temp.bottle)")
-                print("         records Count: \(records.count)")
-                print("         Temp Bottle : \(temp.bottle)")
-                print("         Temp records Count: \(records.count)")
+
                 guard let postId = TravelRecordManager.shared.postId else {
                     print("유효하지 않은 postId")
                     return
                 }
-                
-                TravelRecordManager.shared.updateRecordOnServer(postId: temp.id, record: temp) { result in // 여기서 POST
-                    switch result {
-                    case .success(let response):
-                        print("Successfully updated record: \(response)")
-                    case .failure(let error):
-                        print("Failed to update record: \(error.localizedDescription)")
+                // `temp`가 설정된 경우 업데이트 로직 수행
+                if var temp = temp {
+                    temp.bottle = objeNum
+                    TravelRecordManager.shared.temporaryOneline = objeNum
+                    TravelRecordManager.shared.TemporaryCount = records.count
+                    print("         Title : \(temp.title)")
+                    print("         Bottle : \(temp.bottle)")
+                    print("         records Count: \(records.count)")
+                    print("         Temp Bottle : \(temp.bottle)")
+                    print("         Temp records Count: \(records.count)")
+                    
+                    TravelRecordManager.shared.updateRecordOnServer(postId: postId, record: temp) { result in // 여기서 POST
+                        switch result {
+                        case .success(let response):
+                            print("Successfully updated record: \(response)")
+                        case .failure(let error):
+                            print("Failed to update record: \(error.localizedDescription)")
+                        }
                     }
                 }
             case .failure(let error):
@@ -327,34 +335,8 @@ class ObjeCreationViewController: UIViewController {
             }
         }
         goToNextPage()
-        
-        // TravelRecordManager에서 기록을 가져오기
-//        if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-//            record.oneLine1 = objeNum
-//            TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
-//            print("Record: \(record)")
-//            print("oneLine1: \(record.oneLine1!)")
-//            print("oneLine2: \(record.oneLine2!)")
-//            print("Photos: \(record.stories.count)장")
-//            for (index, photo) in record.stories.enumerated() {
-//                print("    Photo \(index + 1):")
-//                print("    Image Path: \(photo.imagePath)")
-//                print("    Content: \(photo.content)")
-//                print("    Categories: \(photo.categories.joined(separator: ", "))") // 배열을 문자열로 결합
-//            }
-//
-//            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {
-//                print("데이터 저장 후 확인:")
-//                print("oneLine1: \(updatedRecord.oneLine1!)")
-//            } else {
-//                print("데이터 저장 실패")
-//            }
-//
-//            goToNextPage()
-//        } else {
-//            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-//        }
     }
+    
     
     private func goToNextPage() {
         let loadingVC = LoadingViewController() // 이동할 ViewController 인스턴스 생성

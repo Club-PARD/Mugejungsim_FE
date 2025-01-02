@@ -64,6 +64,23 @@ class ShareViewController: UIViewController {
         return button
     }()
     
+    private let shareButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("공유하기", for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
+        button.setTitleColor(.white, for: .normal) // 폰트 색상을 흰색으로 설정
+        button.backgroundColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
+        button.layer.cornerRadius = 8
+        button.layer.shadowPath = UIBezierPath(roundedRect: button.bounds, cornerRadius: 8).cgPath
+        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        button.layer.shadowOpacity = 1
+        button.layer.shadowRadius = 1
+        button.layer.shadowOffset = CGSize(width: 0.5, height: 0.5)
+        button.layer.masksToBounds = false
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationManager.shared.requestNotificationAuthorization()
@@ -72,6 +89,7 @@ class ShareViewController: UIViewController {
         updateLabelText()
         setupUI()
         homeButton.addTarget(self, action: #selector(homeButtonTapped), for: .touchUpInside)
+        shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
     }
     
     private func setupUI() {
@@ -80,7 +98,7 @@ class ShareViewController: UIViewController {
         scrollView.alwaysBounceHorizontal = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.isScrollEnabled = true
-        scrollView.contentSize = CGSize(width: view.frame.width, height: 1000)
+        scrollView.contentSize = CGSize(width: view.frame.width, height: 1100)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -95,6 +113,7 @@ class ShareViewController: UIViewController {
         contentView.addSubview(letterImage)
         
         view.addSubview(homeButton)
+        view.addSubview(shareButton)
         
         setupConstraints()
         setupCustomNavigationBar()
@@ -124,6 +143,11 @@ class ShareViewController: UIViewController {
             homeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             homeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             homeButton.heightAnchor.constraint(equalToConstant: 52),
+            
+            shareButton.topAnchor.constraint(equalTo: homeButton.bottomAnchor, constant: 10),
+            shareButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            shareButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            shareButton.heightAnchor.constraint(equalToConstant: 52),
         ])
     }
     
@@ -178,9 +202,20 @@ class ShareViewController: UIViewController {
         present(myRecordsVC, animated: true, completion: nil)
     }
     
+    @objc private func shareButtonTapped() {
+        guard let image = letterImage.image else {
+            print("이미지를 찾을 수 없습니다.")
+            return
+        }
+        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        present(activityViewController, animated: true, completion: nil)
+    }
+    
     private func updateImages() {
 //        print(TravelRecordManager.shared.temporaryOneline!)
-        switch TravelRecordManager.shared.temporaryOneline {
+        
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             glassImage.image = UIImage(named: "Dreamy Pink")
             letterImage.image = UIImage(named: "pink")

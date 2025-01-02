@@ -5,10 +5,6 @@
 //  Created by 도현학 on 12/28/24.
 //
 
-/*
- * App 전체적인 기능 Flow 점검 위한 코드
- *
- */
 import Alamofire
 import UIKit
 
@@ -174,10 +170,40 @@ extension TravelRecordManager {
             return
         }
         
+        print("===== Update Record Debugging =====")
+        print("Post ID: \(postId)")
+        print("Record ID: \(record.id)")
+        print("User ID: \(userId)")
+        print("Title: \(record.title)")
+        print("Start Date: \(record.startDate)")
+        print("End Date: \(record.endDate)")
+        print("Location: \(record.location)")
+        print("Companion: \(record.companion)")
+        print("Bottle: \(record.bottle)")
+        print("Stories Count: \(record.stories.count)")
+        record.stories.enumerated().forEach { index, story in
+                print("Story \(index + 1): \(story)")
+        }
+        print("One Line 1: \(record.oneLine1 ?? "nil")")
+        print("One Line 2: \(record.oneLine2 ?? "nil")")
+        print("===================================")
+        
         let serverURL = "\(URLService.shared.baseURL)/api/posts/\(postId)/finalize"
         let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
+        
+        // `stories`를 JSON 배열로 변환
+        let storiesData = record.stories.map { story in
+            return [
+                "pid": story.pid,
+                "imagePath": story.imagePath,
+                "content": story.content,
+                "categories": story.categories
+            ]
+        }
+          
+        
         let parameters: [String: Any] = [
             "pid": record.id,
             "userId": userId,
@@ -186,7 +212,8 @@ extension TravelRecordManager {
             "endDate": record.endDate,
             "location": record.location,
             "companion": record.companion,
-            "bottle": record.bottle
+            "bottle": record.bottle,
+            "stories": storiesData
         ]
 
         AF.request(

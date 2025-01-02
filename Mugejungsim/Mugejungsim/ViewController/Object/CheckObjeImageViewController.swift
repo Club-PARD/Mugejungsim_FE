@@ -2,7 +2,6 @@ import UIKit
 
 class CheckObjeImageViewController: UIViewController {
     
-    // MARK: - UI Elements
     var recordID: String = ""
     
     let textLabel: UILabel = {
@@ -118,15 +117,7 @@ class CheckObjeImageViewController: UIViewController {
     }
     
     private func updateImages() {
-        // 병 이미지도 여기서 관리하라!
-//        guard let recordID = Int(recordID) else {
-//            print("유효하지 않은 recordID: \(recordID)")
-//            return
-//        }
-//        var record = TravelRecordManager.shared.getRecord(by: recordID)
-//        
-        // bottle(glass)
-        switch TravelRecordManager.shared.temporaryOneline {
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             bottleImageView.image = UIImage(named: "Dreamy Pink")
         case "value2":
