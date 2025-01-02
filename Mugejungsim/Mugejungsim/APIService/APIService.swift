@@ -19,42 +19,24 @@ class APIService {
     }
     
 
-    // MARK: - 여행 기록 목록 조회
-    func getTravelRecords(completion: @escaping (Result<[TravelRecord], Error>) -> Void) {
-        networkManager.request(
-            "/travelRecords",
-            method: .get,
-            completion: completion
-        )
-    }
-    
-    // MARK: - 여행 기록 생성
-    func createTravelRecord(record: TravelRecord, completion: @escaping (Result<APIResponse, Error>) -> Void) {
-        networkManager.request(
-            "/travelRecords",
-            method: .post,
-            body: record,
-            completion: completion
-        )
-    }
-    
-    // MARK: - 여행 기록 업데이트
-    func updateTravelRecord(id: UUID, record: TravelRecord, completion: @escaping (Result<APIResponse, Error>) -> Void) {
-        networkManager.request(
-            "/travelRecords/\(id)",
-            method: .patch,
-            body: record,
-            completion: completion
-        )
-    }
-    
-    // MARK: - 여행 기록 삭제
-    func deleteTravelRecord(id: UUID, completion: @escaping (Result<APIResponse, Error>) -> Void) {
-        networkManager.request(
-            "/travelRecords/\(id)",
-            method: .delete,
-            completion: completion
-        )
+    func deletePost(postId: Int, userId: Int, completion: @escaping (Result<APIResponse, Error>) -> Void) {
+        let endpoint = "/api/posts/\(postId)?userId=\(userId)"
+        
+        NetworkManager.shared.requestRawResponse(endpoint, method: .delete) { result in
+            switch result {
+            case .success(let rawResponse):
+                print("Raw Response: \(rawResponse)")
+                if rawResponse.contains("success") {
+                    let response = APIResponse(success: true, message: rawResponse)
+                    completion(.success(response))
+                } else {
+                    let response = APIResponse(success: false, message: rawResponse)
+                    completion(.success(response))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
     
     // MARK: - 다중 이미지 업로드

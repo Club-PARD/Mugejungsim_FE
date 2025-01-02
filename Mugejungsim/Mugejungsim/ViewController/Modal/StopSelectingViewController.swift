@@ -1,8 +1,10 @@
 import UIKit
 
-class StopSelectingViewController: UIViewController {
+protocol StopSelectingViewControllerDelegate: AnyObject {
+    func didStopSelecting()
+}
 
-    // MARK: - UI Elements
+class StopSelectingViewController: UIViewController {
     
     private let overlayView: UIView = { // 모달창 배경을 위한 변수
         let view = UIView()
@@ -71,7 +73,7 @@ class StopSelectingViewController: UIViewController {
         
         return button
     }()
-
+    
     private let continueButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("이어서 쓰기", for: .normal)
@@ -89,7 +91,7 @@ class StopSelectingViewController: UIViewController {
         
         return button
     }()
-
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -130,7 +132,7 @@ class StopSelectingViewController: UIViewController {
             // Close button (X_Button)
             closeButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 21),
             closeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -23),
-
+            
             
             // Prompt label
             promptLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 63),
@@ -139,7 +141,7 @@ class StopSelectingViewController: UIViewController {
             // Prompt2 label
             promptLabel2.topAnchor.constraint(equalTo: promptLabel.bottomAnchor, constant: 10),
             promptLabel2.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-
+            
             // Stop button
             stopButton.topAnchor.constraint(equalTo: promptLabel2.bottomAnchor, constant: 34),
             stopButton.centerXAnchor.constraint(equalTo: promptLabel2.centerXAnchor),
@@ -161,28 +163,32 @@ class StopSelectingViewController: UIViewController {
         continueButton.addTarget(self, action: #selector(ContinueButtonTapped), for: .touchUpInside)
         closeButton.addTarget(self, action: #selector(CloseButtonTapped), for: .touchUpInside) // Close 버튼 액션 추가
     }
-    // 개선 여지 가능성이 있어서 더 나은 방안 확인해볼 것
-    @objc private func StopButtonTapped() {
+    
+    @objc func StopButtonTapped() {
         print("그만두기 버튼 클릭됨")
+        let myRecordVC = MyRecordsViewController()
+        myRecordVC.modalPresentationStyle = .fullScreen
+        myRecordVC.modalTransitionStyle = .crossDissolve
         
-        // 현재 모달 닫기
-        dismiss(animated: true)
-        // MainViewController를 강제로 rootViewController로 띄우기
-        if let window = UIApplication.shared.windows.first {
-            let mainVC = CreateViewController()
-            mainVC.modalPresentationStyle = .fullScreen
-            window.rootViewController = mainVC
-            window.makeKeyAndVisible()
-            print("MainViewController로 강제 이동")
+        // NavigationController 여부 확인
+        if let navigationController = self.navigationController {
+            navigationController.setViewControllers([myRecordVC], animated: true)
+        } else {
+            if let window = UIApplication.shared.windows.first {
+                let navController = UINavigationController(rootViewController: myRecordVC)
+                window.rootViewController = navController
+                window.makeKeyAndVisible()
+            } else {
+            }
         }
     }
     
-    @objc private func ContinueButtonTapped() {
+    @objc func ContinueButtonTapped() {
         print("이어서 하기 버튼 클릭됨")
         dismiss(animated: false, completion: nil)
     }
     
-    @objc private func CloseButtonTapped() {
+    @objc func CloseButtonTapped() {
         print("Close 버튼 클릭됨")
         dismiss(animated: false, completion: nil) // 화면 닫기
     }

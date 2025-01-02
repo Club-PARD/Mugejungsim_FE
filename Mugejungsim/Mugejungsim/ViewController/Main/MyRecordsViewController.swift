@@ -75,7 +75,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     }()
     
     let segmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["여행 기록", "오브제"])
+        let control = UISegmentedControl(items: ["여행 기록", "컬렉션"])
         control.selectedSegmentIndex = 0
         control.backgroundColor = .clear
         control.selectedSegmentTintColor = .white
@@ -230,6 +230,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         let deleteButton = createMenuButton(title: "여행 삭제", iconName: "trash")
         
         addButton.addTarget(self, action: #selector(addTripTapped), for: .touchUpInside)
+        deleteButton.addTarget(self, action: #selector(deleteTripTapped), for: .touchUpInside)
         
         let divider = UIView()
         divider.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0)
@@ -266,6 +267,81 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         let createViewController = CreateViewController()
         createViewController.modalPresentationStyle = .fullScreen
         self.present(createViewController, animated: false, completion: nil)
+    }
+    
+    @objc private func deleteTripTapped() {
+        // 여행 기록이 없을 경우 경고 메시지 표시
+        guard !travelRecords.isEmpty else {
+            let alert = UIAlertController(
+                title: "삭제 불가",
+                message: "삭제할 여행 기록이 없습니다.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return
+        }
+        // 여행 기록을 선택할 수 있는 AlertController 생성
+        let alert = UIAlertController(
+            title: "여행 기록 삭제",
+            message: "삭제할 여행 기록을 선택하세요:",
+            preferredStyle: .actionSheet
+        )
+        // 각 여행 기록을 AlertAction으로 추가
+        for (index, record) in travelRecords.enumerated() {
+            alert.addAction(UIAlertAction(title: record.title, style: .default, handler: { [weak self] _ in
+                self?.confirmDelete(record: record, at: index)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
+    private func confirmDelete(record: TravelRecord, at index: Int) {
+        let alert = UIAlertController(
+            title: "삭제 확인",
+            message: "\"\(record.title)\" 여행 기록을 삭제하시겠습니까?",
+            preferredStyle: .alert
+        )
+
+        let confirmAction = UIAlertAction(title: "삭제", style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            
+            let postId = record.id
+
+            // 서버에 삭제 요청
+            APIService.shared.deletePost(postId: postId, userId: TravelRecordManager.shared.userId!) { result in
+                switch result {
+                case .success:
+                    print("삭제 성공: \(record.title)")
+                    // 데이터 삭제
+                    self.travelRecords.remove(at: index)
+                    self.recordCount = self.travelRecords.count
+                    self.objectCount = self.travelRecords.filter { $0.bottle != "" }.count
+                    
+                    DispatchQueue.main.async {
+                        self.scrollableTravelCollectionView.reloadData()
+                        self.scrollableObjectCollectionView.reloadData()
+                        self.updateCollectionViewHeight()
+                    }
+                case .failure(let error):
+                    print("삭제 실패: \(error.localizedDescription)")
+                    let errorAlert = UIAlertController(
+                        title: "삭제 실패",
+                        message: "여행 기록을 삭제할 수 없습니다. \(error.localizedDescription)",
+                        preferredStyle: .alert
+                    )
+                    errorAlert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+                    self.present(errorAlert, animated: true, completion: nil)
+                }
+            }
+        }
+
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+
+        present(alert, animated: true, completion: nil)
     }
     
     @objc private func toggleContextMenu() {
@@ -433,74 +509,128 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         return 0
     }
     
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
+//        var record: TravelRecord
+//        if collectionView == scrollableTravelCollectionView {
+//            record = travelRecords[indexPath.row] // 여행 기록 데이터
+//        } else if collectionView == scrollableObjectCollectionView {
+//            let filteredRecords = travelRecords.filter { $0.bottle != "" }
+//            record = filteredRecords[indexPath.row] // 오브제 데이터
+//        } else {
+//            return UICollectionViewCell() // 기본적으로 빈 셀을 리턴
+//        }
+//        
+//        
+//        if collectionView == scrollableTravelCollectionView {
+//            switch record.bottle {
+//            case "value1":
+//                cell.imageView.image = UIImage(named: "핑크")
+//            case "value2":
+//                cell.imageView.image = UIImage(named: "클라우디")
+//            case "value3":
+//                cell.imageView.image = UIImage(named: "밝은 노랑")
+//            case "value4":
+//                cell.imageView.image = UIImage(named: "골드주황")
+//            case "value5":
+//                cell.imageView.image = UIImage(named: "하늘색")
+//            case "value6":
+//                cell.imageView.image = UIImage(named: "네이비")
+//            case "value7":
+//                cell.imageView.image = UIImage(named: "보라색")
+//            case "value8":
+//                cell.imageView.image = UIImage(named: "브라운")
+//            case "value9":
+//                cell.imageView.image = UIImage(named: "레드")
+//            case "value10":
+//                cell.imageView.image = UIImage(named: "연두색")
+//            default:
+//                cell.imageView.image = UIImage(named: "한줄남기기X") // 기본 이미지
+//            }
+//            cell.titleLabel.text = record.title // 여행 기록 제목
+//            print("Cell \(indexPath.row): \(record)")
+//        } else if collectionView == scrollableObjectCollectionView {
+//            switch record.bottle {
+//            case "value1":
+//                cell.imageView.image = UIImage(named: "Dreamy Pink")
+//            case "value2":
+//                cell.imageView.image = UIImage(named: "Cloud Whisper")
+//            case "value3":
+//                cell.imageView.image = UIImage(named: "Sunburst Yellow")
+//            case "value4":
+//                cell.imageView.image = UIImage(named: "Radiant Orange")
+//            case "value5":
+//                cell.imageView.image = UIImage(named: "Serene Sky")
+//            case "value6":
+//                cell.imageView.image = UIImage(named: "Midnight Depth")
+//            case "value7":
+//                cell.imageView.image = UIImage(named: "Wanderer's Flame")
+//            case "value8":
+//                cell.imageView.image = UIImage(named: "Storybook Brown")
+//            case "value9":
+//                cell.imageView.image = UIImage(named: "Ember Red")
+//            case "value10":
+//                cell.imageView.image = UIImage(named: "Meadow Green")
+//            default:
+//                cell.imageView.image = UIImage(named: "Storybook Brown")
+//            }
+//            cell.titleLabel.text = record.title // 오브제 이름
+//            print("OBJ Cell \(indexPath.row): \(record)")
+//        }
+//        return cell
+//    }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
-        var record: TravelRecord
+
         if collectionView == scrollableTravelCollectionView {
-            record = travelRecords[indexPath.row] // 여행 기록 데이터
-        } else if collectionView == scrollableObjectCollectionView {
-            let filteredRecords = travelRecords.filter { $0.bottle != "" }
-            record = filteredRecords[indexPath.row] // 오브제 데이터
-        } else {
-            return UICollectionViewCell() // 기본적으로 빈 셀을 리턴
-        }
-        
-        if collectionView == scrollableTravelCollectionView {
-            switch record.bottle {
-            case "value1":
-                cell.imageView.image = UIImage(named: "핑크")
-            case "value2":
-                cell.imageView.image = UIImage(named: "클라우디")
-            case "value3":
-                cell.imageView.image = UIImage(named: "밝은 노랑")
-            case "value4":
-                cell.imageView.image = UIImage(named: "골드주황")
-            case "value5":
-                cell.imageView.image = UIImage(named: "하늘색")
-            case "value6":
-                cell.imageView.image = UIImage(named: "네이비")
-            case "value7":
-                cell.imageView.image = UIImage(named: "보라색")
-            case "value8":
-                cell.imageView.image = UIImage(named: "브라운")
-            case "value9":
-                cell.imageView.image = UIImage(named: "레드")
-            case "value10":
-                cell.imageView.image = UIImage(named: "연두색")
-            default:
-                cell.imageView.image = UIImage(named: "한줄남기기X") // 기본 이미지
-            }
-            cell.titleLabel.text = record.title // 여행 기록 제목
+            // 여행 기록 데이터
+            guard indexPath.row < travelRecords.count else { return cell } // 배열 범위 검사
+            let record = travelRecords[indexPath.row]
+            configureCell(cell, with: record, isObjectView: false)
             print("Cell \(indexPath.row): \(record)")
         } else if collectionView == scrollableObjectCollectionView {
-            switch record.bottle {
-            case "value1":
-                cell.imageView.image = UIImage(named: "Dreamy Pink")
-            case "value2":
-                cell.imageView.image = UIImage(named: "Cloud Whisper")
-            case "value3":
-                cell.imageView.image = UIImage(named: "Sunburst Yellow")
-            case "value4":
-                cell.imageView.image = UIImage(named: "Radiant Orange")
-            case "value5":
-                cell.imageView.image = UIImage(named: "Serene Sky")
-            case "value6":
-                cell.imageView.image = UIImage(named: "Midnight Depth")
-            case "value7":
-                cell.imageView.image = UIImage(named: "Wanderer's Flame")
-            case "value8":
-                cell.imageView.image = UIImage(named: "Storybook Brown")
-            case "value9":
-                cell.imageView.image = UIImage(named: "Ember Red")
-            case "value10":
-                cell.imageView.image = UIImage(named: "Meadow Green")
-            default:
-                cell.imageView.image = UIImage(named: "Storybook Brown")
-            }
-            cell.titleLabel.text = record.title // 오브제 이름
+            // 오브제 데이터
+            let filteredRecords = travelRecords.filter { $0.bottle != "" }
+            guard indexPath.row < filteredRecords.count else { return cell } // 배열 범위 검사
+            let record = filteredRecords[indexPath.row]
+            configureCell(cell, with: record, isObjectView: true)
             print("OBJ Cell \(indexPath.row): \(record)")
         }
         return cell
+    }
+
+    private func configureCell(_ cell: TravelRecordCell, with record: TravelRecord, isObjectView: Bool) {
+        // 이미지 및 텍스트 설정
+        if isObjectView {
+            switch record.bottle {
+            case "value1": cell.imageView.image = UIImage(named: "Dreamy Pink")
+            case "value2": cell.imageView.image = UIImage(named: "Cloud Whisper")
+            case "value3": cell.imageView.image = UIImage(named: "Sunburst Yellow")
+            case "value4": cell.imageView.image = UIImage(named: "Radiant Orange")
+            case "value5": cell.imageView.image = UIImage(named: "Serene Sky")
+            case "value6": cell.imageView.image = UIImage(named: "Midnight Depth")
+            case "value7": cell.imageView.image = UIImage(named: "Wanderer's Flame")
+            case "value8": cell.imageView.image = UIImage(named: "Storybook Brown")
+            case "value9": cell.imageView.image = UIImage(named: "Ember Red")
+            case "value10": cell.imageView.image = UIImage(named: "Meadow Green")
+            default: cell.imageView.image = UIImage(named: "Storybook Brown")
+            }
+        } else {
+            switch record.bottle {
+            case "value1": cell.imageView.image = UIImage(named: "핑크")
+            case "value2": cell.imageView.image = UIImage(named: "클라우디")
+            case "value3": cell.imageView.image = UIImage(named: "밝은 노랑")
+            case "value4": cell.imageView.image = UIImage(named: "골드주황")
+            case "value5": cell.imageView.image = UIImage(named: "하늘색")
+            case "value6": cell.imageView.image = UIImage(named: "네이비")
+            case "value7": cell.imageView.image = UIImage(named: "보라색")
+            case "value8": cell.imageView.image = UIImage(named: "브라운")
+            case "value9": cell.imageView.image = UIImage(named: "레드")
+            case "value10": cell.imageView.image = UIImage(named: "연두색")
+            default: cell.imageView.image = UIImage(named: "한줄남기기X")
+            }
+        }
+        cell.titleLabel.text = record.title
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -531,7 +661,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             print("오브제 셀 클릭됨: \(indexPath.row), 선택된 레코드 ID: \(selectedRecord.id)")
             let objectModalVC = ObjectModal()
             objectModalVC.travelRecord = selectedRecord
-            objectModalVC.modalPresentationStyle = .fullScreen
+            objectModalVC.modalPresentationStyle = .overFullScreen
             present(objectModalVC, animated: false, completion: nil)
         }
     }
@@ -584,10 +714,13 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     }
 
     private func reloadTravelRecords() {
-        loadTravelRecords()
-        scrollableTravelCollectionView.reloadData()
-        updateCollectionViewHeight()
-        updateScrollViewContentSize()
+        self.loadTravelRecords() // 여행 기록 데이터 재로드
+        DispatchQueue.main.async {
+            self.scrollableTravelCollectionView.reloadData()
+            self.scrollableObjectCollectionView.reloadData()
+            self.updateCollectionViewHeight()
+            self.updateScrollViewContentSize()
+        }
     }
     
     private func updateScrollViewContentSize() {

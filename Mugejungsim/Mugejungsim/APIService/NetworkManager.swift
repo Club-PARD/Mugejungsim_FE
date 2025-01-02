@@ -75,6 +75,57 @@ class NetworkManager {
         }
     }
     
+    // MARK: - 단순 문자열/데이터 요청 메서드
+        func requestRawResponse(
+            _ endpoint: String,
+            method: HTTPMethod,
+            parameters: [String: String]? = nil,
+            body: Codable? = nil,
+            completion: @escaping (Result<String, Error>) -> Void
+        ) {
+            let url = baseURL + endpoint
+            let headers: HTTPHeaders = [
+                "Content-Type": "application/json"
+            ]
+            
+            let encoding: ParameterEncoding = (method == .get || method == .delete) ? URLEncoding.default : JSONEncoding.default
+            var bodyParameters: [String: Any]? = nil
+            
+            if let body = body {
+                do {
+                    let encoder = JSONEncoder()
+                    encoder.keyEncodingStrategy = .convertToSnakeCase
+                    let data = try encoder.encode(body)
+                    bodyParameters = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                } catch {
+                    print("Encoding Error: \(error)")
+                    completion(.failure(error))
+                    return
+                }
+            }
+            
+            AF.request(
+                url,
+                method: method,
+                parameters: bodyParameters ?? parameters,
+                encoding: encoding,
+                headers: headers
+            )
+            .validate(statusCode: 200..<300)
+            .responseData { response in
+                switch response.result {
+                case .success(let data):
+                    if let rawString = String(data: data, encoding: .utf8) {
+                        completion(.success(rawString))
+                    } else {
+                        completion(.failure(NSError(domain: "NetworkError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unable to decode response."])))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+    
     func resizeImage(image: UIImage, maxWidth: CGFloat, maxHeight: CGFloat) -> UIImage? {
         let size = image.size
         let widthRatio = maxWidth / size.width

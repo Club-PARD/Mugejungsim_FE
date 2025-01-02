@@ -10,13 +10,31 @@ import UIKit
 class ObjectModal: UIViewController {
     var travelRecord: TravelRecord? // 전달받을 여행 기록 데이터
     
-    private let scrollView = UIScrollView()
-    private let contentView = UIView()
-    private let ButtontContentView = UIView()
+    private let overlayView: UIView = { // 모달창 배경
+        let view = UIView()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
-    private let mode : String = ""
+    private let scrollView: UIScrollView = { // 스크롤 가능한 뷰
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.layer.cornerRadius = 12 // 모서리를 둥글게 설정
+        scrollView.clipsToBounds = true   // 콘텐츠가 모서리를 넘지 않도록 설정
+        scrollView.showsVerticalScrollIndicator = false   // 세로 스크롤바 숨김
+        return scrollView
+    }()
     
-    private let contentLabel: UILabel = {
+    private let contentView: UIView = { // 스크롤뷰 안에 들어갈 컨텐츠 뷰
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 12
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let contentLabel: UILabel = { // 제목 레이블
         let label = UILabel()
         label.text = "당신의 여행 컬러는\n\"바바 마젠타입니다.\""
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
@@ -27,197 +45,188 @@ class ObjectModal: UIViewController {
         return label
     }()
     
-    private let glassImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "moments")
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-
-        return imageView
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor(red: 0.141, green: 0.141, blue: 0.141, alpha: 1)
+        label.font = UIFont(name: "Pretendard-SemiBold", size: 17)
+        label.textAlignment = .center
+        label.numberOfLines = 1 // 한 줄로 제한
+        label.translatesAutoresizingMaskIntoConstraints = false // AutoLayout 활성화
+        return label
     }()
     
-    private let letterImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "yellow")
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-
-        return imageView
-    }()
-    
-    private let homeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("홈으로 돌아가기", for: .normal)
-        button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
-        button.setTitleColor(.white, for: .normal) // 폰트 색상을 흰색으로 설정
-        button.backgroundColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
-        button.layer.cornerRadius = 8
-        button.layer.shadowPath = UIBezierPath(roundedRect: button.bounds, cornerRadius: 8).cgPath
-        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
-        button.layer.shadowOpacity = 1
-        button.layer.shadowRadius = 1
-        button.layer.shadowOffset = CGSize(width: 0.5, height: 0.5)
-        button.layer.masksToBounds = false
+    private let glassButton: UIButton = { // 상단 버튼으로 변경
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "moments"), for: .normal) // 기본 이미지 설정
+        button.imageView?.contentMode = .scaleAspectFit // 이미지 뷰의 콘텐츠 모드 설정
+        button.clipsToBounds = true
+        button.addTarget(self, action: #selector(openUSDZPreviewController), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
+    private let backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "X_Button"), for: .normal)
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(goBack), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let separatorLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(red: 0.67, green: 0.67, blue: 0.67, alpha: 1)
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let closeButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "moments"), for: .normal) // 기본 이미지 설정
+        button.imageView?.contentMode = .scaleAspectFit // 이미지 뷰의 콘텐츠 모드 설정
+        button.clipsToBounds = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let letterImage: UIImageView = { // 중앙 이미지
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "yellow")
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        if let record = travelRecord {
+            print("TravelRecord exists: \(record)")
+            titleLabel.text = record.title ?? "제목 없음"
+        } else {
+            print("TravelRecord is nil")
+            titleLabel.text = "제목 없음"
+        }
+        
         setupUI()
-        homeButton.addTarget(self, action: #selector(homeButtonTapped), for: .touchUpInside)
-
         updateLabelText()
         updateImages()
+
     }
     
     private func setupUI() {
-        scrollView.backgroundColor = .white
-        scrollView.alwaysBounceVertical = true
-        scrollView.alwaysBounceHorizontal = false
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.isScrollEnabled = true
-        scrollView.contentSize = CGSize(width: view.frame.width, height: 1000)
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.layer.borderWidth = 1
-        contentView.layer.borderColor = UIColor.black.cgColor
-        
+        view.addSubview(overlayView)
         view.addSubview(scrollView)
+        
         scrollView.addSubview(contentView)
-        
+
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(separatorLine)
         contentView.addSubview(contentLabel)
-        contentView.addSubview(glassImage)
+        contentView.addSubview(glassButton)
         contentView.addSubview(letterImage)
+        contentView.addSubview(backButton)
         
-        view.addSubview(homeButton)
-        
-        setupConstraints()
-        setupCustomNavigationBar()
-    }
-    
-    private func setupConstraints() {
+        // 제약 조건 설정
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-
-            contentLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20),
-            contentLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-
-            glassImage.topAnchor.constraint(equalTo: contentLabel.bottomAnchor, constant: 20),
-            glassImage.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            glassImage.widthAnchor.constraint(equalToConstant: 200),
-            glassImage.heightAnchor.constraint(equalToConstant: 200),
-
-            letterImage.topAnchor.constraint(equalTo: glassImage.bottomAnchor, constant: 20),
-            letterImage.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            letterImage.widthAnchor.constraint(equalToConstant: 328),
-            letterImage.heightAnchor.constraint(equalToConstant: 610),
+            // Overlay
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            homeButton.topAnchor.constraint(equalTo: letterImage.bottomAnchor, constant: 20),
-            homeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            homeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
-            homeButton.heightAnchor.constraint(equalToConstant: 52),
-        ])
-    }
-    
-    // MARK: - 네비게이션 바
-    private func setupCustomNavigationBar() {
-        let navBar = UIView()
-        navBar.backgroundColor = .clear
-        navBar.translatesAutoresizingMaskIntoConstraints = false
-        
-        let backButton = UIButton(type: .system)
-        backButton.setImage(UIImage(named: "out"), for: .normal)
-        backButton.tintColor = .black
-        backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
-        backButton.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(navBar)
-        navBar.addSubview(backButton)
-        
-        NSLayoutConstraint.activate([
-            navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            navBar.heightAnchor.constraint(equalToConstant: 40),
+            // ScrollView
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -29),
             
-            backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
-            backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 20),
+            // ContentView
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            contentView.heightAnchor.constraint(equalToConstant: 900),
+            
+            // Separator Line
+            separatorLine.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 88),
+            separatorLine.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            separatorLine.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            separatorLine.heightAnchor.constraint(equalToConstant: 1),
+            
+            // Title Label
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 36), // 위 여백 36
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24), // 좌측 여백 24
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24), // 우측 여백 -24
+            titleLabel.heightAnchor.constraint(equalToConstant: 48), // 고정 높이 25
+            
+            // Glass Button
+            glassButton.topAnchor.constraint(equalTo: contentLabel.bottomAnchor, constant: 20), // 텍스트 아래 20
+            glassButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            glassButton.widthAnchor.constraint(equalToConstant: 145), // 너비 145
+            glassButton.heightAnchor.constraint(equalToConstant: 145), // 높이 145
+                
+            // Letter Image
+            letterImage.topAnchor.constraint(equalTo: glassButton.bottomAnchor, constant: 24), // 이미지 아래 20
+            letterImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            letterImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            letterImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -37),
+            
+            backButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 18),
+            backButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -18),
         ])
-    }
-    
-    @objc private func didTapCloseButton() {
-        let stopSelectingVC = StopSelectingViewController()
-        stopSelectingVC.modalTransitionStyle = .crossDissolve
-        stopSelectingVC.modalPresentationStyle = .overFullScreen
-        self.present(stopSelectingVC, animated: true, completion: nil)
-    }
-    
-    @objc private func didTapBackButton() {
-        dismiss(animated: true, completion: nil)
-        navigationController?.popViewController(animated: true)
-    }
-    
-    @objc private func homeButtonTapped() {
-        print("Home button frame: \(homeButton.frame)")
-        print("Home button isHidden: \(homeButton.isHidden)")
-        print("Home button isUserInteractionEnabled: \(homeButton.isUserInteractionEnabled)")
-        
-        let myRecordsVC = MyRecordsViewController()
-        myRecordsVC.modalPresentationStyle = .fullScreen
-        present(myRecordsVC, animated: true, completion: nil)
+        contentLabel.topAnchor.constraint(equalTo: separatorLine.bottomAnchor, constant: 28).isActive = true
+        contentLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24).isActive = true
+        contentLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24).isActive = true
     }
     
     private func updateImages() {
         guard let record = travelRecord else { return }
-        
+           
         switch record.bottle {
         case "value1":
-            glassImage.image = UIImage(named: "Dreamy Pink")
+            glassButton.setImage(UIImage(named: "Dreamy Pink"), for: .normal)
             letterImage.image = UIImage(named: "pink")
         case "value2":
-            glassImage.image = UIImage(named: "Cloud Whisper")
+            glassButton.setImage(UIImage(named: "Cloud Whisper"), for: .normal)
             letterImage.image = UIImage(named: "whisper")
         case "value3":
-            glassImage.image = UIImage(named: "Sunburst Yellow")
+            glassButton.setImage(UIImage(named: "Sunburst Yellow"), for: .normal)
             letterImage.image = UIImage(named: "yellow")
         case "value4":
-            glassImage.image = UIImage(named: "Radiant Orange")
+            glassButton.setImage(UIImage(named: "Radiant Orange"), for: .normal)
             letterImage.image = UIImage(named: "orange")
         case "value5":
-            glassImage.image = UIImage(named: "Serene Sky")
+            glassButton.setImage(UIImage(named: "Serene Sky"), for: .normal)
             letterImage.image = UIImage(named: "serene_sky")
         case "value6":
-            glassImage.image = UIImage(named: "Midnight Depth")
+            glassButton.setImage(UIImage(named: "Midnight Depth"), for: .normal)
             letterImage.image = UIImage(named: "midnight_depth")
         case "value7":
-            glassImage.image = UIImage(named: "Wanderer's Flame")
+            glassButton.setImage(UIImage(named: "Wanderer's Flame"), for: .normal)
             letterImage.image = UIImage(named: "wandarer")
         case "value8":
-            glassImage.image = UIImage(named: "Storybook Brown")
+            glassButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
             letterImage.image = UIImage(named: "brown")
         case "value9":
-            glassImage.image = UIImage(named: "Ember Red")
+            glassButton.setImage(UIImage(named: "Ember Red"), for: .normal)
             letterImage.image = UIImage(named: "red")
         case "value10":
-            glassImage.image = UIImage(named: "Meadow Green")
+            glassButton.setImage(UIImage(named: "Meadow Green"), for: .normal)
             letterImage.image = UIImage(named: "green")
         default:
-            glassImage.image = UIImage(named: "Storybook Brown")
+            glassButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
             letterImage.image = UIImage(named: "brown")
         }
     }
-    
+       
     private func updateLabelText() {
         guard let record = travelRecord else { return }
         let labelText: String
-        
+           
         switch record.bottle {
         case "value1":
             labelText = "당신의 여행 컬러는\n\"Dreamy Pink\"입니다."
@@ -243,5 +252,15 @@ class ObjectModal: UIViewController {
             labelText = "당신의 여행 컬러는\n\"알 수 없음\"입니다."
         }
         contentLabel.text = labelText
+    }
+    
+    @objc private func goBack() {
+        dismiss(animated: false, completion: nil)
+    }
+    
+    @objc func openUSDZPreviewController() {
+        let USDZPreviewVC = USDZPreviewViewController()
+        USDZPreviewVC.modalPresentationStyle = .fullScreen
+        present(USDZPreviewVC, animated: false, completion: nil)
     }
 }
