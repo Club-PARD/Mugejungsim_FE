@@ -75,8 +75,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
         button.backgroundColor = UIColor.white
         button.layer.cornerRadius = 3.3
-        button.layer.borderWidth = 1.0
-        button.layer.borderColor = UIColor.systemGray.cgColor
+        button.layer.borderWidth = 1.24
+        button.layer.borderColor = #colorLiteral(red: 0.7233663201, green: 0.7233663201, blue: 0.7233663201, alpha: 1)
 
         return button
     }()
@@ -85,7 +85,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         let label = UILabel()
         label.text = "0/25"
         label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.font = UIFont(name: "Pretendard-Medium", size : 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -241,16 +241,16 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         backButton.addTarget(self, action: #selector(goBack), for: .touchUpInside)
         backButton.translatesAutoresizingMaskIntoConstraints = false
 
-        let saveButton = UIButton(type: .system)
-        saveButton.setTitle("임시저장", for: .normal)
-        saveButton.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
-        saveButton.setTitleColor(UIColor.lightGray, for: .normal)
-        saveButton.addTarget(self, action: #selector(saveTemporarily), for: .touchUpInside)
-        saveButton.translatesAutoresizingMaskIntoConstraints = false
+//        let saveButton = UIButton(type: .system)
+//        saveButton.setTitle("임시저장", for: .normal)
+//        saveButton.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
+//        saveButton.setTitleColor(UIColor.lightGray, for: .normal)
+//        saveButton.addTarget(self, action: #selector(saveTemporarily), for: .touchUpInside)
+//        saveButton.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(navBar)
         navBar.addSubview(backButton)
-        navBar.addSubview(saveButton)
+//        navBar.addSubview(saveButton)
         navBar.addSubview(imageCountLabel)
 
         NSLayoutConstraint.activate([
@@ -262,8 +262,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor, constant: 25),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
 
-            saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor, constant: 25),
-            saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
+//            saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor, constant: 25),
+//            saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
 
             imageCountLabel.centerYAnchor.constraint(equalTo: backButton.centerYAnchor),
             imageCountLabel.centerXAnchor.constraint(equalTo: navBar.centerXAnchor)
@@ -407,9 +407,9 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         contentView.addSubview(categoryContainer)
 
         let categoryLabel = UILabel()
-        categoryLabel.text = "카테고리 선택"
+        categoryLabel.text = "당신의 Moments는?"
         categoryLabel.font = UIFont(name: "Pretendard-SemiBold", size: 18)
-        categoryLabel.textColor = .black
+        categoryLabel.textColor = #colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1)
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
         categoryContainer.addSubview(categoryLabel)
 
@@ -479,7 +479,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         for title in buttonTitles {
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
-            button.titleLabel?.font = selectedSubCategories.contains(title) ? UIFont(name: "Pretendard-SemiBold", size: 14) : UIFont(name: "Pretendard-Regular", size: 14)
+            button.titleLabel?.font = selectedSubCategories.contains(title) ? UIFont(name: "Pretendard-SemiBold", size: 14) : UIFont(name: "Pretendard-Medium", size: 14)
             button.setTitleColor(.black, for: .normal)
             button.layer.borderWidth = 1.25
             button.layer.cornerRadius = 4
@@ -509,8 +509,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
 
     private func setupExpressionField() {
         let expressionLabel = UILabel()
-        expressionLabel.text = "글로 표현해보세요!"
-        expressionLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        expressionLabel.text = "감정으로 Moments를 채워주세요!"
+        expressionLabel.font = UIFont(name: "Pretendard-SemiBold", size: 18)
         expressionLabel.textColor = .black
         expressionLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(expressionLabel)
@@ -563,8 +563,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         characterCountLabel.translatesAutoresizingMaskIntoConstraints = false
         characterCountLabel.text = "0 / \(maxCharacterCount)"
         characterCountLabel.textColor = .systemGray
-        characterCountLabel.font = UIFont.systemFont(ofSize: 15)
-        backgroundView.addSubview(characterCountLabel) // characterCountLabel을 backgroundView에 추가
+        characterCountLabel.font = UIFont(name: "Pretendard-Regular", size: 15)
+        textView.addSubview(characterCountLabel) // characterCountLabel을 backgroundView에 추가
 
         NSLayoutConstraint.activate([
             // Text Input Background
@@ -598,17 +598,17 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         }
     }
 
-    @objc private func saveTemporarily() {
-        presentSaveDraftModal()
-    }
-    
-    func presentSaveDraftModal() {
-        let saveDraftModal = SaveDraftModal() // 커스텀 모달 뷰 컨트롤러
-            saveDraftModal.modalPresentationStyle = .overFullScreen // 화면 전체에 표시
-            saveDraftModal.modalTransitionStyle = .crossDissolve // 전환 애니메이션 설정
-            present(saveDraftModal, animated: true, completion: nil)
-        }
-    
+//    @objc private func saveTemporarily() {
+//        presentSaveDraftModal()
+//    }
+//    
+//    func presentSaveDraftModal() {
+//        let saveDraftModal = SaveDraftModal() // 커스텀 모달 뷰 컨트롤러
+//            saveDraftModal.modalPresentationStyle = .overFullScreen // 화면 전체에 표시
+//            saveDraftModal.modalTransitionStyle = .crossDissolve // 전환 애니메이션 설정
+//            present(saveDraftModal, animated: true, completion: nil)
+//        }
+//    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return images.count
     }
@@ -652,10 +652,14 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         mainImageView.image = images[currentIndex] // 선택한 사진 업데이트
         textView.text = texts[currentIndex] // 선택한 사진의 텍스트 불러오기
         selectedSubCategories = selectedCategoriesForImages[currentIndex] // 선택한 사진의 카테고리 불러오기
+        
+        updatePlaceholderVisibility()
+        updateCharacterCountLabel()
 
         // UI 업데이트
         updateCategoryButtonsAppearance() // 하위 카테고리 버튼 UI 업데이트
         setupButtonsAboutCategoryButton() // 세부 카테고리 버튼 다시 설정
+        updateSubHowLabel()
         updateImageCountLabels()
         updateNextButtonState(for: nextButton)
     }
@@ -692,22 +696,38 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         updateImageCountLabels()
     }
 
-    func textViewDidChange(_ textView: UITextView) {
+    private func updateCharacterCountLabel() {
         let characterCount = textView.text.count
         characterCountLabel.text = "\(characterCount) / \(maxCharacterCount)"
         characterCountLabel.textColor = characterCount > maxCharacterCount ? .systemRed : .systemGray
-
-        if currentIndex < texts.count {         // 현재 사진의 텍스트 실시간 업데이트
-            texts[currentIndex] = textView.text
-        }
+    }
         
-        // 플레이스홀더 업데이트
+    // Placeholder 업데이트 함수 추가
+    private func updatePlaceholderVisibility() {
         if let placeholderLabel = textView.subviews.first(where: { $0 is UILabel }) as? UILabel {
             placeholderLabel.isHidden = !textView.text.isEmpty
         }
-        
-        updateNextButtonState(for: nextButton)  // 버튼 상태 업데이트
     }
+
+    // `textViewDidChange`에서 placeholder 업데이트
+    func textViewDidChange(_ textView: UITextView) {
+        let characterCount = textView.text.count
+
+        // 현재 이미지의 텍스트 업데이트
+        if currentIndex < texts.count {
+            texts[currentIndex] = textView.text
+        }
+
+        // Placeholder 업데이트
+        updatePlaceholderVisibility()
+
+        // 텍스트 카운트 라벨 업데이트
+        updateCharacterCountLabel()
+
+        // 버튼 상태 업데이트
+        updateNextButtonState(for: nextButton)
+    }
+    
     var selectedButton: UIButton?
 
     private func setupCategoryButtons() {
@@ -821,7 +841,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             sender.backgroundColor = UIColor.black
             sender.layer.borderColor = UIColor(red: 0.961, green: 0.961, blue: 0.973, alpha: 1).cgColor
             sender.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
-            sender.setTitleColor(.black, for: .normal)
+//            sender.setTitleColor(.black, for: .normal)
         } else {
             // 최대 선택 개수 제한 (예: 3개)
             guard selectedSubCategories.count < 3 else {
@@ -845,7 +865,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             selectedCategoriesForImages[currentIndex] = selectedSubCategories
         }
 
-        print("사진 \(currentIndex + 1)의 현재 카테고리: \(selectedCategoriesForImages[currentIndex])")
+//        print("사진 \(currentIndex + 1)의 현재 카테고리: \(selectedCategoriesForImages[currentIndex])")
 
         // UI 업데이트
         updateCategoryButtonsAppearance()

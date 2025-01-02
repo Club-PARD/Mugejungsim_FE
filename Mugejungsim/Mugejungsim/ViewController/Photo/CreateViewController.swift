@@ -64,16 +64,16 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         return textField
     }()
     
-    let saveButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("임시저장", for: .normal)
-        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
-        button.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
-        button.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
+//    let saveButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        button.setTitle("임시저장", for: .normal)
+//        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
+//        button.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
+//        button.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
+//        button.translatesAutoresizingMaskIntoConstraints = false
+//        return button
+//    }()
+//    
     let titleUnderline: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // 기본 색상
@@ -89,21 +89,22 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    @objc private func didTapSaveButton() {
-        print("SaveButton 누름")
-
-        // SaveDraftModal 모달을 생성
-        let saveDraftModal = SaveDraftModal()
-        saveDraftModal.modalPresentationStyle = .overFullScreen // 전체 화면 모달로 띄움
-        saveDraftModal.view.alpha = 0 // 초기 알파 값 설정
-
-        // 모달 추가 및 애니메이션
-        self.present(saveDraftModal, animated: false) {
-            UIView.animate(withDuration: 0.3) {
-                saveDraftModal.view.alpha = 1 // 서서히 등장
-            }
-        }
-    }
+    
+//    @objc private func didTapSaveButton() {
+//        print("SaveButton 누름")
+//
+//        // SaveDraftModal 모달을 생성
+//        let saveDraftModal = SaveDraftModal()
+//        saveDraftModal.modalPresentationStyle = .overFullScreen // 전체 화면 모달로 띄움
+//        saveDraftModal.view.alpha = 0 // 초기 알파 값 설정
+//
+//        // 모달 추가 및 애니메이션
+//        self.present(saveDraftModal, animated: false) {
+//            UIView.animate(withDuration: 0.3) {
+//                saveDraftModal.view.alpha = 1 // 서서히 등장
+//            }
+//        }
+//    }
 
     let locationLabel: UILabel = {
         let label = UILabel()
@@ -282,8 +283,8 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         titleUnderline.backgroundColor = newColor
         titleCount.textColor = newColor
 
-        // "임시저장" 버튼 활성화 여부
-        validateInputsForSaveButton()
+//        // "임시저장" 버튼 활성화 여부
+//        validateInputsForSaveButton()
     }
     
     @objc private func locationTextFieldDidChange(_ textField: UITextField) {
@@ -304,28 +305,28 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         locationCount.textColor = newColor
 
         // "임시저장" 버튼 활성화 여부
-        validateInputsForSaveButton()
+//        validateInputsForSaveButton()
     }
     
-    private func validateInputsForSaveButton() {
-        // 제목, 여행지, 동행자 상태 확인
-        let isTitleFilled = !(titleTextField.text?.isEmpty ?? true)
-        let isLocationFilled = !(locationTextField.text?.isEmpty ?? true)
-        let isCompanionSelected = selectedCompanion != nil
-
-        // 하나라도 입력 또는 선택된 경우 활성화
-        let isAnyFieldFilled = isTitleFilled || isLocationFilled || isCompanionSelected
-
-        // 버튼 활성화/비활성화 및 색상 업데이트
-        saveButton.setTitleColor(
-            isAnyFieldFilled
-                ? UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1) // #979797
-                : UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), // 기본 색상
-            for: .normal
-        )
-
-        saveButton.isEnabled = isAnyFieldFilled // 버튼 활성화 상태 설정
-    }
+//    private func validateInputsForSaveButton() {
+//        // 제목, 여행지, 동행자 상태 확인
+//        let isTitleFilled = !(titleTextField.text?.isEmpty ?? true)
+//        let isLocationFilled = !(locationTextField.text?.isEmpty ?? true)
+//        let isCompanionSelected = selectedCompanion != nil
+//
+//        // 하나라도 입력 또는 선택된 경우 활성화
+//        let isAnyFieldFilled = isTitleFilled || isLocationFilled || isCompanionSelected
+//
+//        // 버튼 활성화/비활성화 및 색상 업데이트
+//        saveButton.setTitleColor(
+//            isAnyFieldFilled
+//                ? UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1) // #979797
+//                : UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), // 기본 색상
+//            for: .normal
+//        )
+//
+//        saveButton.isEnabled = isAnyFieldFilled // 버튼 활성화 상태 설정
+//    }
     
     @objc private func updateClearButtonState(_ textField: UITextField) {
         if textField == titleTextField {
@@ -362,7 +363,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         navBar.addSubview(separator)
         navBar.addSubview(titleLabel)
         navBar.addSubview(backButton)
-        navBar.addSubview(saveButton)
+//        navBar.addSubview(saveButton)
         
         // Add `titleCount` to the same view hierarchy as `titleTextField`
 //        view.addSubview(titleCount)
@@ -386,8 +387,8 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             
-            saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
-            saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
+//            saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
+//            saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
                  
         ])
     }
@@ -401,7 +402,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             titleTextField.text = ""
             titleCount.text = "0 / \(maxTitleLength)" // 제목 글자 수 업데이트
             clearButton1.isHidden = true // 버튼 숨기기
-            validateInputsForSaveButton()
+//            validateInputsForSaveButton()
         } else if sender == clearButton2 {
             locationTextField.text = ""
             clearButton2.isHidden = true // 버튼 숨기기
@@ -563,7 +564,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             }
             previousButton = button
         }
-        validateInputsForSaveButton()
+//        validateInputsForSaveButton()
     }
     
     @objc func companionButtonTapped(_ sender: UIButton) {
@@ -777,7 +778,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         
         // 유효성 검사 실행
         validateInputs()
-        validateInputsForSaveButton()
+//        validateInputsForSaveButton()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

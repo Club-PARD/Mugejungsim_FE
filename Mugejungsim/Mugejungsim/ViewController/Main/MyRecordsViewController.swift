@@ -153,17 +153,44 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         view.isHidden = true
         return view
     }()
-    // 우측 하단 핑크 버튼
+    
     let floatingButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0)
-        button.setTitle("＋", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 30)
+        button.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0) // 기본 버튼 색상
         button.layer.cornerRadius = 30
         button.translatesAutoresizingMaskIntoConstraints = false
+
+        // Drop Shadow 설정
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 1, height: 1) // X: 1, Y: 1
+        button.layer.shadowRadius = 4.5 // Blur 설정
+        button.layer.shadowOpacity = 0.25 // 그림자 투명도 설정 (25%)
+        button.layer.masksToBounds = false
+
+        // "+" 이미지 추가
+        let plusImageView = UIImageView()
+        plusImageView.image = UIImage(named: "+")?.withRenderingMode(.alwaysTemplate)
+        plusImageView.tintColor = .white // 기본 "+ 색상"
+        plusImageView.contentMode = .scaleAspectFit
+        plusImageView.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(plusImageView)
+
+        // "+" 이미지 레이아웃 설정
+        NSLayoutConstraint.activate([
+            plusImageView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            plusImageView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            plusImageView.widthAnchor.constraint(equalToConstant: 20),
+            plusImageView.heightAnchor.constraint(equalToConstant: 20)
+        ])
+
+        // 이미지뷰를 버튼에 연결
+        button.accessibilityElements = [plusImageView]
+
         return button
     }()
+    
+    // 버튼 색상 토글 상태를 저장하는 변수
+    private var isFloatingButtonToggled = false
     
     private let contextMenuContainer: UIView = {
         let view = UIView()
@@ -201,61 +228,68 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
 //        segmentedControlChanged()
 //    }
     
-    private func createMenuButton(title: String, iconName: String) -> UIButton {
+    private func createMenuButton(title: String, iconName: String, spacing: CGFloat) -> UIButton {
         let button = UIButton(type: .system)
-        button.setTitle(" \(title)", for: .normal) // 텍스트와 아이콘 사이 간격을 위한 공백 추가
-        button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 16)
-        
-        let iconImage = UIImage(named: iconName)
+        button.setTitle(title, for: .normal) // 텍스트 설정
+        button.setTitleColor(#colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1), for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 16) // Pretendard-Regular 폰트 적용
+
+        let iconImage = UIImage(named: iconName)?.withRenderingMode(.alwaysOriginal)
         button.setImage(iconImage, for: .normal)
-        
+
         button.tintColor = .black
         button.backgroundColor = .white
-        button.contentHorizontalAlignment = .center
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
-        
+
+        // 버튼 내 텍스트와 이미지 중앙 정렬
+        button.contentHorizontalAlignment = .center
+        button.contentVerticalAlignment = .center
+
+        // 텍스트와 이미지 간 간격 설정
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -spacing / 2, bottom: 0, right: spacing / 2)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing / 2, bottom: 0, right: -spacing / 2)
+
         NSLayoutConstraint.activate([
-            button.heightAnchor.constraint(equalToConstant: 44)
+            button.heightAnchor.constraint(equalToConstant: 44) // 버튼 높이 고정
         ])
-        
+            
         return button
     }
     
     private func setupContextMenu() {
         view.addSubview(contextMenuContainer)
-        
-        let addButton = createMenuButton(title: "여행 추가", iconName: "image-add")
-        let deleteButton = createMenuButton(title: "여행 삭제", iconName: "trash")
-        
+            
+        let addButton = createMenuButton(title: "여행 추가", iconName: "image-add", spacing: 11)
+        let deleteButton = createMenuButton(title: "여행 삭제", iconName: "trash", spacing: 10)
+            
         addButton.addTarget(self, action: #selector(addTripTapped), for: .touchUpInside)
         deleteButton.addTarget(self, action: #selector(deleteTripTapped), for: .touchUpInside)
-        
+            
         let divider = UIView()
-        divider.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0)
+        divider.backgroundColor = #colorLiteral(red: 0.8110429645, green: 0.8110429049, blue: 0.8110429049, alpha: 1)
         divider.translatesAutoresizingMaskIntoConstraints = false
-        
+            
         contextMenuContainer.addSubview(addButton)
         contextMenuContainer.addSubview(divider)
         contextMenuContainer.addSubview(deleteButton)
-        
+            
         NSLayoutConstraint.activate([
-            contextMenuContainer.widthAnchor.constraint(equalToConstant: 146),
+            contextMenuContainer.widthAnchor.constraint(equalToConstant: 143),
             contextMenuContainer.heightAnchor.constraint(equalToConstant: 90),
             contextMenuContainer.trailingAnchor.constraint(equalTo: floatingButton.trailingAnchor),
             contextMenuContainer.bottomAnchor.constraint(equalTo: floatingButton.topAnchor, constant: -10),
-            
+                
             addButton.topAnchor.constraint(equalTo: contextMenuContainer.topAnchor),
             addButton.leadingAnchor.constraint(equalTo: contextMenuContainer.leadingAnchor),
             addButton.trailingAnchor.constraint(equalTo: contextMenuContainer.trailingAnchor),
             addButton.heightAnchor.constraint(equalToConstant: 45),
-            
+                
             divider.topAnchor.constraint(equalTo: addButton.bottomAnchor),
             divider.leadingAnchor.constraint(equalTo: contextMenuContainer.leadingAnchor, constant: 1),
             divider.trailingAnchor.constraint(equalTo: contextMenuContainer.trailingAnchor, constant: -1),
             divider.heightAnchor.constraint(equalToConstant: 1),
-            
+                
             deleteButton.topAnchor.constraint(equalTo: divider.bottomAnchor),
             deleteButton.leadingAnchor.constraint(equalTo: contextMenuContainer.leadingAnchor),
             deleteButton.trailingAnchor.constraint(equalTo: contextMenuContainer.trailingAnchor),
@@ -267,6 +301,12 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         let createViewController = CreateViewController()
         createViewController.modalPresentationStyle = .fullScreen
         self.present(createViewController, animated: false, completion: nil)
+    }
+    
+    @objc private func toggleContextMenu() {
+        UIView.animate(withDuration: 0.3) {
+            self.contextMenuContainer.isHidden.toggle()
+        }
     }
     
     @objc private func deleteTripTapped() {
@@ -342,12 +382,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         alert.addAction(cancelAction)
 
         present(alert, animated: true, completion: nil)
-    }
-    
-    @objc private func toggleContextMenu() {
-        UIView.animate(withDuration: 0.3) {
-            self.contextMenuContainer.isHidden.toggle()
-        }
     }
     
     private func setupUI() {
@@ -438,6 +472,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     
     private func setupActions() {
+        floatingButton.addTarget(self, action: #selector(toggleFloatingButtonState), for: .touchUpInside)
         floatingButton.addTarget(self, action: #selector(toggleContextMenu), for: .touchUpInside)                   // 플로팅 버튼 클릭 이벤트 설정
         segmentedControl.addTarget(self, action: #selector(segmentedControlChanged), for: .valueChanged)            // 세그먼트 컨트롤 값 변경 이벤트 설정
     }
@@ -452,6 +487,21 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         scrollableObjectCollectionView.dataSource = self
         scrollableObjectCollectionView.register(TravelRecordCell.self, forCellWithReuseIdentifier: "TravelRecordCell")
     }
+    
+    @objc private func toggleFloatingButtonState() {
+            if let plusImageView = floatingButton.subviews.first(where: { $0 is UIImageView }) as? UIImageView {
+                if isFloatingButtonToggled {
+                    // 원래 상태로 복귀
+                    floatingButton.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0) // 기본 버튼 색상
+                    plusImageView.tintColor = .white // 기본 "+ 색상"
+                } else {
+                    // 클릭된 상태
+                    floatingButton.backgroundColor = UIColor(red: 244/255, green: 245/255, blue: 251/255, alpha: 1.0) // f4f5fb 색상
+                    plusImageView.tintColor = UIColor(red: 117/255, green: 115/255, blue: 195/255, alpha: 1.0) // 7573c3 색상
+                }
+                isFloatingButtonToggled.toggle()
+            }
+        }
     
     @objc private func segmentedControlChanged() {
         // 선택된 세그먼트 인덱스에 따라 다른 CollectionView 표시
@@ -509,76 +559,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         return 0
     }
     
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
-//        var record: TravelRecord
-//        if collectionView == scrollableTravelCollectionView {
-//            record = travelRecords[indexPath.row] // 여행 기록 데이터
-//        } else if collectionView == scrollableObjectCollectionView {
-//            let filteredRecords = travelRecords.filter { $0.bottle != "" }
-//            record = filteredRecords[indexPath.row] // 오브제 데이터
-//        } else {
-//            return UICollectionViewCell() // 기본적으로 빈 셀을 리턴
-//        }
-//        
-//        
-//        if collectionView == scrollableTravelCollectionView {
-//            switch record.bottle {
-//            case "value1":
-//                cell.imageView.image = UIImage(named: "핑크")
-//            case "value2":
-//                cell.imageView.image = UIImage(named: "클라우디")
-//            case "value3":
-//                cell.imageView.image = UIImage(named: "밝은 노랑")
-//            case "value4":
-//                cell.imageView.image = UIImage(named: "골드주황")
-//            case "value5":
-//                cell.imageView.image = UIImage(named: "하늘색")
-//            case "value6":
-//                cell.imageView.image = UIImage(named: "네이비")
-//            case "value7":
-//                cell.imageView.image = UIImage(named: "보라색")
-//            case "value8":
-//                cell.imageView.image = UIImage(named: "브라운")
-//            case "value9":
-//                cell.imageView.image = UIImage(named: "레드")
-//            case "value10":
-//                cell.imageView.image = UIImage(named: "연두색")
-//            default:
-//                cell.imageView.image = UIImage(named: "한줄남기기X") // 기본 이미지
-//            }
-//            cell.titleLabel.text = record.title // 여행 기록 제목
-//            print("Cell \(indexPath.row): \(record)")
-//        } else if collectionView == scrollableObjectCollectionView {
-//            switch record.bottle {
-//            case "value1":
-//                cell.imageView.image = UIImage(named: "Dreamy Pink")
-//            case "value2":
-//                cell.imageView.image = UIImage(named: "Cloud Whisper")
-//            case "value3":
-//                cell.imageView.image = UIImage(named: "Sunburst Yellow")
-//            case "value4":
-//                cell.imageView.image = UIImage(named: "Radiant Orange")
-//            case "value5":
-//                cell.imageView.image = UIImage(named: "Serene Sky")
-//            case "value6":
-//                cell.imageView.image = UIImage(named: "Midnight Depth")
-//            case "value7":
-//                cell.imageView.image = UIImage(named: "Wanderer's Flame")
-//            case "value8":
-//                cell.imageView.image = UIImage(named: "Storybook Brown")
-//            case "value9":
-//                cell.imageView.image = UIImage(named: "Ember Red")
-//            case "value10":
-//                cell.imageView.image = UIImage(named: "Meadow Green")
-//            default:
-//                cell.imageView.image = UIImage(named: "Storybook Brown")
-//            }
-//            cell.titleLabel.text = record.title // 오브제 이름
-//            print("OBJ Cell \(indexPath.row): \(record)")
-//        }
-//        return cell
-//    }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TravelRecordCell", for: indexPath) as! TravelRecordCell
 
@@ -748,6 +728,7 @@ class TravelRecordCell: UICollectionViewCell {
     let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 4
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
         return imageView
