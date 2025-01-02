@@ -2,7 +2,6 @@ import UIKit
 
 class ResultViewController: UIViewController {
 
-    // MARK: - Properties (UI Elements)
     var recordID: String = ""
 
     let memoryLabel: UILabel = {
@@ -21,7 +20,7 @@ class ResultViewController: UIViewController {
         label.text = "유리병을 터치하고 움직여 보세요!"
         label.numberOfLines = 0
         label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
-        label.font = UIFont(name: "Pretendard-SemiBold", size: 17)
+        label.font = UIFont(name: "Pretendard-Regular", size: 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -56,18 +55,18 @@ class ResultViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
 
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-            
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            print("ResultViewController에서 데이터 확인:")
-            print("oneLine1: \(record.oneLine1)")
-        } else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-        }
-        
+//        guard let recordUUID = Int(recordID) else {
+//            print("유효하지 않은 recordID: \(recordID)")
+//            return
+//        }
+//            
+//        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
+//            print("ResultViewController에서 데이터 확인:")
+//            print("oneLine1: \(record.oneLine1!)")
+//        } else {
+//            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+//        }
+//        
         // 버튼 액션 연결
         openPreviewButton.addTarget(self, action: #selector(openUSDZPreviewController), for: .touchUpInside)
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
@@ -117,14 +116,16 @@ class ResultViewController: UIViewController {
 
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            memoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 177),
+//            memoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 175),
             memoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            memoryLabel.bottomAnchor.constraint(equalTo: touchLabel.topAnchor, constant: -37),
             
-            touchLabel.topAnchor.constraint(equalTo: memoryLabel.bottomAnchor, constant: 14),
             touchLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            touchLabel.bottomAnchor.constraint(equalTo: openPreviewButton.topAnchor, constant: -37),
+            
             
             openPreviewButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            openPreviewButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 50),
+            openPreviewButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
             openPreviewButton.widthAnchor.constraint(equalToConstant: 200),
             openPreviewButton.heightAnchor.constraint(equalToConstant: 200),
 
@@ -152,14 +153,16 @@ class ResultViewController: UIViewController {
     
     private func updateImages() {
         // 병 이미지도 여기서 관리하라!
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+//        guard let recordUUID = Int(recordID) else {
+//            print("유효하지 않은 recordID: \(recordID)")
+//            return
+//        }
+//        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
         
-        // bottle(glass)
-        switch record?.oneLine1 {
+//         bottle(glass)
+//        print("      oneline1 in ResultVC: \(record?.oneLine1)")
+//        print(TravelRecordManager.shared.temporaryOneline!)
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             openPreviewButton.setImage(UIImage(named: "Dreamy Pink"), for: .normal)
         case "value2":

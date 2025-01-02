@@ -20,17 +20,21 @@ class NetworkManager {
             "Content-Type": "application/json"
         ]
         
-        var encoding: ParameterEncoding = URLEncoding.default
-        if method == .post || method == .patch {
-            encoding = JSONEncoding.default
+        let encoding: ParameterEncoding = (method == .get || method == .delete) ? URLEncoding.default : JSONEncoding.default
+        var bodyParameters: [String: Any]? = nil
+                
+        if let body = body {
+            do {
+                let encoder = JSONEncoder()
+                encoder.keyEncodingStrategy = .convertToSnakeCase
+                let data = try encoder.encode(body)
+                bodyParameters = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            } catch {
+                print("Encoding Error: \(error)")
+                completion(.failure(error))
+                return
+            }
         }
-        
-        let bodyParameters: Parameters? = {
-            guard let body = body else { return nil }
-            let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .useDefaultKeys
-            return try? encoder.encode(body).toDictionary()
-        }()
         
         // Print request details
         print("=== Request ===")
@@ -82,52 +86,6 @@ class NetworkManager {
         let renderer = UIGraphicsImageRenderer(size: newSize)
         return renderer.image { _ in
             image.draw(in: CGRect(origin: .zero, size: newSize))
-        }
-    }
-    
-    func uploadImages(
-        _ endpoint: String,
-        photos: [[String: Any]],
-        completion: @escaping (Result<APIResponse, Error>) -> Void
-    ) {
-        let url = baseURL + endpoint
-        let headers: HTTPHeaders = [
-            "Content-Type": "application/json"
-        ]
-
-        // JSON 데이터를 생성
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: ["photos": photos], options: []) else {
-            print("Failed to serialize JSON")
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to serialize JSON"])))
-            return
-        }
-
-        // 디버깅용 출력
-        if let jsonString = String(data: jsonData, encoding: .utf8) {
-            print("JSON Payload: \(jsonString)")
-        }
-
-        // 서버로 요청
-        AF.request(
-            url,
-            method: .post,
-            parameters: nil,
-            encoding: JSONEncoding.default,
-            headers: headers
-        )
-        .validate(statusCode: 200..<300)
-        .responseDecodable(of: APIResponse.self) { response in
-            switch response.result {
-            case .success(let apiResponse):
-                print("Upload Success:", apiResponse)
-                completion(.success(apiResponse))
-            case .failure(let error):
-                print("Upload Failure:", error.localizedDescription)
-                if let data = response.data {
-                    print("Response Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
-                }
-                completion(.failure(error))
-            }
         }
     }
 }

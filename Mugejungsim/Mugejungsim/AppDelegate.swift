@@ -8,6 +8,8 @@
 import UIKit
 import KakaoSDKAuth
 import KakaoSDKCommon
+import UserNotifications
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -36,8 +38,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-
     
-
+    // 알림을 클릭했을 때 특정 페이지로 이동
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let userInfo = response.notification.request.content.userInfo
+            
+        if let page = userInfo["page"] as? String {
+            DispatchQueue.main.async {
+                if let window = UIApplication.shared.windows.first {
+                    let rootViewController = window.rootViewController
+                        
+                    if page == "MyRecordsViewController" {
+                        let myRecordsVC = MyRecordsViewController()
+                        myRecordsVC.modalPresentationStyle = .fullScreen
+                        rootViewController?.present(myRecordsVC, animated: true, completion: nil)
+                    }
+                        
+                    if page == "LoginViewController" {
+                        let otherVC = LoginViewController()
+                        otherVC.modalPresentationStyle = .fullScreen
+                        rootViewController?.present(otherVC, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+        completionHandler()
+    }
 }
 
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .sound, .badge])
+    }
+}

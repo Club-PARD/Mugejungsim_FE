@@ -50,6 +50,11 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         countLabel.textColor = #colorLiteral(red: 0.6666666667, green: 0.6666666667, blue: 0.6666666667, alpha: 1)
         countLabel.font = UIFont(name: "Pretendard-Medium", size: 8.59)
         countLabel.textAlignment = .center
+        
+        // 자간 설정
+        let attributedString = NSMutableAttributedString(string: "0 / 25")
+        attributedString.addAttribute(.kern, value: -0.21, range: NSRange(location: 0, length: attributedString.length))
+        countLabel.attributedText = attributedString
 
         // 자간 설정
         let attributedString = NSMutableAttributedString(string: "0 / 25")
@@ -272,10 +277,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     @objc private func goBack() {
-            delegate?.didTapBackButton() // 이전 화면의 동작 실행
-            dismiss(animated: true, completion: nil)
-            navigationController?.popViewController(animated: true)
-        }
+        delegate?.didTapBackButton() // 이전 화면의 동작 실행
+        dismiss(animated: true, completion: nil)
+        navigationController?.popViewController(animated: true)
+    }
     
     private func setupToolbar() {
         doneToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 44))
@@ -322,7 +327,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             }
         }
     }
-
+    
     @objc private func keyboardWillHide(_ notification: Notification) {
         UIView.animate(withDuration: 0.3) {
             self.view.transform = .identity
@@ -432,7 +437,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         howLabel.font = UIFont(name: "Pretendard-SemiBold", size: 18)
         howLabel.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         howLabel.translatesAutoresizingMaskIntoConstraints = false
-
         subHowLabel = UILabel()
         subHowLabel.text = "최대 3개까지 선택할 수 있어요. (0 / 3)"
         subHowLabel.font = UIFont(name: "Pretendard-Light", size: 12)
@@ -579,6 +583,10 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             textView.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor),
             textView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
             textView.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -8),
+            
+            // Placeholder Label
+            placeholderLabel.topAnchor.constraint(equalTo: textView.topAnchor, constant: textView.textContainerInset.top),
+            placeholderLabel.leadingAnchor.constraint(equalTo: textView.leadingAnchor, constant: textView.textContainerInset.left),
 
             // Placeholder Label
             placeholderLabel.topAnchor.constraint(equalTo: textView.topAnchor, constant: textView.textContainerInset.top),
@@ -610,6 +618,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             saveDraftModal.modalTransitionStyle = .crossDissolve // 전환 애니메이션 설정
             present(saveDraftModal, animated: true, completion: nil)
         }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return images.count
     }
@@ -706,7 +715,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         if let placeholderLabel = textView.subviews.first(where: { $0 is UILabel }) as? UILabel {
             placeholderLabel.isHidden = !textView.text.isEmpty
         }
-
         updateNextButtonState(for: nextButton)  // 버튼 상태 업데이트
     }
     
@@ -744,9 +752,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             button.layer.cornerRadius = 18.5
             button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 13, bottom: 10, right: 13)
             button.translatesAutoresizingMaskIntoConstraints = false
-
-//            button.widthAnchor.constraint(equalToConstant: 86).isActive = true
-//            button.heightAnchor.constraint(equalToConstant: 37).isActive = true
+            
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
 
@@ -778,7 +784,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         setupButtonsAboutCategoryButton() // 세부 카테고리 초기화
         // 터치 이벤트 설정
         scrollView.isUserInteractionEnabled = true
-        view.bringSubviewToFront(scrollView) // 스크롤 뷰 터치 활성화를 위해 계
+        view.bringSubviewToFront(scrollView) // 스크롤 뷰 터치 활성화를 위해
     }
 
     @objc private func categoryButtonTapped(_ sender: UIButton) {
@@ -832,6 +838,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             sender.layer.borderColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1).cgColor
             sender.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14)
+//            sender.setTitleColor(.black, for: .normal)
         }
 
         if currentIndex < selectedCategoriesForImages.count {
@@ -885,11 +892,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         nextButton.setTitleColor(UIColor(red: 0.54, green: 0.54, blue: 0.54, alpha: 1), for: .normal)
         nextButton.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
         
-//        // 활성화
-//        button.setTitleColor(.white, for: .normal)
-//        button.backgroundColor = #colorLiteral(red: 0.5338280797, green: 0.5380638838, blue: 0.8084236383, alpha: 1)
-        
-        
         nextButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         nextButton.layer.cornerRadius = 8
         nextButton.translatesAutoresizingMaskIntoConstraints = false
@@ -937,7 +939,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
     @objc private func nextButtonTapped() {
-        guard let recordUUID = UUID(uuidString: recordID) else {
+        guard let recordUUID = Int(recordID) else {
             print("유효하지 않은 Record ID: \(recordID)")
             return
         }
@@ -951,7 +953,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             return
         }
         
-        
         // 현재 이미지를 저장
         if currentIndex < texts.count {
             texts[currentIndex] = textView.text
@@ -963,7 +964,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         
         // 각 이미지 관련 정보 출력
         var savedImagePaths: [String] = [] // 로컬에 저장된 이미지 경로들을 담을 배열
-
         
         print("현재 Record ID (\(recordID))의 이미지 정보:")
            for (index, image) in images.enumerated() {
@@ -990,7 +990,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             let category = selectedCategoriesForImages[index].joined(separator: ", ")
 
             let success = TravelRecordManager.shared.addPhoto(
-                to: UUID(uuidString: recordID) ?? UUID(),
+                to: Int(recordID)!,
                 image: image,
                 text: text,
                 categories: category
@@ -1001,7 +1001,6 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 print("사진 \(index + 1) 추가 실패")
             }
         }
-        
         // `metadata` 생성
         let metadata: [[String: Any]] = images.enumerated().map { index, _ in
             let imagePath = savedImagePaths[index]  // savedImagePaths에서 가져옴
@@ -1010,11 +1009,8 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
                 "content": texts[index],
                 "categories": selectedCategoriesForImages[index],
                 "pid": "unique_pid_\(index + 1)",
-//                "imagePath": imagePath  // 저장된 이미지 경로 사용
             ]
         }
-        print(images)
-        // 서버 업로드 호출
 
         APIService.shared.uploadImages(
             endpoint: "/stories",
@@ -1024,34 +1020,24 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
             switch result {
             case .success(let response):
                 print("이미지 업로드 성공:", response)
+                let savedPhotosVC = SavedPhotosViewController()
+                savedPhotosVC.recordID = self.recordID
+                savedPhotosVC.modalPresentationStyle = .fullScreen
+                self.present(savedPhotosVC, animated: true)
             case .failure(let error):
                 print("이미지 업로드 실패:", error.localizedDescription)
             }
         }
-        
-
         if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            print("해당 Record ID (\(recordUUID))의 데이터:")
-            print("Title: \(record.title)")
-            print("Location: \(record.location)")
-            print("Photos:")
-            for (index, photo) in record.photos.enumerated() {
+            for (index, photo) in record.stories.enumerated() {
                 print("Photo \(index + 1):")
                 print("    Image Path: \(photo.imagePath)")
-                print("    Text: \(photo.text)")
+                print("    content: \(photo.content)")
                 print("    Category: \(photo.categories)")
             }
-        } else {
-            print("해당 Record ID (\(recordUUID))와 관련된 데이터를 찾을 수 없습니다.")
         }
-
-        let savedPhotosVC = SavedPhotosViewController()
-        savedPhotosVC.recordID = recordID
-        savedPhotosVC.modalPresentationStyle = .fullScreen
-        present(savedPhotosVC, animated: true)
     }
 
-    
     func saveImageToLocalFile(image: UIImage, fileName: String) -> String? {
         // 이미지 데이터를 JPEG 형식으로 변환
         guard let imageData = image.jpegData(compressionQuality: 1.0) else {
@@ -1063,8 +1049,7 @@ class StoryEditorViewController: UIViewController, UICollectionViewDelegate, UIC
         let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileURL = documentDirectory.appendingPathComponent(fileName)
 
-        do {
-            // 파일을 저장
+        do {// 파일을 저장
             try imageData.write(to: fileURL)
             return fileURL.path // 저장된 파일의 경로 반환
         } catch {

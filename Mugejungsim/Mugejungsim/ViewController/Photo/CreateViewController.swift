@@ -38,6 +38,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
     private let titleCount: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "Pretendard-Medium", size: 12)
@@ -62,15 +63,16 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
+    
     let saveButton: UIButton = {
-            let button = UIButton(type: .system)
-            button.setTitle("임시저장", for: .normal)
-            button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
-            button.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
-            button.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
-            button.translatesAutoresizingMaskIntoConstraints = false
-            return button
-        }()
+        let button = UIButton(type: .system)
+        button.setTitle("임시저장", for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
+        button.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
+        button.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     
     let titleUnderline: UIView = {
         let view = UIView()
@@ -112,6 +114,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
     private let locationCount: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "Pretendard-Medium", size: 12)
@@ -181,7 +184,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         button.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
         return button
     }()
-
     let clearButton2: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
@@ -218,45 +220,54 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
 //
 //    }
     override func viewDidLoad() {
-            super.viewDidLoad()
-            view.backgroundColor = .white
-            view.addSubview(titleCount)
-            configureTextFieldDelegates(in: startDateStackView)
-            configureTextFieldDelegates(in: endDateStackView)
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        view.addSubview(titleCount)
+        configureTextFieldDelegates(in: startDateStackView)
+        configureTextFieldDelegates(in: endDateStackView)
         
-            titleTextField.addTarget(self, action: #selector(updateClearButtonState(_:)), for: .editingChanged)
-            locationTextField.addTarget(self, action: #selector(updateClearButtonState(_:)), for: .editingChanged)
+        titleTextField.addTarget(self, action: #selector(updateClearButtonState(_:)), for: .editingChanged)
+        locationTextField.addTarget(self, action: #selector(updateClearButtonState(_:)), for: .editingChanged)
             
-            titleTextField.delegate = self
-            locationTextField.delegate = self
+        titleTextField.delegate = self
+        locationTextField.delegate = self
             
-            setupCustomNavigationBar()
-            setupUI()
-            setupCompanionButtons()
-            setupObservers()
-            setupDateFieldObservers()
-        
-            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        setupCustomNavigationBar()
+        setupUI()
+        setupCompanionButtons()
+        setupObservers()
+        setupDateFieldObservers()
 
-            titleCount.translatesAutoresizingMaskIntoConstraints = false
-            titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
-            titleTextField.delegate = self
-            locationTextField.delegate = self
-            
-            titleCount.translatesAutoresizingMaskIntoConstraints = false
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        titleCount.translatesAutoresizingMaskIntoConstraints = false
+        titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
+        titleTextField.delegate = self
+        locationTextField.delegate = self
+        
+        titleCount.translatesAutoresizingMaskIntoConstraints = false
+        
+        clearButton1.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
+        clearButton2.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
         
         
             clearButton1.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
             clearButton2.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
         
         // userId 확인 (로그인에서 받은 userId가 잘 넘어왔는지 확인)
-            if let userId = TravelRecordManager.shared.userId {
-                print("CreateViewController에서 확인된 userId: \(userId)")
-            } else {
-                print("userId가 설정되지 않았습니다.")
-            }
+        if let userId = TravelRecordManager.shared.userId {
+            print("CreateViewController에서 확인된 userId: \(userId)")
+        } else {
+            print("userId가 설정되지 않았습니다.")
         }
+    }
+    
+    deinit {
+        // 키보드 이벤트 해제
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
     
     deinit {
             // 키보드 이벤트 해제
@@ -352,7 +363,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         
         let backButton = UIButton(type: .system)
         backButton.setImage(UIImage(named: "back_button"), for: .normal)
-        backButton.tintColor = .black
+        backButton.tintColor = #colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1)
         backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -438,6 +449,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         view.addSubview(clearButton1) // X 버튼을 추가
         clearButton1.widthAnchor.constraint(equalToConstant: 20).isActive = true
         clearButton1.heightAnchor.constraint(equalToConstant: 20).isActive = true
+//        view.addSubview(saveButton)  // saveButton 추가
 
         view.addSubview(clearButton2) // X 버튼을 추가
         clearButton2.widthAnchor.constraint(equalToConstant: 20).isActive = true
@@ -467,8 +479,11 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             titleCount.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 5),
             titleCount.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor),
             
-            dateLabel.topAnchor.constraint(equalTo: titleCount.bottomAnchor, constant: 25),
+            dateLabel.topAnchor.constraint(equalTo: titleUnderline.bottomAnchor, constant: 25),
             dateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            
+            
+            
             
             startDateStackView.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 16),
             startDateStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
@@ -497,13 +512,19 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             locationCount.topAnchor.constraint(equalTo: locationTextField.bottomAnchor, constant: 5),
             locationCount.trailingAnchor.constraint(equalTo: locationTextField.trailingAnchor),
             
-            companionLabel.topAnchor.constraint(equalTo: locationCount.bottomAnchor, constant: 25),
+            companionLabel.topAnchor.constraint(equalTo: locationUnderline.bottomAnchor, constant: 25),
             companionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             
             nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             nextButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             nextButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            nextButton.heightAnchor.constraint(equalToConstant: 50)
+            nextButton.heightAnchor.constraint(equalToConstant: 50),
+            
+//            saveButton.topAnchor.constraint(equalTo: titleUnderline.bottomAnchor, constant: -125),  // 적절한 위치 설정
+//            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+//            saveButton.heightAnchor.constraint(equalToConstant: 19),
+//            saveButton.widthAnchor.constraint(equalToConstant: 49),
+                 
         ])
     }
 
@@ -519,7 +540,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
 
         var previousButton: UIButton?
         var previousRowFirstButton: UIButton?
-
+        
         for (index, option) in options.enumerated() {
             let button = UIButton(type: .system)
             button.setTitle(option, for: .normal)
@@ -538,7 +559,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 button.widthAnchor.constraint(equalToConstant: buttonWidth),
                 button.heightAnchor.constraint(equalToConstant: buttonHeight)
             ])
-
+            
             if index < firstRowButtonsCount { // 첫 행
                 if previousButton == nil {
                     // 첫 번째 버튼
@@ -555,7 +576,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 button.topAnchor.constraint(equalTo: previousRowFirstButton!.bottomAnchor, constant: 14).isActive = true
                 button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: sidePadding).isActive = true
             }
-
             previousButton = button
         }
         validateInputsForSaveButton()
@@ -890,7 +910,8 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         location = locationTextField.text ?? "없음"
 
         let newRecord = TravelRecord(
-            id: UUID(),
+            id: 0,
+            pid: "",
             title: travelTitle,
             startDate: startDate,
             endDate: endDate,
@@ -908,10 +929,10 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 switch result {
                 case .success(let json):
                     if let postId = json["postId"] as? Int {
-                        TravelRecordManager.shared.postId = postId
+                        TravelRecordManager.shared.postId = postId  // 포스트 저장
                         print("Received postId: \(postId)")
 //                        self.navigateToStoryEditor()
-                        self.navigateToNextScreen(recordID: newRecord.id.uuidString)
+                        self.navigateToNextScreen(recordID: String(newRecord.id))
                     } else {
                         self.showAlert(title: "오류", message: "postId를 응답에서 찾을 수 없습니다.")
                     }
@@ -921,7 +942,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
                 }
             }
         }
-        self.navigateToNextScreen(recordID: newRecord.id.uuidString)
+        self.navigateToNextScreen(recordID: String(newRecord.id))
     }
     
     
@@ -1008,6 +1029,47 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         return dateFields
     }
 
+            let keyboardHeight = keyboardFrame.height
+            let bottomSafeArea = view.safeAreaInsets.bottom
+            let additionalOffset: CGFloat = 20 // 키보드와 텍스트필드 간격 추가
+
+            UIView.animate(withDuration: 0.3) {
+                self.view.transform = CGAffineTransform(translationX: 0, y: -(keyboardHeight - bottomSafeArea + additionalOffset))
+            }
+        }
+        
+        // MARK: - 키보드 사라질 때
+        @objc private func keyboardWillHide(_ notification: Notification) {
+            UIView.animate(withDuration: 0.3) {
+                self.view.transform = .identity // 화면을 원래 위치로 복구
+            }
+        }
+    
+    // MARK: - Setup Date Field Observers
+    private func setupDateFieldObservers() {
+        let dateFields = getAllDateFields()
+        dateFields.forEach { field in
+            field.addTarget(self, action: #selector(dateFieldEditingChanged(_:)), for: .editingChanged)
+        }
+    }
+
+    // MARK: - Date Field Editing Changed
+    @objc private func dateFieldEditingChanged(_ textField: UITextField) {
+        if let underline = textField.subviews.first(where: { $0 is UIView }) as? UIView {
+            let text = textField.text ?? ""
+            underline.backgroundColor = text.isEmpty
+                ? UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // 기본 색상
+                : UIColor(red: 0.82, green: 0.82, blue: 0.96, alpha: 1) // #D2D2F5
+        }
+    }
+
+    // MARK: - Helper to Get All Date Fields
+    private func getAllDateFields() -> [UITextField] {
+        var dateFields: [UITextField] = []
+        collectTextFields(from: startDateStackView, into: &dateFields)
+        collectTextFields(from: endDateStackView, into: &dateFields)
+        return dateFields
+    }
     
 }
 

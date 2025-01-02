@@ -11,6 +11,13 @@ class APIService {
     
     private let networkManager = NetworkManager.shared
     private init() {}
+    
+    // MARK: - 사용자별 게시물 조회
+    func getUserPosts(userId: Int, completion: @escaping (Result<[TravelRecord], Error>) -> Void) {
+            let endpoint = "/api/posts/user/\(userId)"
+            networkManager.request( endpoint, method: .get, completion: completion)
+    }
+    
 
     // MARK: - 여행 기록 목록 조회
     func getTravelRecords(completion: @escaping (Result<[TravelRecord], Error>) -> Void) {
@@ -175,9 +182,25 @@ class APIService {
                 }
             }
         }
-
     
-    
+    // MARK: - 업로드된 이미지 조회
+    func getUploadedImages(postId: Int, completion: @escaping (Result<[PhotoData], Error>) -> Void) {
+        let endpoint = "/stories/\(postId)/stories" // 서버에서 이미지를 제공하는 엔드포인트
+        networkManager.request(
+            endpoint,
+            method: .get,
+            completion: { (result: Result<[PhotoData], Error>) in
+                switch result {
+                case .success(let photoData):
+                    // 서버에서 받은 데이터 처리 (예: 이미지 URL, 카테고리 등)
+                    completion(.success(photoData))
+                case .failure(let error):
+                    // 에러 처리
+                    completion(.failure(error))
+                }
+            }
+        )
+    }
     
 }
 

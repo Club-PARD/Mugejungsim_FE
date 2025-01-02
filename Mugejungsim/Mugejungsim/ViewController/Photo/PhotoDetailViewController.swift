@@ -3,7 +3,7 @@ import UIKit
 class PhotoDetailViewController: UIViewController {
     
     var selectedPhotoData: PhotoData? // 선택한 데이터 저장
-    var currentPhotoIndex: Int = 0 // 현재 사진의 인덱스
+    var currentIndex: Int = 0 // 현재 이미지의 인덱스를 저장
     var allPhotoData: [PhotoData] = [] // 전체 사진 데이터
 
     private var imageView: UIImageView!
@@ -55,7 +55,7 @@ class PhotoDetailViewController: UIViewController {
             navBar.heightAnchor.constraint(equalToConstant: 65),
             
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
-            backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 26),
+            backButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -26),
             
             imageCountLabel.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             imageCountLabel.centerXAnchor.constraint(equalTo: navBar.centerXAnchor)
@@ -97,7 +97,7 @@ class PhotoDetailViewController: UIViewController {
         categoryButtonsStackView.axis = .horizontal
         categoryButtonsStackView.alignment = .center
         categoryButtonsStackView.distribution = .equalSpacing
-        categoryButtonsStackView.spacing = 10
+        categoryButtonsStackView.spacing = 13
         categoryButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
         categoryScrollView.addSubview(categoryButtonsStackView)
         
@@ -133,8 +133,8 @@ class PhotoDetailViewController: UIViewController {
             // 검정 박스
             blackBoxView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             blackBoxView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            blackBoxView.widthAnchor.constraint(equalToConstant: 444),
-            blackBoxView.heightAnchor.constraint(equalToConstant: 324),
+            blackBoxView.widthAnchor.constraint(equalToConstant: 328),
+            blackBoxView.heightAnchor.constraint(equalToConstant: 328),
             
             // 이미지 뷰 (검정 박스 안에서 중앙 정렬)
             imageView.centerXAnchor.constraint(equalTo: blackBoxView.centerXAnchor),
@@ -144,13 +144,13 @@ class PhotoDetailViewController: UIViewController {
             
             // 카테고리 스크롤 뷰
             categoryScrollView.topAnchor.constraint(equalTo: blackBoxView.bottomAnchor, constant: 20),
-            categoryScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            categoryScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            categoryScrollView.heightAnchor.constraint(equalToConstant: 50),
+            categoryScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            categoryScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            categoryScrollView.heightAnchor.constraint(equalToConstant: 55),
             
             // 카테고리 스택뷰
             categoryButtonsStackView.topAnchor.constraint(equalTo: categoryScrollView.topAnchor),
-            categoryButtonsStackView.leadingAnchor.constraint(equalTo: categoryScrollView.leadingAnchor),
+            categoryButtonsStackView.leadingAnchor.constraint(equalTo: categoryScrollView.leadingAnchor, constant: 20),
             categoryButtonsStackView.trailingAnchor.constraint(equalTo: categoryScrollView.trailingAnchor),
             categoryButtonsStackView.bottomAnchor.constraint(equalTo: categoryScrollView.bottomAnchor),
             categoryButtonsStackView.heightAnchor.constraint(equalTo: categoryScrollView.heightAnchor),
@@ -161,7 +161,7 @@ class PhotoDetailViewController: UIViewController {
             descriptionTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             descriptionTextView.heightAnchor.constraint(equalToConstant: 135),
             
-            // 마지막 콘텐츠 제약 조건
+            // 마지막 콘텐츠 제약 조건 (스크롤 뷰의 높이를 확장)
             descriptionTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
     }
@@ -169,22 +169,30 @@ class PhotoDetailViewController: UIViewController {
     func populateData() {
         guard let photoData = selectedPhotoData else { return }
         // 이미지 로드
-        if let url = URL(string: photoData.imagePath) {
-            loadImageAsync(from: url) { [weak self] image in
-                DispatchQueue.main.async {
-                    self?.imageView.image = image ?? UIImage(named: "placeholder")
-                }
+        let imageUrl = URL(string: photoData.imagePath) // imagePath가 이미 옵셔널이 아닌 String이라 직접 사용
+        imageView.sd_setImage(with: imageUrl, placeholderImage: UIImage(named: "placeholder")) { [weak self] image, error, cacheType, url in
+            if let error = error {
+                print("이미지 로드 실패: \(error.localizedDescription)")
+                // 오류 발생 시 대체 이미지 표시
+                self?.imageView.image = UIImage(named: "placeholder")
+            } else {
+                print("이미지 로드 성공: \(String(describing: url))")
             }
         }
-        // 카테고리 버튼 초기화 후 추가
+        
         categoryButtonsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        for category in photoData.categories {
-            let button = createCategoryButton(with: category)
-            categoryButtonsStackView.addArrangedSubview(button)
+
+        let categories = photoData.categories.flatMap { $0.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) } }
+        print("카테고리 배열: \(categories)") // 디버깅용 출력
+
+        for category in categories {
+            print("버튼에 추가할 카테고리: \(category)") // 각 카테고리 확인
+            let button = createCategoryButton(with: category) // 각 카테고리에 대해 버튼 생성
+            categoryButtonsStackView.addArrangedSubview(button) // 스택뷰에 추가
         }
-        // 텍스트뷰 업데이트
-        descriptionTextView.text = photoData.text
-        updateImageCountLabel()
+        
+        descriptionTextView.text = photoData.content // 텍스트뷰에 설명 설정
+        updateImageCountLabel() // 이미지 개수 레이블 업데이트
     }
     
     func loadImageAsync(from url: URL, completion: @escaping (UIImage?) -> Void) {
@@ -214,18 +222,19 @@ class PhotoDetailViewController: UIViewController {
     func createCategoryButton(with title: String) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(UIColor(red: 0.333, green: 0.333, blue: 0.345, alpha: 1), for: .normal)
         button.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
         button.layer.cornerRadius = 4
-        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 15)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.heightAnchor.constraint(equalToConstant: 37).isActive = true
         button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 12, bottom: 5, right: 12)
         return button
     }
     
     func updateImageCountLabel() {
-        let totalCount = allPhotoData.count
-        imageCountLabel.text = "\(currentPhotoIndex + 1) / \(totalCount)"
+        let totalCount = DataManager.shared.loadData().count
+        imageCountLabel.text = "\(currentIndex + 1) / 25"
     }
     
     @objc private func goBack() {
