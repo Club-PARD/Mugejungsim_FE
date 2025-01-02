@@ -1,12 +1,13 @@
 import UIKit
 import KakaoSDKUser
-
+import KakaoSDKAuth
 
 class LoginViewController: UIViewController {
     
-    var name : String = ""
+    static var name : String = ""
     var provider : String = ""
     var userId: Int? // 서버에서 받은 userId를 저장
+    
     
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -16,32 +17,13 @@ class LoginViewController: UIViewController {
         return imageView
     }()
     
-    private let googleButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("구글로 시작하기", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = UIFont.medium
-        button.layer.borderColor = #colorLiteral(red: 0.7233663201, green: 0.7233663201, blue: 0.7233663201, alpha: 1)
-        button.layer.borderWidth = 1
-        button.layer.cornerRadius = 8
-        button.backgroundColor = .white
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        let image = UIImage(named: "google")?.withRenderingMode(.alwaysOriginal)
-        button.setImage(image, for: .normal)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -18, bottom: 0, right: 8)
-        button.contentHorizontalAlignment = .center
-        button.addShadow() // Shadow 추가
-        return button
-    }()
     
     private let kakaoButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("카카오로 시작하기", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = UIFont.medium
-        button.layer.borderColor = #colorLiteral(red: 0.7233663201, green: 0.7233663201, blue: 0.7233663201, alpha: 1)
+        button.layer.borderColor = UIColor(hex: "#D2D2D2").cgColor
         button.layer.borderWidth = 1
         button.layer.cornerRadius = 8
         button.backgroundColor = .white
@@ -56,19 +38,6 @@ class LoginViewController: UIViewController {
         return button
     }()
     
-    private let emailButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("이메일로 시작하기", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = UIFont.font(.pretendardSemiBold, ofSize: 16)
-        button.layer.borderColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
-        button.layer.borderWidth = 1
-        button.layer.cornerRadius = 8
-        button.backgroundColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addShadow() // Shadow 추가
-        return button
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,41 +47,23 @@ class LoginViewController: UIViewController {
     
     private func setupUI() {
         view.addSubview(logoImageView)
-        view.addSubview(googleButton)
         view.addSubview(kakaoButton)
-        view.addSubview(emailButton)
         
         NSLayoutConstraint.activate([
-            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 226),
+            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 315),
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoImageView.widthAnchor.constraint(equalToConstant: 205),
             logoImageView.heightAnchor.constraint(equalToConstant: 30),
             
-            googleButton.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 70),
-            googleButton.centerXAnchor.constraint(equalTo: logoImageView.centerXAnchor),
-            googleButton.widthAnchor.constraint(equalToConstant: 327),
-            googleButton.heightAnchor.constraint(equalToConstant: 52),
-            
-            kakaoButton.topAnchor.constraint(equalTo: googleButton.bottomAnchor, constant: 10),
-            kakaoButton.centerXAnchor.constraint(equalTo: googleButton.centerXAnchor),
+            kakaoButton.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 26),
+            kakaoButton.centerXAnchor.constraint(equalTo: logoImageView.centerXAnchor),
             kakaoButton.widthAnchor.constraint(equalToConstant: 327),
-            kakaoButton.heightAnchor.constraint(equalTo: googleButton.heightAnchor),
-            
-            emailButton.topAnchor.constraint(equalTo: kakaoButton.bottomAnchor, constant: 10),
-            emailButton.centerXAnchor.constraint(equalTo: googleButton.centerXAnchor),
-            emailButton.widthAnchor.constraint(equalToConstant: 327),
-            emailButton.heightAnchor.constraint(equalTo: googleButton.heightAnchor),
-            
-            googleButton.imageView!.widthAnchor.constraint(equalToConstant: 21),
-            googleButton.imageView!.heightAnchor.constraint(equalToConstant: 21.6),
-            
-            kakaoButton.imageView!.widthAnchor.constraint(equalToConstant: 27),
-            kakaoButton.imageView!.heightAnchor.constraint(equalToConstant: 27)
+            kakaoButton.heightAnchor.constraint(equalToConstant: 52),
+            kakaoButton.imageView!.widthAnchor.constraint(equalToConstant: 30),
+            kakaoButton.imageView!.heightAnchor.constraint(equalToConstant: 30)
         ])
         
-        googleButton.addTarget(self, action: #selector(handleOtherButtons), for: .touchUpInside)
         kakaoButton.addTarget(self, action: #selector(didTapKakaoLogin), for: .touchUpInside)
-        emailButton.addTarget(self, action: #selector(handleEmailButton), for: .touchUpInside)
     }
     
     @objc private func handleOtherButtons() {
@@ -148,6 +99,7 @@ class LoginViewController: UIViewController {
                 self.showAlert(title: "에러", message: "사용자 정보를 가져오는 데 실패했습니다.")
             } else if let user = user {
                 let nickname = user.kakaoAccount?.profile?.nickname ?? "사용자"
+                LoginViewController.name = user.kakaoAccount?.profile?.nickname ?? "사용자"
                 let provider = "kakao"
                 
                 // 서버로 로그인 정보 전송 후 userId 받아오기
@@ -168,6 +120,9 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToOnboarding(with nickname: String) {
+//        let onboardingVC = MyRecordsViewController()
+//        onboardingVC.modalPresentationStyle = .fullScreen
+//        present(onboardingVC, animated: true, completion: nil)
         let onboardingVC = OBViewController1()
         onboardingVC.modalPresentationStyle = .fullScreen
         present(onboardingVC, animated: true, completion: nil)

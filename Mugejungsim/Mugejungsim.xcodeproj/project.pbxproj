@@ -36,6 +36,8 @@
 		5FA257C32D198B5F00D8E4FF /* KakaoSDKTalk in Frameworks */ = {isa = PBXBuildFile; productRef = 5FA257C22D198B5F00D8E4FF /* KakaoSDKTalk */; };
 		5FA257C52D198B5F00D8E4FF /* KakaoSDKTemplate in Frameworks */ = {isa = PBXBuildFile; productRef = 5FA257C42D198B5F00D8E4FF /* KakaoSDKTemplate */; };
 		5FA257C72D198B5F00D8E4FF /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 5FA257C62D198B5F00D8E4FF /* KakaoSDKUser */; };
+		5FA9750E2D2578B20080B05D /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 5FA9750D2D2578B20080B05D /* SDWebImage */; };
+		5FA975102D2578B20080B05D /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5FA9750F2D2578B20080B05D /* SDWebImageMapKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +124,7 @@
 				5F95D3EA2D19747E0009B234 /* KakaoSDK in Frameworks */,
 				5FA257B72D198B5F00D8E4FF /* KakaoSDKCertCore in Frameworks */,
 				5F95D3F02D19747E0009B234 /* KakaoSDKCertCore in Frameworks */,
+				5FA975102D2578B20080B05D /* SDWebImageMapKit in Frameworks */,
 				5F1A75A72D19904C0041E6AB /* KakaoSDKUser in Frameworks */,
 				5F1A759F2D19904C0041E6AB /* KakaoSDKNavi in Frameworks */,
 				5F95D3EC2D19747E0009B234 /* KakaoSDKAuth in Frameworks */,
@@ -138,6 +141,7 @@
 				5FA257B32D198B5F00D8E4FF /* KakaoSDKAuth in Frameworks */,
 				5FA257BB2D198B5F00D8E4FF /* KakaoSDKFriend in Frameworks */,
 				5F1A75912D19904C0041E6AB /* KakaoSDK in Frameworks */,
+				5FA9750E2D2578B20080B05D /* SDWebImage in Frameworks */,
 				5F1A75972D19904C0041E6AB /* KakaoSDKCertCore in Frameworks */,
 				5F1A75992D19904C0041E6AB /* KakaoSDKCommon in Frameworks */,
 				5F1A75932D19904C0041E6AB /* KakaoSDKAuth in Frameworks */,
@@ -275,6 +279,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				5F95D3E82D19747E0009B234 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				5FA9750C2D2578B20080B05D /* XCRemoteSwiftPackageReference "SDWebImage" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5FAD6EFE2D17129C00EE3B9C;
@@ -356,12 +361,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mugejungsim/Mugejungsim.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NBKQCU426T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "앱이 카메라에 접근하려면 권한이 필요합니다.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크에 접근하기 위해 사용됩니다.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진첩에 글귀 이미지를 저장할 수 있습니다. ";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진 갤러리에서 이미지를 선택하기 위해 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -373,8 +381,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.one.ram.Mugejungsim;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ram.Mugejungsim;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -387,12 +396,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mugejungsim/Mugejungsim.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NBKQCU426T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mugejungsim/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "앱이 카메라에 접근하려면 권한이 필요합니다.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크에 접근하기 위해 사용됩니다.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진첩에 글귀 이미지를 저장할 수 있습니다. ";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진 갤러리에서 이미지를 선택하기 위해 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -404,8 +416,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.one.ram.Mugejungsim;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ram.Mugejungsim;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -653,6 +666,14 @@
 				kind = branch;
 			};
 		};
+		5FA9750C2D2578B20080B05D /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.20.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -788,6 +809,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5F95D3E82D19747E0009B234 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKUser;
+		};
+		5FA9750D2D2578B20080B05D /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5FA9750C2D2578B20080B05D /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		5FA9750F2D2578B20080B05D /* SDWebImageMapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5FA9750C2D2578B20080B05D /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImageMapKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

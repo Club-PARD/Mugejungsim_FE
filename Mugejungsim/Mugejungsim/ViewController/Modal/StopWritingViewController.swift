@@ -7,7 +7,7 @@ protocol StopWritingViewControllerDelegate: AnyObject {
 
 class StopWritingViewController: UIViewController {
     weak var delegate: StopWritingViewControllerDelegate?
-
+    
     // MARK: - UI Elements
     
     private let overlayView: UIView = { // 모달창 배경을 위한 변수
@@ -42,11 +42,11 @@ class StopWritingViewController: UIViewController {
     private let promptLabel: UILabel = {
         let label = UILabel()
         let text = "여행 기록 쓰기를\n그만두시겠어요?"
-
+        
         // Line height 설정
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 27 - 18 // Line height - Font size (18)
-
+        
         // Letter spacing 설정
         let attributedString = NSMutableAttributedString(
             string: text,
@@ -81,7 +81,7 @@ class StopWritingViewController: UIViewController {
         
         return button
     }()
-
+    
     private let continueButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("이어서 쓰기", for: .normal)
@@ -99,7 +99,7 @@ class StopWritingViewController: UIViewController {
         
         return button
     }()
-
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -139,13 +139,13 @@ class StopWritingViewController: UIViewController {
             // Close button (X_Button)
             closeButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 21),
             closeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -23),
-
+            
             
             // Prompt label
             promptLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 63),
             promptLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-
-
+            
+            
             // Stop button
             stopButton.topAnchor.constraint(equalTo: promptLabel.bottomAnchor, constant: 36),
             stopButton.centerXAnchor.constraint(equalTo: promptLabel.centerXAnchor),
@@ -169,39 +169,32 @@ class StopWritingViewController: UIViewController {
     }
     @objc private func StopButtonTapped() {
         print("그만두기 버튼 클릭됨")
-        dismiss(animated: false) { // 애니메이션 제거
-            self.delegate?.didStopWriting()
+        let myRecordVC = MyRecordsViewController()
+        
+        myRecordVC.modalPresentationStyle = .fullScreen
+        myRecordVC.modalTransitionStyle = .crossDissolve
+        
+        // NavigationController 여부 확인
+        if let navigationController = self.navigationController {
+            navigationController.setViewControllers([myRecordVC], animated: true)
+        } else {
+            if let window = UIApplication.shared.windows.first {
+                let navController = UINavigationController(rootViewController: myRecordVC)
+                window.rootViewController = navController
+                window.makeKeyAndVisible()
+            } else {
+            }
         }
     }
-
+    
     @objc private func ContinueButtonTapped() {
         print("이어서 하기 버튼 클릭됨")
         dismiss(animated: false, completion: nil) // 애니메이션 제거
     }
-
+    
     @objc private func CloseButtonTapped() {
         print("Close 버튼 클릭됨")
-        
-        view.endEditing(true) // 키보드 닫기
-        
-        if let navigationController = self.navigationController {
-            for controller in navigationController.viewControllers {
-                if controller is MyRecordsViewController {
-                    navigationController.popToViewController(controller, animated: true)
-                    return
-                }
-            }
-            // MyRecordsViewController가 스택에 없으면 pop
-            navigationController.popViewController(animated: true)
-        } else {    // Navigation Controller가 없으면 dismiss 후 새로 표시
-            dismiss(animated: true) {
-                let myRecordVC = MyRecordsViewController()
-                myRecordVC.modalPresentationStyle = .overFullScreen
-                myRecordVC.modalTransitionStyle = .crossDissolve // 페이드 효과
-                self.present(myRecordVC, animated: false, completion: nil)
-            }
-        }
+        dismiss(animated: false, completion: nil)
     }
+    
 }
-
-

@@ -164,8 +164,6 @@ class DeleteViewController: UIViewController {
     }
 
     
-    // MARK: - Actions
-    
     private func setActions() {
         stopButton.addTarget(self, action: #selector(StopButtonTapped), for: .touchUpInside)
         continueButton.addTarget(self, action: #selector(ContinueButtonTapped), for: .touchUpInside)
@@ -178,7 +176,7 @@ class DeleteViewController: UIViewController {
             print("삭제할 데이터가 없습니다.")
             return
         }
-
+        
         // 삭제 처리
 //        DataManager.shared.deleteData(photoData: photoData)
 
@@ -186,7 +184,7 @@ class DeleteViewController: UIViewController {
         if let presentingVC = presentingViewController as? SavedPhotosViewController {
             dismiss(animated: true) {
                 // SavedPhotosViewController에 데이터 갱신 요청
-                presentingVC.refreshData()
+//                presentingVC.refreshData()
             }
         } else {
             // 만약 SavedPhotosViewController를 찾을 수 없다면 새로 생성합니다.

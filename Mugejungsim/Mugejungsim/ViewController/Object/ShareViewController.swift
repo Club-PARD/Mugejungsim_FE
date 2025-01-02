@@ -9,7 +9,7 @@ import UIKit
 
 
 class ShareViewController: UIViewController {
-
+    
     var recordID: String = ""
     
     private let scrollView = UIScrollView()
@@ -29,13 +29,23 @@ class ShareViewController: UIViewController {
         return label
     }()
     
-    private let glassImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "moments")
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-
-        return imageView
+//    private let glassImage: UIImageView = {
+//        let imageView = UIImageView()
+//        imageView.image = UIImage(named: "moments")
+//        imageView.contentMode = .scaleAspectFit
+//        imageView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        return imageView
+//    }()
+    
+    let openPreviewButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "Storybook Brown"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.clipsToBounds = true
+        button.backgroundColor = .clear
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     private let letterImage: UIImageView = {
@@ -64,28 +74,34 @@ class ShareViewController: UIViewController {
         return button
     }()
     
+    private let shareButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("공유하기", for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
+        button.setTitleColor(.white, for: .normal) // 폰트 색상을 흰색으로 설정
+        button.backgroundColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
+        button.layer.cornerRadius = 8
+        button.layer.shadowPath = UIBezierPath(roundedRect: button.bounds, cornerRadius: 8).cgPath
+        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        button.layer.shadowOpacity = 1
+        button.layer.shadowRadius = 1
+        button.layer.shadowOffset = CGSize(width: 0.5, height: 0.5)
+        button.layer.masksToBounds = false
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationManager.shared.requestNotificationAuthorization()
         view.backgroundColor = .white
+        updateImages()
+        updateLabelText()
         setupUI()
+        
+        openPreviewButton.addTarget(self, action: #selector(openUSDZPreviewController), for: .touchUpInside)
         homeButton.addTarget(self, action: #selector(homeButtonTapped), for: .touchUpInside)
-
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-            
-        if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            print("CheckObjeImageViewController에서 데이터 확인:")
-            print("Record ID: \(record.id)")
-            print("Title: \(record.title)")
-            print("oneLine1: \(record.oneLine1)")
-            print("oneLine2: \(record.oneLine2)")
-            updateLabelText()
-            updateImages()
-        } else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-        }
+        shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
     }
     
     private func setupUI() {
@@ -94,7 +110,7 @@ class ShareViewController: UIViewController {
         scrollView.alwaysBounceHorizontal = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.isScrollEnabled = true
-        scrollView.contentSize = CGSize(width: view.frame.width, height: 1000)
+        scrollView.contentSize = CGSize(width: view.frame.width, height: 1070)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -105,10 +121,12 @@ class ShareViewController: UIViewController {
         scrollView.addSubview(contentView)
         
         contentView.addSubview(contentLabel)
-        contentView.addSubview(glassImage)
+        contentView.addSubview(openPreviewButton)
         contentView.addSubview(letterImage)
         
         view.addSubview(homeButton)
+        view.addSubview(shareButton)
+        view.addSubview(openPreviewButton)
         
         setupConstraints()
         setupCustomNavigationBar()
@@ -124,12 +142,12 @@ class ShareViewController: UIViewController {
             contentLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20),
             contentLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
 
-            glassImage.topAnchor.constraint(equalTo: contentLabel.bottomAnchor, constant: 20),
-            glassImage.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            glassImage.widthAnchor.constraint(equalToConstant: 200),
-            glassImage.heightAnchor.constraint(equalToConstant: 200),
+            openPreviewButton.topAnchor.constraint(equalTo: contentLabel.bottomAnchor, constant: 20),
+            openPreviewButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            openPreviewButton.widthAnchor.constraint(equalToConstant: 200),
+            openPreviewButton.heightAnchor.constraint(equalToConstant: 200),
 
-            letterImage.topAnchor.constraint(equalTo: glassImage.bottomAnchor, constant: 20),
+            letterImage.topAnchor.constraint(equalTo: openPreviewButton.bottomAnchor, constant: 20),
             letterImage.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             letterImage.widthAnchor.constraint(equalToConstant: 328),
             letterImage.heightAnchor.constraint(equalToConstant: 610),
@@ -137,9 +155,12 @@ class ShareViewController: UIViewController {
             homeButton.topAnchor.constraint(equalTo: letterImage.bottomAnchor, constant: 20),
             homeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             homeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
-//            homeButton.widthAnchor.constraint(equalToConstant: 328),
             homeButton.heightAnchor.constraint(equalToConstant: 52),
+            
+            shareButton.topAnchor.constraint(equalTo: homeButton.bottomAnchor, constant: 10),
+            shareButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            shareButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            shareButton.heightAnchor.constraint(equalToConstant: 52),
         ])
     }
     
@@ -186,73 +207,68 @@ class ShareViewController: UIViewController {
         print("Home button isHidden: \(homeButton.isHidden)")
         print("Home button isUserInteractionEnabled: \(homeButton.isUserInteractionEnabled)")
         
+        print("알림 예약 시작")
+        NotificationManager.shared.scheduleNotificationAfter(seconds: 10, navigateTo: "LoginViewController")
+
         let myRecordsVC = MyRecordsViewController()
         myRecordsVC.modalPresentationStyle = .fullScreen
         present(myRecordsVC, animated: true, completion: nil)
     }
     
-    private func updateImages() {
-        // 병 이미지도 여기서 관리하라!
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
+    @objc private func shareButtonTapped() {
+        guard let image = letterImage.image else {
+            print("이미지를 찾을 수 없습니다.")
             return
         }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        present(activityViewController, animated: true, completion: nil)
+    }
+    
+    private func updateImages() {
+//        print(TravelRecordManager.shared.temporaryOneline!)
         
-        // bottle(glass)
-        // letter
-        switch record?.oneLine1 {
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
-            glassImage.image = UIImage(named: "Dreamy Pink")
+            openPreviewButton.setImage(UIImage(named: "Dreamy Pink"), for: .normal)
             letterImage.image = UIImage(named: "pink")
         case "value2":
-            glassImage.image = UIImage(named: "Cloud Whisper")
+            openPreviewButton.setImage(UIImage(named: "Cloud Whisper"), for: .normal)
             letterImage.image = UIImage(named: "whisper")
         case "value3":
-            glassImage.image = UIImage(named: "Sunburst Yellow")
+            openPreviewButton.setImage(UIImage(named: "Sunburst Yellow"), for: .normal)
             letterImage.image = UIImage(named: "yellow")
         case "value4":
-            glassImage.image = UIImage(named: "Radiant Orange")
+            openPreviewButton.setImage(UIImage(named: "Radiant Orange"), for: .normal)
             letterImage.image = UIImage(named: "orange")
         case "value5":
-            glassImage.image = UIImage(named: "Serene Sky")
+            openPreviewButton.setImage(UIImage(named: "Serene Sky"), for: .normal)
             letterImage.image = UIImage(named: "serene_sky")
         case "value6":
-            glassImage.image = UIImage(named: "Midnight Depth")
+            openPreviewButton.setImage(UIImage(named: "Midnight Depth"), for: .normal)
             letterImage.image = UIImage(named: "midnight_depth")
         case "value7":
-            glassImage.image = UIImage(named: "Wanderer's Flame")
+            openPreviewButton.setImage(UIImage(named: "Wanderer's Flame"), for: .normal)
             letterImage.image = UIImage(named: "wandarer")
         case "value8":
-            glassImage.image = UIImage(named: "Storybook Brown")
+            openPreviewButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
             letterImage.image = UIImage(named: "brown")
         case "value9":
-            glassImage.image = UIImage(named: "Ember Red")
+            openPreviewButton.setImage(UIImage(named: "Ember Red"), for: .normal)
             letterImage.image = UIImage(named: "red")
         case "value10":
-            glassImage.image = UIImage(named: "Meadow Green")
+            openPreviewButton.setImage(UIImage(named: "Meadow Green"), for: .normal)
             letterImage.image = UIImage(named: "green")
         default:
-            glassImage.image = UIImage(named: "Storybook Brown")
+            openPreviewButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
             letterImage.image = UIImage(named: "brown")
         }
     }
     
     private func updateLabelText() {
-        // recordID 유효성 확인
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        // 기록 가져오기
-        guard let record = TravelRecordManager.shared.getRecord(by: recordUUID) else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
-            return
-        }
-        
         // oneLine1 값을 확인하고 contentLabel 업데이트
         let labelText: String
-        switch record.oneLine1 {
+        switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
             labelText = "당신의 여행 컬러는\n\"Dreamy Pink\"입니다."
         case "value2":
@@ -276,8 +292,13 @@ class ShareViewController: UIViewController {
         default:
             labelText = "당신의 여행 컬러는\n\"알 수 없음\"입니다."
         }
-        
-        // 업데이트된 텍스트를 라벨에 설정
         contentLabel.text = labelText
     }
+    
+    @objc func openUSDZPreviewController() {
+        let USDZPreviewVC = USDZPreviewViewController()
+        USDZPreviewVC.modalPresentationStyle = .fullScreen
+        present(USDZPreviewVC, animated: false, completion: nil)
+    }
+
 }

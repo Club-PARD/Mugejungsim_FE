@@ -10,6 +10,7 @@ import UIKit
 class ObjeCreationViewController: UIViewController {
     
     var recordID : String = ""
+    var travelRecord : TravelRecord?
     
     private let items: [(value: String, title: String)] = [
         ("value1", "🥰 마치 사랑에 빠진 것처럼 설레던 여행"),
@@ -31,7 +32,7 @@ class ObjeCreationViewController: UIViewController {
     // 제목 라벨
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "한줄 남기기로 오브제를 만들어\n어행을 추억해 보세요!"
+        label.text = "이번 여행은 당신에게\n어떤 의미인가요?"
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textColor = .black
         label.textAlignment = .center
@@ -118,12 +119,6 @@ class ObjeCreationViewController: UIViewController {
     }
     
     @objc private func didTapCloseButton() {
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
-            return
-        }
-        
-        
         let stopSelectingVC = StopSelectingViewController()
         stopSelectingVC.modalTransitionStyle = .crossDissolve
         stopSelectingVC.modalPresentationStyle = .overFullScreen
@@ -160,7 +155,6 @@ class ObjeCreationViewController: UIViewController {
         createButton.addTarget(self, action: #selector(didTapCreateButton), for: .touchUpInside)
     }
     
-    // MARK: - 제약조건
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
@@ -174,7 +168,7 @@ class ObjeCreationViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
@@ -182,7 +176,7 @@ class ObjeCreationViewController: UIViewController {
             subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
-            stackView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 16),
+            stackView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 23),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -206,7 +200,7 @@ class ObjeCreationViewController: UIViewController {
         button.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
         button.layer.cornerRadius = 4
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.heightAnchor.constraint(equalToConstant: 39).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 48).isActive = true
         button.addTarget(self, action: #selector(didTapItemButton(_:)), for: .touchUpInside)
         return button
     }
@@ -272,47 +266,88 @@ class ObjeCreationViewController: UIViewController {
     
     @objc private func didTapCreateButton() {
         print("선택된 값: \(selectedItems)")
-        guard let recordUUID = UUID(uuidString: recordID) else {
-            print("유효하지 않은 recordID: \(recordID)")
+        let objeNum: String = selectedItems[0]
+
+        // userId 확인 및 범위 검증
+        guard let userId = TravelRecordManager.shared.userId else {
+            print("유효하지 않은 사용자 ID")
             return
         }
-        
-        var objeNum: String = selectedItems[0]
 
-        // TravelRecordManager에서 기록을 가져오기
-        if var record = TravelRecordManager.shared.getRecord(by: recordUUID) {
-            record.oneLine1 = objeNum
-            TravelRecordManager.shared.updateRecord(record) // 기존 레코드를 대체하는 방식
-            print("Record \(recordUUID) 업데이트 완료:")
-            print("Title: \(record.title)")
-//            print("Description: \(record.description)")
-//            print("Date: \(record.date)")
-            print("Location: \(record.location)")
-            print("oneLine1: \(record.oneLine1)")
-            print("oneLine2: \(record.oneLine2)")
-            print("Photos: \(record.photos.count)장")
-            for (index, photo) in record.photos.enumerated() {
-                print("  Photo \(index + 1):")
-                print("    Image Path: \(photo.imagePath)")
-                print("    Text: \(photo.text)")
-                print("Categories: \(photo.categories.joined(separator: ", "))") // 배열을 문자열로 결합
-            }
-            // 저장 후 데이터 확인
-            if let updatedRecord = TravelRecordManager.shared.getRecord(by: recordUUID) {
-                print("데이터 저장 후 확인:")
-                print("oneLine1: \(updatedRecord.oneLine1)")
-            } else {
-                print("데이터 저장 실패")
-            }
-
-            goToNextPage()
+        // 중도 진행 여부 확인
+        if let travelRecord = travelRecord, travelRecord.id != 0 {
+            TravelRecordManager.shared.postId = travelRecord.id
+            print("===============\(travelRecord.id)=================")
+            print("===============\(TravelRecordManager.shared.postId ?? -1)=================")
+            print("===============\(travelRecord.title)=================")
         } else {
-            print("recordID에 해당하는 기록을 찾을 수 없습니다.")
+            print("travelRecord가 nil이거나 ID가 0입니다.")
         }
+
+        // getUserPosts 호출
+        APIService.shared.getUserPosts(userId: userId) { [weak self] result in
+            switch result {
+            case .success(let records):
+                print("불러온 게시물 개수: \(records.count)")
+                
+                var temp: TravelRecord? // `temp` 변수를 함수 범위에서 선언
+
+                if let targetRecordID = self?.travelRecord?.id,
+                   let matchedRecord = records.first(where: { $0.id == targetRecordID }) {
+                    // 중도 참여용: targetRecordID와 매칭되는 레코드를 찾은 경우
+                    print("업데이트할 레코드를 찾았습니다: \(matchedRecord)")
+                    temp = matchedRecord
+                    TravelRecordManager.shared.postId = temp?.id
+                }else if let postId = TravelRecordManager.shared.postId,
+                         let matchedByPostId = records.first(where: { $0.id == postId }) {
+                   print("postId를 기준으로 레코드를 찾았습니다: \(matchedByPostId)")
+                   temp = matchedByPostId
+                } else {    // records가 비어 있는 경우 처리
+                    print("레코드가 없습니다.")
+                }
+
+                guard let postId = TravelRecordManager.shared.postId else {
+                    print("유효하지 않은 postId")
+                    return
+                }
+                // `temp`가 설정된 경우 업데이트 로직 수행
+                if var temp = temp {
+                    temp.bottle = objeNum
+                    TravelRecordManager.shared.temporaryOneline = objeNum
+                    TravelRecordManager.shared.TemporaryCount = records.count
+                    print("         Title : \(temp.title)")
+                    print("         Bottle : \(temp.bottle)")
+                    print("         records Count: \(records.count)")
+                    print("         Temp Bottle : \(temp.bottle)")
+                    print("         Temp records Count: \(records.count)")
+                    
+                    TravelRecordManager.shared.updateRecordOnServer(postId: postId, record: temp) { result in // 여기서 POST
+                        switch result {
+                        case .success(let response):
+                            print("Successfully updated record: \(response)")
+                        case .failure(let error):
+                            print("Failed to update record: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            case .failure(let error):
+                print("데이터 가져오기 실패: \(error.localizedDescription)")
+            }
+        }
+        goToNextPage()
     }
+    
     
     private func goToNextPage() {
         let loadingVC = LoadingViewController() // 이동할 ViewController 인스턴스 생성
+        if let travelRecord = travelRecord, travelRecord.id != 0 {
+            recordID = "0"
+            print("===============\(travelRecord.id)=================")
+            print("===============\(TravelRecordManager.shared.postId ?? -1)=================")
+        } else {
+            print("travelRecord가 nil이거나 ID가 0입니다.")
+        }
+
         loadingVC.recordID = recordID
         print("recordID: \(recordID)")
         loadingVC.modalTransitionStyle = .crossDissolve // 화면 전환 스타일 설정 (페이드 효과)

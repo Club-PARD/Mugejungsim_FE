@@ -28,14 +28,14 @@ class LoadingViewController: UIViewController {
         view.backgroundColor = .white
         setupUI()
         
-        guard let recordUUID = UUID(uuidString: recordID) else {
+        guard let recordUUID = Int(recordID) else {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
             
         if let record = TravelRecordManager.shared.getRecord(by: recordUUID) {
             print("LoadingViewController에서 데이터 확인:")
-            print("oneLine1: \(record.oneLine1)")
+            print("oneLine1: \(record.oneLine1!)")
         } else {
             print("recordID에 해당하는 기록을 찾을 수 없습니다.")
         }
@@ -75,6 +75,7 @@ class LoadingViewController: UIViewController {
     private func goToNextPage() {
         // 다음 화면 이동 코드
         let resultVC = ResultViewController()
+//        print(recordID)
         resultVC.recordID = recordID
         resultVC.modalTransitionStyle = .crossDissolve // 오픈 모션
         resultVC.modalPresentationStyle = .fullScreen

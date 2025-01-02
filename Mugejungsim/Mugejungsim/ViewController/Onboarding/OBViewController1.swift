@@ -24,7 +24,7 @@ class OBViewController1: UIViewController {
 
     private let placeholderView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "OB2") // "OB2"라는 이미지 파일 추가
+        imageView.image = UIImage(named: "OB1") // "OB2"라는 이미지 파일 추가
         imageView.contentMode = .scaleAspectFit // 이미지 비율 유지하며 맞추기
         imageView.layer.cornerRadius = 10
         imageView.clipsToBounds = true // 이미지가 라운드 영역을 벗어나지 않도록
