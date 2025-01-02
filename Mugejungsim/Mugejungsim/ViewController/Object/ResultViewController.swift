@@ -7,7 +7,7 @@ class ResultViewController: UIViewController {
     let memoryLabel: UILabel = {
         let label = UILabel()
         label.text = "여행 이야기를 담은\n유리병 편지가 완성되었어요!"
-        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        label.textColor = UIColor(red: 0.141, green: 0.141, blue: 0.141, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -20,7 +20,7 @@ class ResultViewController: UIViewController {
         label.text = "유리병을 터치하고 움직여 보세요!"
         label.numberOfLines = 0
         label.textColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
-        label.font = UIFont(name: "Pretendard-SemiBold", size: 17)
+        label.font = UIFont(name: "Pretendard-Regular", size: 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -116,14 +116,16 @@ class ResultViewController: UIViewController {
 
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            memoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 175),
+//            memoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 175),
             memoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            memoryLabel.bottomAnchor.constraint(equalTo: touchLabel.topAnchor, constant: -37),
             
-            touchLabel.topAnchor.constraint(equalTo: memoryLabel.bottomAnchor, constant: 14),
             touchLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            touchLabel.bottomAnchor.constraint(equalTo: openPreviewButton.topAnchor, constant: -37),
+            
             
             openPreviewButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            openPreviewButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 50),
+            openPreviewButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
             openPreviewButton.widthAnchor.constraint(equalToConstant: 200),
             openPreviewButton.heightAnchor.constraint(equalToConstant: 200),
 

@@ -29,13 +29,23 @@ class ShareViewController: UIViewController {
         return label
     }()
     
-    private let glassImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "moments")
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-
-        return imageView
+//    private let glassImage: UIImageView = {
+//        let imageView = UIImageView()
+//        imageView.image = UIImage(named: "moments")
+//        imageView.contentMode = .scaleAspectFit
+//        imageView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        return imageView
+//    }()
+    
+    let openPreviewButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "Storybook Brown"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.clipsToBounds = true
+        button.backgroundColor = .clear
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     private let letterImage: UIImageView = {
@@ -88,6 +98,8 @@ class ShareViewController: UIViewController {
         updateImages()
         updateLabelText()
         setupUI()
+        
+        openPreviewButton.addTarget(self, action: #selector(openUSDZPreviewController), for: .touchUpInside)
         homeButton.addTarget(self, action: #selector(homeButtonTapped), for: .touchUpInside)
         shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
     }
@@ -98,7 +110,7 @@ class ShareViewController: UIViewController {
         scrollView.alwaysBounceHorizontal = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.isScrollEnabled = true
-        scrollView.contentSize = CGSize(width: view.frame.width, height: 1100)
+        scrollView.contentSize = CGSize(width: view.frame.width, height: 1070)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -109,11 +121,12 @@ class ShareViewController: UIViewController {
         scrollView.addSubview(contentView)
         
         contentView.addSubview(contentLabel)
-        contentView.addSubview(glassImage)
+        contentView.addSubview(openPreviewButton)
         contentView.addSubview(letterImage)
         
         view.addSubview(homeButton)
         view.addSubview(shareButton)
+        view.addSubview(openPreviewButton)
         
         setupConstraints()
         setupCustomNavigationBar()
@@ -129,12 +142,12 @@ class ShareViewController: UIViewController {
             contentLabel.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20),
             contentLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
 
-            glassImage.topAnchor.constraint(equalTo: contentLabel.bottomAnchor, constant: 20),
-            glassImage.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            glassImage.widthAnchor.constraint(equalToConstant: 200),
-            glassImage.heightAnchor.constraint(equalToConstant: 200),
+            openPreviewButton.topAnchor.constraint(equalTo: contentLabel.bottomAnchor, constant: 20),
+            openPreviewButton.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            openPreviewButton.widthAnchor.constraint(equalToConstant: 200),
+            openPreviewButton.heightAnchor.constraint(equalToConstant: 200),
 
-            letterImage.topAnchor.constraint(equalTo: glassImage.bottomAnchor, constant: 20),
+            letterImage.topAnchor.constraint(equalTo: openPreviewButton.bottomAnchor, constant: 20),
             letterImage.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
             letterImage.widthAnchor.constraint(equalToConstant: 328),
             letterImage.heightAnchor.constraint(equalToConstant: 610),
@@ -217,37 +230,37 @@ class ShareViewController: UIViewController {
         
         switch TravelRecordManager.shared.temporaryOneline! {
         case "value1":
-            glassImage.image = UIImage(named: "Dreamy Pink")
+            openPreviewButton.setImage(UIImage(named: "Dreamy Pink"), for: .normal)
             letterImage.image = UIImage(named: "pink")
         case "value2":
-            glassImage.image = UIImage(named: "Cloud Whisper")
+            openPreviewButton.setImage(UIImage(named: "Cloud Whisper"), for: .normal)
             letterImage.image = UIImage(named: "whisper")
         case "value3":
-            glassImage.image = UIImage(named: "Sunburst Yellow")
+            openPreviewButton.setImage(UIImage(named: "Sunburst Yellow"), for: .normal)
             letterImage.image = UIImage(named: "yellow")
         case "value4":
-            glassImage.image = UIImage(named: "Radiant Orange")
+            openPreviewButton.setImage(UIImage(named: "Radiant Orange"), for: .normal)
             letterImage.image = UIImage(named: "orange")
         case "value5":
-            glassImage.image = UIImage(named: "Serene Sky")
+            openPreviewButton.setImage(UIImage(named: "Serene Sky"), for: .normal)
             letterImage.image = UIImage(named: "serene_sky")
         case "value6":
-            glassImage.image = UIImage(named: "Midnight Depth")
+            openPreviewButton.setImage(UIImage(named: "Midnight Depth"), for: .normal)
             letterImage.image = UIImage(named: "midnight_depth")
         case "value7":
-            glassImage.image = UIImage(named: "Wanderer's Flame")
+            openPreviewButton.setImage(UIImage(named: "Wanderer's Flame"), for: .normal)
             letterImage.image = UIImage(named: "wandarer")
         case "value8":
-            glassImage.image = UIImage(named: "Storybook Brown")
+            openPreviewButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
             letterImage.image = UIImage(named: "brown")
         case "value9":
-            glassImage.image = UIImage(named: "Ember Red")
+            openPreviewButton.setImage(UIImage(named: "Ember Red"), for: .normal)
             letterImage.image = UIImage(named: "red")
         case "value10":
-            glassImage.image = UIImage(named: "Meadow Green")
+            openPreviewButton.setImage(UIImage(named: "Meadow Green"), for: .normal)
             letterImage.image = UIImage(named: "green")
         default:
-            glassImage.image = UIImage(named: "Storybook Brown")
+            openPreviewButton.setImage(UIImage(named: "Storybook Brown"), for: .normal)
             letterImage.image = UIImage(named: "brown")
         }
     }
@@ -281,4 +294,11 @@ class ShareViewController: UIViewController {
         }
         contentLabel.text = labelText
     }
+    
+    @objc func openUSDZPreviewController() {
+        let USDZPreviewVC = USDZPreviewViewController()
+        USDZPreviewVC.modalPresentationStyle = .fullScreen
+        present(USDZPreviewVC, animated: false, completion: nil)
+    }
+
 }

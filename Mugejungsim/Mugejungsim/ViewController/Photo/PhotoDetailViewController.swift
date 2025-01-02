@@ -5,6 +5,7 @@ class PhotoDetailViewController: UIViewController {
     
     var selectedPhotoData: PhotoData? // 선택한 데이터 저장
     var currentIndex: Int = 0 // 현재 이미지의 인덱스를 저장
+    var allPhotoData: [PhotoData] = [] // 전체 사진 데이터
 
     private var imageView: UIImageView!
     private var categoryButtonsStackView: UIStackView! // 세부 카테고리를 표시할 스택뷰
@@ -42,14 +43,6 @@ class PhotoDetailViewController: UIViewController {
         backButton.addTarget(self, action: #selector(goBack), for: .touchUpInside)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         
-        // 삭제 버튼
-        //        let deleteButton = UIButton(type: .system)
-        //        deleteButton.setTitle("삭제", for: .normal)
-        //        deleteButton.setTitleColor(.red, for: .normal) // 텍스트 색상 빨간색
-        //        deleteButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        //        deleteButton.addTarget(self, action: #selector(deletePhoto), for: .touchUpInside)
-        //        deleteButton.translatesAutoresizingMaskIntoConstraints = false
-        
         // 내비게이션 바에 뷰 추가
         navBar.addSubview(backButton)
         navBar.addSubview(imageCountLabel)
@@ -63,7 +56,7 @@ class PhotoDetailViewController: UIViewController {
             navBar.heightAnchor.constraint(equalToConstant: 65),
             
             backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
-            backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 26),
+            backButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -26),
             
             imageCountLabel.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             imageCountLabel.centerXAnchor.constraint(equalTo: navBar.centerXAnchor)
@@ -105,7 +98,7 @@ class PhotoDetailViewController: UIViewController {
         categoryButtonsStackView.axis = .horizontal
         categoryButtonsStackView.alignment = .center
         categoryButtonsStackView.distribution = .equalSpacing
-        categoryButtonsStackView.spacing = 10
+        categoryButtonsStackView.spacing = 13
         categoryButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
         categoryScrollView.addSubview(categoryButtonsStackView)
         
@@ -141,8 +134,8 @@ class PhotoDetailViewController: UIViewController {
             // 검정 박스
             blackBoxView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             blackBoxView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            blackBoxView.widthAnchor.constraint(equalToConstant: 444),
-            blackBoxView.heightAnchor.constraint(equalToConstant: 324),
+            blackBoxView.widthAnchor.constraint(equalToConstant: 328),
+            blackBoxView.heightAnchor.constraint(equalToConstant: 328),
             
             // 이미지 뷰 (검정 박스 안에서 중앙 정렬)
             imageView.centerXAnchor.constraint(equalTo: blackBoxView.centerXAnchor),
@@ -152,13 +145,13 @@ class PhotoDetailViewController: UIViewController {
             
             // 카테고리 스크롤 뷰
             categoryScrollView.topAnchor.constraint(equalTo: blackBoxView.bottomAnchor, constant: 20),
-            categoryScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            categoryScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            categoryScrollView.heightAnchor.constraint(equalToConstant: 50),
+            categoryScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            categoryScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            categoryScrollView.heightAnchor.constraint(equalToConstant: 55),
             
             // 카테고리 스택뷰
             categoryButtonsStackView.topAnchor.constraint(equalTo: categoryScrollView.topAnchor),
-            categoryButtonsStackView.leadingAnchor.constraint(equalTo: categoryScrollView.leadingAnchor),
+            categoryButtonsStackView.leadingAnchor.constraint(equalTo: categoryScrollView.leadingAnchor, constant: 20),
             categoryButtonsStackView.trailingAnchor.constraint(equalTo: categoryScrollView.trailingAnchor),
             categoryButtonsStackView.bottomAnchor.constraint(equalTo: categoryScrollView.bottomAnchor),
             categoryButtonsStackView.heightAnchor.constraint(equalTo: categoryScrollView.heightAnchor),
@@ -207,10 +200,10 @@ class PhotoDetailViewController: UIViewController {
     func createCategoryButton(with title: String) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(UIColor(red: 0.333, green: 0.333, blue: 0.345, alpha: 1), for: .normal)
         button.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
         button.layer.cornerRadius = 4
-        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 15)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.heightAnchor.constraint(equalToConstant: 37).isActive = true
         button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 12, bottom: 5, right: 12)

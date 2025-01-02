@@ -32,7 +32,7 @@ class ObjeCreationViewController: UIViewController {
     // 제목 라벨
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "한줄 남기기로 오브제를 만들어\n어행을 추억해 보세요!"
+        label.text = "이번 여행은 당신에게\n어떤 의미인가요?"
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textColor = .black
         label.textAlignment = .center
@@ -168,7 +168,7 @@ class ObjeCreationViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
@@ -176,7 +176,7 @@ class ObjeCreationViewController: UIViewController {
             subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
-            stackView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 16),
+            stackView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 23),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -200,7 +200,7 @@ class ObjeCreationViewController: UIViewController {
         button.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
         button.layer.cornerRadius = 4
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.heightAnchor.constraint(equalToConstant: 39).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 48).isActive = true
         button.addTarget(self, action: #selector(didTapItemButton(_:)), for: .touchUpInside)
         return button
     }

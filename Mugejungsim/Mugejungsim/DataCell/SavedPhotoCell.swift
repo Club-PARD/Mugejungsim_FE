@@ -40,7 +40,7 @@ class SavedPhotoCell: UICollectionViewCell {
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.8),
+            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             textLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 4),
             textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
