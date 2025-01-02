@@ -4,6 +4,7 @@ class CheckObjeImageViewController: UIViewController {
     
     // MARK: - UI Elements
     var recordID: String = ""
+    private let gradientLayer = CAGradientLayer()
     
     let textLabel: UILabel = {
         let label = UILabel()
@@ -82,6 +83,7 @@ class CheckObjeImageViewController: UIViewController {
             print("recordID에 해당하는 기록을 찾을 수 없습니다.")
         }
         updateImages()
+        setupGradientLayer()
     }
     
     // MARK: - Constraints Setup
@@ -108,6 +110,21 @@ class CheckObjeImageViewController: UIViewController {
         ])
     }
     
+    private func setupGradientLayer() { 
+        gradientLayer.colors = [
+            UIColor(red: 0.44, green: 0.43, blue: 0.7, alpha: 1).cgColor,
+            UIColor(red: 0.78, green: 0.55, blue: 0.75, alpha: 1).cgColor
+        ]
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1.0, y: 0.5)
+        gradientLayer.frame = readButton.bounds
+        gradientLayer.cornerRadius = 8
+
+        if gradientLayer.superlayer == nil {
+            readButton.layer.insertSublayer(gradientLayer, at: 0)
+        }
+    }
+    
     // MARK: - Button Actions
     @objc func saveButtonTapped() {
         print("성공!")
@@ -117,13 +134,14 @@ class CheckObjeImageViewController: UIViewController {
         self.present(ShareVC, animated: true, completion: nil)
     }
     
+    
     private func updateImages() {
         // 병 이미지도 여기서 관리하라!
         guard let recordUUID = UUID(uuidString: recordID) else {
             print("유효하지 않은 recordID: \(recordID)")
             return
         }
-        var record = TravelRecordManager.shared.getRecord(by: recordUUID)
+        var record = TravelRecordManager.shared.getRecord(by: recordUUID) 
         
         // bottle(glass)
         switch record?.oneLine1 {

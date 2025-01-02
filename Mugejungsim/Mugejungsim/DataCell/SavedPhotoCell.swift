@@ -29,7 +29,7 @@ class SavedPhotoCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+         
         contentView.addSubview(imageView)
         contentView.addSubview(textLabel)
         contentView.addSubview(categoryLabel)
@@ -38,7 +38,7 @@ class SavedPhotoCell: UICollectionViewCell {
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.8),
+            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             textLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 4),
             textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),

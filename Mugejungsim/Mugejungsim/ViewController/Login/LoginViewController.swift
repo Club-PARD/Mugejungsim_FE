@@ -1,6 +1,6 @@
 import UIKit
 import KakaoSDKUser
-
+import KakaoSDKAuth
 
 class LoginViewController: UIViewController {
     

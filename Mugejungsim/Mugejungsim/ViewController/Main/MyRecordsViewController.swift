@@ -4,24 +4,30 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     
     private var travelRecords: [TravelRecord] = [] // 여행 기록 데이터
     
-    let myPageButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "person.circle"), for: .normal)
-        button.tintColor = .gray
-        button.layer.cornerRadius = 25
-        button.clipsToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+    private let logoImageView0: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "person") // 로고 이미지 파일 필요
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
     }()
     
     let titleCardView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 8
+        
+        // 테두리 설정
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor(red: 210/255, green: 210/255, blue: 245/255, alpha: 1.0).cgColor // d2d2f5 색상
+        
+        // 그림자 설정
         view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOpacity = 0.25
-        view.layer.shadowOffset = CGSize(width: 0, height: 4)
-        view.layer.shadowRadius = 4
+        view.layer.shadowOpacity = 0.25 // 25%
+        view.layer.shadowOffset = CGSize(width: 1, height: 1) // X: 0.5, Y: 0.5
+        view.layer.shadowRadius = 2 // Blur 값
+        view.layer.masksToBounds = false // 그림자가 레이어를 넘어서 보이도록 설정
+
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -37,9 +43,9 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     // 상단 제목 레이블
     let titleLabel: UILabel = {
         let label1 = UILabel()
-        label1.text = "무게중심 님의 여행 기록"
+        label1.text = "무게중심 님의 여행 이야기"
         label1.font = UIFont(name: "Pretendard-Bold", size: 22)
-        label1.textColor = .black
+        label1.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label1.numberOfLines = 1
         label1.textAlignment = .center
         label1.translatesAutoresizingMaskIntoConstraints = false
@@ -48,36 +54,37 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     
     let subLabel: UILabel = {
         let label2 = UILabel()
-        label2.text = "지금까지의 여행을 모아보세요!"
-        label2.font = .systemFont(ofSize: 14, weight: .regular)
-        label2.textColor = .gray
+        label2.text = "여행의 추억을 유리병 편지에 담아보세요!"
+        label2.font = UIFont(name: "Pretendard-Medium", size: 15)
+        label2.textColor = #colorLiteral(red: 0.4588235294, green: 0.4509803922, blue: 0.7647058824, alpha: 1)
         label2.numberOfLines = 1
         label2.textAlignment = .center
         label2.translatesAutoresizingMaskIntoConstraints = false
         return label2
     }()
     
-    // 커스텀 스타일의 Segmented Control
+    // Segmented Control Container 설정
     let segmentedControlContainer: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 8
         view.clipsToBounds = false
         view.backgroundColor = UIColor(red: 110/255, green: 110/255, blue: 222/255, alpha: 1.0)
         view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOpacity = 0.25
-        view.layer.shadowOffset = CGSize(width: 0, height: 4)
-        view.layer.shadowRadius = 4
+        view.layer.shadowOpacity = 0.15
+        view.layer.shadowOffset = CGSize(width: 1.95, height: 1.95)
+        view.layer.shadowRadius = 2.6
         
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
+
+    // Segmented Control 설정
     let segmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["여행 기록", "오브제"])
+        let control = UISegmentedControl(items: ["여행 기록", "컬렉션"])
         control.selectedSegmentIndex = 0
         control.backgroundColor = .clear
         control.selectedSegmentTintColor = .white
-        control.clipsToBounds = true // 필수 설정
+        control.clipsToBounds = true
         
         // 기본 및 선택된 텍스트 스타일 설정
         let normalAttributes: [NSAttributedString.Key: Any] = [
@@ -94,9 +101,6 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         control.setTitleTextAttributes(selectedAttributes, for: .selected)
         
         control.translatesAutoresizingMaskIntoConstraints = false
-        
-        // 선택된 세그먼트의 CornerRadius 설정
-        control.addTarget(self, action: #selector(updateSegmentedControlCorners), for: .valueChanged)
         return control
     }()
     
@@ -286,7 +290,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         scrollView.addSubview(scrollableTravelCollectionView)
         
         view.addSubview(floatingButton)
-        view.addSubview(myPageButton)
+        view.addSubview(logoImageView0)
         
         NSLayoutConstraint.activate([
             logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
@@ -295,7 +299,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             logoImageView.heightAnchor.constraint(equalToConstant: 25),
             
             // Title Card View
-            titleCardView.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 20),
+            titleCardView.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 23),
             titleCardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25),
             titleCardView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25),
             titleCardView.heightAnchor.constraint(equalToConstant: 93),
@@ -309,25 +313,26 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             subLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 47),
             
             // Segmented Control Container
-            segmentedControlContainer.topAnchor.constraint(equalTo: titleCardView.bottomAnchor, constant: 30),
+            segmentedControlContainer.topAnchor.constraint(equalTo: titleCardView.bottomAnchor, constant: 33),
             segmentedControlContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
             segmentedControlContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
             segmentedControlContainer.heightAnchor.constraint(equalToConstant: 40),
             
-            // Segmented Control
-            segmentedControl.leadingAnchor.constraint(equalTo: segmentedControlContainer.leadingAnchor),
-            segmentedControl.trailingAnchor.constraint(equalTo: segmentedControlContainer.trailingAnchor),
-            segmentedControl.topAnchor.constraint(equalTo: segmentedControlContainer.topAnchor),
-            segmentedControl.bottomAnchor.constraint(equalTo: segmentedControlContainer.bottomAnchor),
+            // Segmented Control - 정중앙 배치
+            segmentedControl.centerXAnchor.constraint(equalTo: segmentedControlContainer.centerXAnchor),
+            segmentedControl.centerYAnchor.constraint(equalTo: segmentedControlContainer.centerYAnchor, constant: -0.5),
+            segmentedControl.leadingAnchor.constraint(equalTo: segmentedControlContainer.leadingAnchor, constant: 0.5), // 좌측 여백
+            segmentedControl.trailingAnchor.constraint(equalTo: segmentedControlContainer.trailingAnchor, constant: -0.5), // 우측 여백
+            segmentedControl.heightAnchor.constraint(equalToConstant: 38),
             
             // My Page Button
-            myPageButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            myPageButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            myPageButton.widthAnchor.constraint(equalToConstant: 50),
-            myPageButton.heightAnchor.constraint(equalToConstant: 50),
+            logoImageView0.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
+            logoImageView0.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+//            logoImageView0.widthAnchor.constraint(equalToConstant: 50),
+//            logoImageView0.heightAnchor.constraint(equalToConstant: 50),
             
             // ScrollView
-            scrollView.topAnchor.constraint(equalTo: segmentedControlContainer.bottomAnchor, constant: 16),
+            scrollView.topAnchor.constraint(equalTo: segmentedControlContainer.bottomAnchor, constant: 33),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -80),
@@ -365,13 +370,17 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     
     @objc private func segmentedControlChanged() {
-        // 선택된 세그먼트 인덱스에 따라 다른 CollectionView 표시
+        // 선택된 세그먼트 인덱스에 따라 다른 CollectionView 및 subLabel 설정
         print("Segmented control changed to index: \(segmentedControl.selectedSegmentIndex)")
 
         switch segmentedControl.selectedSegmentIndex {
         case 0: // 여행 기록
             scrollableObjectCollectionView.removeFromSuperview()
             scrollView.addSubview(scrollableTravelCollectionView)
+            
+            // subLabel 텍스트 변경
+            subLabel.text = "여행의 추억을 유리병 편지에 담아보세요!"
+            
             NSLayoutConstraint.activate([
                 scrollableTravelCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor),
                 scrollableTravelCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -385,9 +394,13 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
             travelRecords.forEach { record in
                 print("TravelRecord - Title: \(record.title), OneLine1: \(record.oneLine1)!")
             }
-        case 1: // 오브제
+        case 1: // 컬렉션
             scrollableTravelCollectionView.removeFromSuperview()
             scrollView.addSubview(scrollableObjectCollectionView)
+            
+            // subLabel 텍스트 변경
+            subLabel.text = "여행의 색이 담긴 유리병 편지를 읽어보세요!"
+            
             NSLayoutConstraint.activate([
                 scrollableObjectCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor),
                 scrollableObjectCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -396,7 +409,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
                 scrollableObjectCollectionView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
                 scrollableObjectCollectionView.heightAnchor.constraint(equalToConstant: calculateCollectionViewHeight()),
             ])
-            reloadTravelRecords() // 여행 기록 데이터를 다시 로드
+            reloadTravelRecords() // 컬렉션 데이터를 다시 로드
             print("Reloaded Travel Records. Count: \(travelRecords.count)")
             travelRecords.forEach { record in
                 print("TravelRecord - Title: \(record.title), OneLine1: \(record.oneLine1)!")
@@ -503,7 +516,7 @@ class MyRecordsViewController: UIViewController, UICollectionViewDelegate, UICol
         } else if collectionView == scrollableObjectCollectionView {
             let selectedRecord = travelRecords[indexPath.row]
             // 오브제 클릭 시 ObjectModalViewController 모달 띄우기
-            print("오브제 셀 클릭됨: \(indexPath.row)")
+            print("컬렉션 셀 클릭됨: \(indexPath.row)")
             
             let objectModalVC = ObjectModal()
             objectModalVC.recordID = selectedRecord.id.uuidString

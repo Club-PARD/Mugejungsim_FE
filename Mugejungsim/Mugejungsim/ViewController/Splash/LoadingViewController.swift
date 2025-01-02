@@ -8,7 +8,7 @@ class LoadingViewController: UIViewController {
         let label = UILabel()
         label.text = "여행의 추억을\n색으로 물들이는 중이에요!"
         label.numberOfLines = 2
-        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        label.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -53,7 +53,7 @@ class LoadingViewController: UIViewController {
     private func setConstraints() {
         NSLayoutConstraint.activate([
             // 로딩 라벨 위치 (이미지 위)
-            loadingLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 175),
+            loadingLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 177),
             loadingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),

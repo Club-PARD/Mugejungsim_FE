@@ -53,7 +53,7 @@ class APIService {
     // MARK: - 다중 이미지 업로드
 
     func uploadTravelRecordImages(
-        recordId: Int,
+        recordId: String,
         images: [UIImage],
         metadata: [[String: Any]], // 각 이미지와 관련된 메타데이터
         completion: @escaping (Result<APIResponse, Error>) -> Void
@@ -69,6 +69,7 @@ class APIService {
             multipartFormData: { multipartFormData in
                 // Add images
                 images.enumerated().forEach { index, image in
+                    multipartFormData.append(Data(recordId.utf8), withName: "recordID")  // recordID 포함
                     if let imageData = image.jpegData(compressionQuality: 0.8) {
                         print("Sending image: image\(index + 1).jpg") // 디버깅용 출력
                         multipartFormData.append(

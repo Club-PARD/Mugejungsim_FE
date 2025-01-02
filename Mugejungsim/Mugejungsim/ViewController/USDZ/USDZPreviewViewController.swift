@@ -29,7 +29,7 @@ class USDZPreviewViewController: UIViewController {
         arView.automaticallyConfigureSession = false // AR 비활성화
         arView.translatesAutoresizingMaskIntoConstraints = false
         // 배경 색 설정
-        arView.environment.background = .color(.white) // 회색 배경 설정
+        arView.environment.background = .color(UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1))
         view.addSubview(arView)
 
         // ARView 레이아웃 설정
@@ -82,10 +82,10 @@ class USDZPreviewViewController: UIViewController {
             usdzEntity?.generateCollisionShapes(recursive: true)
 
             // 최소 크기로 초기화
-            usdzEntity?.scale = [0.05, 0.05, 0.05] // 최소 축소 크기 설정
+            usdzEntity?.scale = [0.2, 0.2, 0.2] // 최소 축소 크기 설정
 
             // 앵커 추가
-            let anchor = AnchorEntity(world: [0, 0, -0.5]) // 사용자 앞 0.5m 위치
+            let anchor = AnchorEntity(world: [0, -0.6, -0.5]) // y 축을 -0.2로 내려 중앙 정렬
             anchor.addChild(entity)
             arView.scene.addAnchor(anchor)
 

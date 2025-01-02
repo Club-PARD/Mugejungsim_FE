@@ -15,13 +15,13 @@ class ObjeCreationViewController: UIViewController {
         ("value1", "🥰 마치 사랑에 빠진 것처럼 설레던 여행"),
         ("value2", "🫧 눈앞에 펼쳐진 모든 것이 꿈같았던 여행"),
         ("value3", "🎉 웃음소리가 바람을 타고 퍼져 나갔던 여행"),
-        ("value4", "✨ 하늘과 땅이 반짝이며 나를 감싼 여행"),
-        ("value5", "️️💐 책갈피 속 작은 꽃처럼 나를 위로한 여행"),
-        ("value6", "️🎞️ 매 순간 영화처럼 선명하게 차오른 여행"),
+        ("value4", "✨ 모든 순간이 별빛처럼 반짝이는 여행"),
+        ("value5", "️️💐 들꽃 같은 소소한 행복을 발견한 여행"),
+        ("value6", "️🎞️ 매 순간 영화처럼 선명하게 새겨진 여행"),
         ("value7", "🪄 모퉁이마다 새로운 세계가 열리던 여행"),
-        ("value8", "📚 평범했던 하루가 따스한 책 한 권이 된 여행"),
+        ("value8", "📚 평범했던 하루가 한 편의 이야기가 된 여행"),
         ("value9", "🥹 가슴 벅찬 아름다움과 진심이 머문 여행"),
-        ("value10", "🍃 고요한 순간들이 나를 평온히 어루만진 여행")
+        ("value10", "🍃 고요한 순간들이 나를 감싸 안은 여행")
     ]
     
     private let scrollView = UIScrollView()
@@ -31,9 +31,9 @@ class ObjeCreationViewController: UIViewController {
     // 제목 라벨
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "한줄 남기기로 오브제를 만들어\n어행을 추억해 보세요!"
+        label.text = "이번 여행은 당신에게\n어떤 의미인가요?"
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
-        label.textColor = .black
+        label.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label.textAlignment = .center
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -61,11 +61,11 @@ class ObjeCreationViewController: UIViewController {
     
     private let createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("오브제 만들기", for: .normal)
-        button.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
+        button.setTitle("유리병 편지 만들기", for: .normal)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 16)
         button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = UIColor(hex: "#D9D9D9")
+        button.backgroundColor = UIColor(hex: "#242424")
         button.layer.cornerRadius = 8
         button.layer.shadowPath = UIBezierPath(roundedRect: button.bounds, cornerRadius: 8).cgPath
         button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
@@ -83,6 +83,17 @@ class ObjeCreationViewController: UIViewController {
         setupCustomNavigationBar()
         setupUI()
         setupConstraints() // 제약조건 함수 호출
+        
+        // createButton 초기 상태 설정
+            createButton.isEnabled = false
+            createButton.setTitleColor(UIColor(hex: "#242424"), for: .normal)
+            createButton.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
+            createButton.backgroundColor = UIColor(hex: "#E9E9E9")
+            createButton.layer.sublayers?.forEach {
+                if $0 is CAGradientLayer {
+                    $0.removeFromSuperlayer()
+                }
+            }
         
         // creatButton에 초기 그림자 고정
         DispatchQueue.main.async {
@@ -178,7 +189,7 @@ class ObjeCreationViewController: UIViewController {
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 9),
+            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 11),
             subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
@@ -198,7 +209,7 @@ class ObjeCreationViewController: UIViewController {
     private func createItemButton(value: String, title: String) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
+        button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 15)
         button.accessibilityIdentifier = value
         button.setTitleColor(UIColor(hex: "#555558"), for: .normal)
         button.backgroundColor = .clear
@@ -206,8 +217,9 @@ class ObjeCreationViewController: UIViewController {
         button.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
         button.layer.cornerRadius = 4
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.heightAnchor.constraint(equalToConstant: 39).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 48).isActive = true
         button.addTarget(self, action: #selector(didTapItemButton(_:)), for: .touchUpInside)
+
         return button
     }
     
@@ -219,14 +231,14 @@ class ObjeCreationViewController: UIViewController {
             selectedItems.removeAll { $0 == value }
             sender.backgroundColor = .white
             sender.layer.borderColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1).cgColor
-            sender.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14) // Regular 폰트로 변경
+            sender.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 15) // Regular 폰트로 변경
         } else {
             // 최대 선택 개수 초과 방지
             guard selectedItems.count < 2 else { return }
             selectedItems.append(value)
             sender.backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             sender.layer.borderColor = UIColor(red: 0.43, green: 0.43, blue: 0.87, alpha: 1).cgColor
-            sender.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 14) 
+            sender.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 15)
         }
     }
     
@@ -247,15 +259,15 @@ class ObjeCreationViewController: UIViewController {
             createButton.layer.insertSublayer(gradientLayer, at: 0)
         } else {
             createButton.isEnabled = false
-            createButton.titleLabel?.textColor = UIColor(red: 0.67, green: 0.67, blue: 0.67, alpha: 1)
-            createButton.titleLabel?.font = UIFont(name: "Pretendard-SemiBold", size: 16)
+            createButton.setTitleColor(UIColor(hex: "#242424"), for: .normal) // 변경된 부분
+            createButton.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 16)
             // Layer 제거
             createButton.layer.sublayers?.forEach {
                 if $0 is CAGradientLayer {
                     $0.removeFromSuperlayer()
                 }
             }
-            createButton.backgroundColor = UIColor(hex: "#D9D9D9")
+            createButton.backgroundColor = UIColor(hex: "#E9E9E9")
         }
         // subtitleLabel 텍스트 색상 변경
         subtitleLabel.textColor = selectedItems.isEmpty

@@ -19,7 +19,7 @@ class DataManager {
     func uploadPhotoData(_ photoData: [[String: Any]], completion: @escaping (Result<String, Error>) -> Void) {
         // API URL 설정 (실제 엔드포인트로 변경 필요)
         
-        guard let url = URL(string: "http://172.17.208.113:8080/") else {
+        guard let url = URL(string: "https://mugejunsim.store") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
             return
         }

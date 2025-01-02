@@ -13,7 +13,8 @@ class URLService {
     let baseURLString: String
     
     private init() {
-        self.baseURLString = "http://172.17.208.113:8080"
+        self.baseURLString = "https://mugejunsim.store"
+//        self.baseURLString = "#"
     }
     
     var baseURL: String {

@@ -8,7 +8,7 @@ class ResultViewController: UIViewController {
     let memoryLabel: UILabel = {
         let label = UILabel()
         label.text = "여행 이야기를 담은\n유리병 편지가 완성되었어요!"
-        label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        label.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label.font = UIFont(name: "Pretendard-Bold", size: 20)
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -117,7 +117,7 @@ class ResultViewController: UIViewController {
 
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            memoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 175),
+            memoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 177),
             memoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             touchLabel.topAnchor.constraint(equalTo: memoryLabel.bottomAnchor, constant: 14),

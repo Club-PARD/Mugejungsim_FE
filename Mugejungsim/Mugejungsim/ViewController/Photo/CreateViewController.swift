@@ -32,25 +32,33 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "여행기 제목"
-        label.font =  UIFont(name: "Pretendard-ExtraBold", size: 20)
-        label.textColor = .black
+        label.text = "여행의 이름을 지어주세요!"
+        label.font =  UIFont(name: "Pretendard-Bold", size: 20)
+        label.textColor = #colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let titleCount: UILabel = {
-            let label = UILabel()
-            label.text = "0 / 10"
-            label.font = UIFont.systemFont(ofSize: 12)
-            label.textColor = .gray
-            return label
-        }()
+        let label = UILabel()
+        label.font = UIFont(name: "Pretendard-Medium", size: 12)
+        label.textColor = #colorLiteral(red: 0.8235294118, green: 0.8235294118, blue: 0.8235294118, alpha: 1)
+        
+        let text = "0 / 10"
+        let attributedString = NSMutableAttributedString(string: text)
+        
+        // 자간 설정 (-1px)
+        attributedString.addAttribute(.kern, value: -1, range: NSRange(location: 4, length: 1)) // 숫자 1과 0 사이에 적용
+        
+        label.attributedText = attributedString
+        return label
+    }()
+    
     let titleTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "제목을 입력하세요"
+        textField.placeholder = "제목을 입력해주세요"
         textField.font = UIFont(name: "Pretendard-Regular", size: 16)
         textField.borderStyle = .none
-        textField.tintColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1) // 6E6EDE
+        textField.tintColor = UIColor(red: 0.43, green: 0.43, blue: 0.87, alpha: 1) // #6E6EDE
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -66,66 +74,82 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     
     let titleUnderline: UIView = {
         let view = UIView()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // 기본 색상
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     let dateLabel: UILabel = {
         let label = UILabel()
-        label.text = "여행 일자"
-        label.font =  UIFont(name: "Pretendard-ExtraBold", size: 20)
-        label.textColor = .black
+        label.text = "언제 떠났나요?"
+        label.font =  UIFont(name: "Pretendard-Bold", size: 20)
+        label.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
     @objc private func didTapSaveButton() {
         print("SaveButton 누름")
-        
-        // SaveDraftModal 모달을 present
+
+        // SaveDraftModal 모달을 생성
         let saveDraftModal = SaveDraftModal()
         saveDraftModal.modalPresentationStyle = .overFullScreen // 전체 화면 모달로 띄움
-        present(saveDraftModal, animated: true, completion: nil)
+        saveDraftModal.view.alpha = 0 // 초기 알파 값 설정
+
+        // 모달 추가 및 애니메이션
+        self.present(saveDraftModal, animated: false) {
+            UIView.animate(withDuration: 0.3) {
+                saveDraftModal.view.alpha = 1 // 서서히 등장
+            }
+        }
     }
 
     let locationLabel: UILabel = {
         let label = UILabel()
-        label.text = "여행 장소"
-        label.font =  UIFont(name: "Pretendard-ExtraBold", size: 20)
-        label.textColor = .black
+        label.text = "어디로 떠났나요?"
+        label.font =  UIFont(name: "Pretendard-Bold", size: 20)
+        label.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let locationCount: UILabel = {
         let label = UILabel()
-        label.text = "0 / 10"
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .gray
+        label.font = UIFont(name: "Pretendard-Medium", size: 12)
+        label.textColor = #colorLiteral(red: 0.8235294118, green: 0.8235294118, blue: 0.8235294118, alpha: 1)
         label.translatesAutoresizingMaskIntoConstraints = false
+        
+        let text = "0 / 10"
+        let attributedString = NSMutableAttributedString(string: text)
+        
+        // 자간 설정 (-1px)
+        attributedString.addAttribute(.kern, value: -1, range: NSRange(location: 4, length: 1)) // "1"과 "0" 사이
+        
+        label.attributedText = attributedString
         return label
     }()
+    
     let locationTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "여행지를 입력하세요"
+        textField.placeholder = "여행지를 입력해주세요"
         textField.font = UIFont(name: "Pretendard-Regular", size: 16)
         textField.borderStyle = .none
-        textField.tintColor = UIColor(red: 0.431, green: 0.431, blue: 0.871, alpha: 1) // 6E6EDE
+        textField.tintColor = UIColor(red: 0.43, green: 0.43, blue: 0.87, alpha: 1) // #6E6EDE
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
     
     let locationUnderline: UIView = {
         let view = UIView()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // 기본 색상
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     let companionLabel: UILabel = {
         let label = UILabel()
-        label.text = "누구와"
-        label.font =  UIFont(name: "Pretendard-ExtraBold", size: 20)
-        label.textColor = .black
+        label.text = "누구와 함께 했나요?"
+        label.font =  UIFont(name: "Pretendard-Bold", size: 20)
+        label.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -136,10 +160,10 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     let nextButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("다음", for: .normal)
-        if let customFont = UIFont(name: "Pretendard-Regular", size: 15) {
+        if let customFont = UIFont(name: "Pretendard-SemiBold", size: 15) {
             button.titleLabel?.font = customFont
         }
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(UIColor(red: 0.541, green: 0.541, blue: 0.541, alpha: 1), for: .normal) // #8A8A8A
         button.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
         button.layer.cornerRadius = 8
         button.isEnabled = false
@@ -147,20 +171,24 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         button.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
         return button
     }()
+    
     let clearButton1: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal) // X 버튼 아이콘 설정
-        button.tintColor = .lightGray // 버튼 색상 설정
+        button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
+        button.tintColor = .lightGray
+        button.isHidden = true // 초기에는 숨김 상태
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(clearTextField), for: .touchUpInside) // X 버튼 클릭 시 동작
+        button.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
         return button
     }()
+
     let clearButton2: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal) // X 버튼 아이콘 설정
-        button.tintColor = .lightGray // 버튼 색상 설정
+        button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
+        button.tintColor = .lightGray
+        button.isHidden = true // 초기에는 숨김 상태
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(clearTextField), for: .touchUpInside) // X 버튼 클릭 시 동작
+        button.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -195,6 +223,9 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             view.addSubview(titleCount)
             configureTextFieldDelegates(in: startDateStackView)
             configureTextFieldDelegates(in: endDateStackView)
+        
+            titleTextField.addTarget(self, action: #selector(updateClearButtonState(_:)), for: .editingChanged)
+            locationTextField.addTarget(self, action: #selector(updateClearButtonState(_:)), for: .editingChanged)
             
             titleTextField.delegate = self
             locationTextField.delegate = self
@@ -203,6 +234,10 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             setupUI()
             setupCompanionButtons()
             setupObservers()
+            setupDateFieldObservers()
+        
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
 
             titleCount.translatesAutoresizingMaskIntoConstraints = false
             titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
@@ -210,6 +245,10 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             locationTextField.delegate = self
             
             titleCount.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+            clearButton1.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
+            clearButton2.addTarget(self, action: #selector(clearTextField(_:)), for: .touchUpInside)
         
         // userId 확인 (로그인에서 받은 userId가 잘 넘어왔는지 확인)
             if let userId = TravelRecordManager.shared.userId {
@@ -219,20 +258,81 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             }
         }
     
-    @objc private func titleTextFieldDidChange(_ textField: UITextField) {
-            let textCount = textField.text?.count ?? 0
-            if textCount > maxTitleLength {
-                textField.text = String(textField.text?.prefix(maxTitleLength) ?? "")
-            }
-            titleCount.text = "\(textField.text?.count ?? 0) / \(maxTitleLength)"
-            
-            // "임시저장" 버튼 글씨 색 변경
-            if let text = textField.text, !text.isEmpty {
-                saveButton.setTitleColor(.black, for: .normal)  // 글씨 색을 검정색으로 변경
-            } else {
-                saveButton.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)  // 글씨 색을 회색으로 변경
-            }
+    deinit {
+            // 키보드 이벤트 해제
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         }
+        
+    @objc private func titleTextFieldDidChange(_ textField: UITextField) {
+        let textCount = textField.text?.count ?? 0
+
+        // 제목 글자 수 제한
+        if textCount > maxTitleLength {
+            textField.text = String(textField.text?.prefix(maxTitleLength) ?? "")
+        }
+
+        titleCount.text = "\(textField.text?.count ?? 0) / \(maxTitleLength)"
+
+        // 입력 여부에 따라 색상 변경
+        let isTextEntered = textCount > 0
+        let newColor = isTextEntered ? UIColor(red: 0.82, green: 0.82, blue: 0.96, alpha: 1) : UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // #D2D2F5 또는 기본 색상
+
+        titleUnderline.backgroundColor = newColor
+        titleCount.textColor = newColor
+
+        // "임시저장" 버튼 활성화 여부
+        validateInputsForSaveButton()
+    }
+    
+    @objc private func locationTextFieldDidChange(_ textField: UITextField) {
+        let textCount = textField.text?.count ?? 0
+
+        // 여행지 글자 수 제한
+        if textCount > 10 {
+            textField.text = String(textField.text?.prefix(10) ?? "")
+        }
+
+        locationCount.text = "\(textField.text?.count ?? 0) / 10"
+
+        // 입력 여부에 따라 색상 변경
+        let isTextEntered = textCount > 0
+        let newColor = isTextEntered ? UIColor(red: 0.82, green: 0.82, blue: 0.96, alpha: 1) : UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // #D2D2F5 또는 기본 색상
+
+        locationUnderline.backgroundColor = newColor
+        locationCount.textColor = newColor
+
+        // "임시저장" 버튼 활성화 여부
+        validateInputsForSaveButton()
+    }
+    
+    private func validateInputsForSaveButton() {
+        // 제목, 여행지, 동행자 상태 확인
+        let isTitleFilled = !(titleTextField.text?.isEmpty ?? true)
+        let isLocationFilled = !(locationTextField.text?.isEmpty ?? true)
+        let isCompanionSelected = selectedCompanion != nil
+
+        // 하나라도 입력 또는 선택된 경우 활성화
+        let isAnyFieldFilled = isTitleFilled || isLocationFilled || isCompanionSelected
+
+        // 버튼 활성화/비활성화 및 색상 업데이트
+        saveButton.setTitleColor(
+            isAnyFieldFilled
+                ? UIColor(red: 0.592, green: 0.592, blue: 0.592, alpha: 1) // #979797
+                : UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), // 기본 색상
+            for: .normal
+        )
+
+        saveButton.isEnabled = isAnyFieldFilled // 버튼 활성화 상태 설정
+    }
+    
+    @objc private func updateClearButtonState(_ textField: UITextField) {
+        if textField == titleTextField {
+            clearButton1.isHidden = (textField.text ?? "").isEmpty
+        } else if textField == locationTextField {
+            clearButton2.isHidden = (textField.text ?? "").isEmpty
+        }
+    }
     
     private func setupCustomNavigationBar() {
         let navBar = UIView()
@@ -240,13 +340,13 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         navBar.translatesAutoresizingMaskIntoConstraints = false
         
         let separator = UIView()
-        separator.backgroundColor = .lightGray
+        separator.backgroundColor = #colorLiteral(red: 0.6666666667, green: 0.6666666667, blue: 0.6666666667, alpha: 1)
         separator.translatesAutoresizingMaskIntoConstraints = false
         
         let titleLabel = UILabel()
         titleLabel.text = "여행 기록 쓰기"
-        titleLabel.font = UIFont(name: "Pretendard-Bold", size: 20)
-        titleLabel.textColor = .black
+        titleLabel.font = UIFont(name: "Pretendard-SemiBold", size: 19)
+        titleLabel.textColor = #colorLiteral(red: 0.1879820824, green: 0.1879820824, blue: 0.1879820824, alpha: 1)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -256,6 +356,13 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         
+//        let saveButton = UIButton(type: .system)
+//        saveButton.setTitle("임시저장", for: .normal)
+//        saveButton.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 14)
+//        saveButton.setTitleColor(UIColor(red: 0.824, green: 0.824, blue: 0.824, alpha: 1), for: .normal)
+//        saveButton.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
+//        saveButton.translatesAutoresizingMaskIntoConstraints = false
+        
         // Add navBar and its subviews
         view.addSubview(navBar)
         navBar.addSubview(separator)
@@ -263,40 +370,47 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         navBar.addSubview(backButton)
         navBar.addSubview(saveButton)
         
-        // Add `titleCount` to the same view hierarchy as `titleTextField`
-        view.addSubview(titleCount)
-        view.addSubview(titleTextField)
-
         // Setup constraints
         NSLayoutConstraint.activate([
+            // Navigation Bar
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             navBar.heightAnchor.constraint(equalToConstant: 48),
             
+            // Separator Line
             separator.bottomAnchor.constraint(equalTo: navBar.bottomAnchor),
             separator.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             separator.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
             separator.heightAnchor.constraint(equalToConstant: 0.3),
             
+            // Title Label
             titleLabel.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
             titleLabel.centerXAnchor.constraint(equalTo: navBar.centerXAnchor),
             
-            backButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
+            // Back Button
+            backButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: navBar.leadingAnchor, constant: 24),
             
-            saveButton.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
+            // Save Button
+            saveButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor), // Title Label과 Y축 정렬
             saveButton.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -24),
-                 
         ])
     }
     
-    @objc private func clearTextField() {
-        titleTextField.text = "" // titleTextField의 텍스트를 비움
-        locationTextField.text = "" // locationTextField의 텍스트를 비움
-        titleCount.text = "0 / 10" // titleTextField에 텍스트가 비었으므로 카운트를 초기화
-        locationCount.text = "0 / 10" // locationTextField에 텍스트가 비었으므로 카운트를 초기화
-        validateInputs() // 유효성 검사 다시 실행
+    // Clear 버튼 동작 수정
+    @objc private func clearTextField(_ sender: UIButton) {
+        if sender == clearButton1 {
+            titleTextField.text = ""
+            titleCount.text = "0 / \(maxTitleLength)" // 제목 글자 수 업데이트
+            clearButton1.isHidden = true // 버튼 숨기기
+            validateInputsForSaveButton()
+        } else if sender == clearButton2 {
+            locationTextField.text = ""
+            clearButton2.isHidden = true // 버튼 숨기기
+            locationCount.text = "0 / 10" // 여행 장소 글자 수 업데이트
+        }
+        validateInputs() // 유효성 검사 실행
     }
     
     @objc private func didTapBackButton() {
@@ -324,7 +438,6 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         view.addSubview(clearButton1) // X 버튼을 추가
         clearButton1.widthAnchor.constraint(equalToConstant: 20).isActive = true
         clearButton1.heightAnchor.constraint(equalToConstant: 20).isActive = true
-        view.addSubview(saveButton)  // saveButton 추가
 
         view.addSubview(clearButton2) // X 버튼을 추가
         clearButton2.widthAnchor.constraint(equalToConstant: 20).isActive = true
@@ -335,7 +448,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
 
         // titleLabel과 titleTextField가 동일한 부모 뷰에 속하도록 constraint 수정
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 65),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 75),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             
             titleTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
@@ -346,7 +459,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             titleUnderline.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 2),
             titleUnderline.leadingAnchor.constraint(equalTo: titleTextField.leadingAnchor),
             titleUnderline.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor),
-            titleUnderline.heightAnchor.constraint(equalToConstant: 1),
+            titleUnderline.heightAnchor.constraint(equalToConstant: 1.5),
             
             clearButton1.topAnchor.constraint(equalTo: titleTextField.topAnchor, constant: 16), // X 버튼을 텍스트 필드 중앙에 배치
             clearButton1.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor), // 텍스트 필드의 오른쪽에 배치
@@ -354,7 +467,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             titleCount.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 5),
             titleCount.trailingAnchor.constraint(equalTo: titleTextField.trailingAnchor),
             
-            dateLabel.topAnchor.constraint(equalTo: titleUnderline.bottomAnchor, constant: 24),
+            dateLabel.topAnchor.constraint(equalTo: titleCount.bottomAnchor, constant: 25),
             dateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             
             startDateStackView.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 16),
@@ -365,7 +478,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             endDateStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             endDateStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -70),
             
-            locationLabel.topAnchor.constraint(equalTo: endDateStackView.bottomAnchor, constant: 24),
+            locationLabel.topAnchor.constraint(equalTo: endDateStackView.bottomAnchor, constant: 44),
             locationLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             
             locationTextField.topAnchor.constraint(equalTo: locationLabel.bottomAnchor, constant: 8),
@@ -379,82 +492,90 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             locationUnderline.topAnchor.constraint(equalTo: locationTextField.bottomAnchor, constant: 2),
             locationUnderline.leadingAnchor.constraint(equalTo: locationTextField.leadingAnchor),
             locationUnderline.trailingAnchor.constraint(equalTo: locationTextField.trailingAnchor),
-            locationUnderline.heightAnchor.constraint(equalToConstant: 1),
+            locationUnderline.heightAnchor.constraint(equalToConstant: 1.5),
             
             locationCount.topAnchor.constraint(equalTo: locationTextField.bottomAnchor, constant: 5),
             locationCount.trailingAnchor.constraint(equalTo: locationTextField.trailingAnchor),
             
-            companionLabel.topAnchor.constraint(equalTo: locationUnderline.bottomAnchor, constant: 24),
+            companionLabel.topAnchor.constraint(equalTo: locationCount.bottomAnchor, constant: 25),
             companionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             
             nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             nextButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             nextButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            nextButton.heightAnchor.constraint(equalToConstant: 50),
-            
-            saveButton.topAnchor.constraint(equalTo: titleUnderline.bottomAnchor, constant: -125),  // 적절한 위치 설정
-            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            saveButton.heightAnchor.constraint(equalToConstant: 19),
-            saveButton.widthAnchor.constraint(equalToConstant: 49),
-                 
+            nextButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
 
     
     private func setupCompanionButtons() {
         let options = ["혼자", "가족과", "친구와", "연인과", "기타"]
+        let buttonWidth: CGFloat = 76
+        let buttonHeight: CGFloat = 39
+        let sidePadding: CGFloat = 24 // 좌우 고정 패딩
+        let maxRowWidth: CGFloat = UIScreen.main.bounds.width - (sidePadding * 2) // 한 행에서 사용할 수 있는 최대 너비
+        let firstRowButtonsCount = 4 // 첫 행에 배치할 버튼 개수
+        let buttonSpacing: CGFloat = (maxRowWidth - (CGFloat(firstRowButtonsCount) * buttonWidth)) / CGFloat(firstRowButtonsCount - 1) // 버튼 간 동적 간격 계산
+
         var previousButton: UIButton?
-        
+        var previousRowFirstButton: UIButton?
+
         for (index, option) in options.enumerated() {
             let button = UIButton(type: .system)
             button.setTitle(option, for: .normal)
             button.setTitleColor(.black, for: .normal)
-            button.layer.cornerRadius = 18.5
+            button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 15) // 기본 상태 Regular 폰트
+
+            button.layer.cornerRadius = buttonHeight / 2
             button.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             button.translatesAutoresizingMaskIntoConstraints = false
             button.addTarget(self, action: #selector(companionButtonTapped(_:)), for: .touchUpInside)
             companionButtons.append(button)
             view.addSubview(button)
-            
+
+            // 버튼 크기 고정
             NSLayoutConstraint.activate([
-                button.widthAnchor.constraint(equalToConstant: 76),
-                button.heightAnchor.constraint(equalToConstant: 37)
+                button.widthAnchor.constraint(equalToConstant: buttonWidth),
+                button.heightAnchor.constraint(equalToConstant: buttonHeight)
             ])
-            
-            if index < 4 {
+
+            if index < firstRowButtonsCount { // 첫 행
                 if previousButton == nil {
+                    // 첫 번째 버튼
                     button.topAnchor.constraint(equalTo: companionLabel.bottomAnchor, constant: 14).isActive = true
-                    button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24).isActive = true
+                    button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: sidePadding).isActive = true
+                    previousRowFirstButton = button
                 } else {
+                    // 같은 행에 버튼 추가
                     button.topAnchor.constraint(equalTo: previousButton!.topAnchor).isActive = true
-                    button.leadingAnchor.constraint(equalTo: previousButton!.trailingAnchor, constant: 8).isActive = true
+                    button.leadingAnchor.constraint(equalTo: previousButton!.trailingAnchor, constant: buttonSpacing).isActive = true
                 }
             } else {
-                if index == 4 {
-                    button.topAnchor.constraint(equalTo: companionButtons[0].bottomAnchor, constant: 8).isActive = true
-                    button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24).isActive = true
-                } else {
-                    button.topAnchor.constraint(equalTo: companionButtons[4].topAnchor).isActive = true
-                    button.leadingAnchor.constraint(equalTo: companionButtons[index - 1].trailingAnchor, constant: 8).isActive = true
-                }
+                // "기타" 버튼은 새 행으로 이동
+                button.topAnchor.constraint(equalTo: previousRowFirstButton!.bottomAnchor, constant: 14).isActive = true
+                button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: sidePadding).isActive = true
             }
-            
+
             previousButton = button
         }
+        validateInputsForSaveButton()
     }
     
     @objc func companionButtonTapped(_ sender: UIButton) {
         if selectedCompanion == sender {
             sender.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
             sender.setTitleColor(.black, for: .normal)
+            sender.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 15) // 선택 해제 시 Regular 폰트
             selectedCompanion = nil
         } else {
             companionButtons.forEach {
                 $0.backgroundColor = UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
                 $0.setTitleColor(.black, for: .normal)
+                $0.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 15) // 다른 버튼은 Regular 폰트로 변경
             }
             sender.backgroundColor = UIColor(red: 0.459, green: 0.451, blue: 0.765, alpha: 1)
             sender.setTitleColor(.white, for: .normal)
+            sender.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 15) // 선택된 버튼은 Medium 폰트로 변경
             selectedCompanion = sender
         }
         validateInputs()
@@ -530,29 +651,44 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
     
     static func createDateField(placeholder: String) -> UITextField {
         let textField = UITextField()
-        textField.placeholder = placeholder
-        textField.font = UIFont(name: "Pretendard-Regular", size: 20)
-        textField.borderStyle = .none
-        textField.textAlignment = .center
-        textField.keyboardType = .numberPad
-        
+            textField.placeholder = placeholder
+            textField.font = UIFont(name: "Pretendard-Regular", size: 20)
+            textField.textColor = UIColor(red: 0.141, green: 0.141, blue: 0.141, alpha: 1)
+            textField.tintColor = UIColor(red: 0.43, green: 0.43, blue: 0.87, alpha: 1) // #6E6EDE
+            textField.borderStyle = .none
+            textField.textAlignment = .center
+            textField.keyboardType = .numberPad
+
+        // Set placeholder color to #D2D2D2
+        textField.attributedPlaceholder = NSAttributedString(
+            string: placeholder,
+            attributes: [
+                .foregroundColor: UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // #D2D2D2
+            ]
+        )
+
         let underline = UIView()
-        underline.backgroundColor = .lightGray
+        underline.backgroundColor = UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // #D2D2D2
         underline.translatesAutoresizingMaskIntoConstraints = false
         textField.addSubview(underline)
-        
-        underline.leadingAnchor.constraint(equalTo: textField.leadingAnchor).isActive = true
-        underline.trailingAnchor.constraint(equalTo: textField.trailingAnchor).isActive = true
-        underline.bottomAnchor.constraint(equalTo: textField.bottomAnchor, constant: 2).isActive = true
-        underline.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        
+
+        NSLayoutConstraint.activate([
+            underline.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
+            underline.trailingAnchor.constraint(equalTo: textField.trailingAnchor),
+            underline.bottomAnchor.constraint(equalTo: textField.bottomAnchor, constant: 6), // Padding of 6
+            underline.heightAnchor.constraint(equalToConstant: 1.5) // Thickness of 1.5
+        ])
+
         return textField
     }
     
+    // Setup Observers에 여행 장소 텍스트 필드 변화 감지 추가
     func setupObservers() {
         [titleTextField, locationTextField].forEach {
             $0.addTarget(self, action: #selector(validateInputs), for: .editingChanged)
         }
+        locationTextField.addTarget(self, action: #selector(locationTextFieldDidChange(_:)), for: .editingChanged)
+        titleTextField.addTarget(self, action: #selector(titleTextFieldDidChange(_:)), for: .editingChanged)
     }
     
     /// `모든 텍스트 안에 delegate 설정
@@ -636,6 +772,7 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         
         // 유효성 검사 실행
         validateInputs()
+        validateInputsForSaveButton()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -670,19 +807,22 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
             }
         }
     }
-    /// Validate Check Function
     @objc func validateInputs() {
-        let isTitleFilled = !(titleTextField.text?.isEmpty ?? true)
-        let isLocationFilled = !(locationTextField.text?.isEmpty ?? true)
-        let isCompanionSelected = selectedCompanion != nil
-        let isStartDateValid = isValidDate(year: startDateYear ?? "0000", month: startDateMonth ?? "00", day: startDateDay ?? "00")
-        let isEndDateValid = isValidDate(year: endDateYear ?? "0000", month: endDateMonth ?? "00", day: endDateDay ?? "00")
-            
+        let isTitleFilled = !(titleTextField.text?.isEmpty ?? true) // 제목 입력 여부
+        let isLocationFilled = !(locationTextField.text?.isEmpty ?? true) // 여행지 입력 여부
+        let isCompanionSelected = selectedCompanion != nil // 동행자 선택 여부
+        let isStartDateValid = isValidDate(year: startDateYear ?? "0000", month: startDateMonth ?? "00", day: startDateDay ?? "00") // 시작일 유효성
+        let isEndDateValid = isValidDate(year: endDateYear ?? "0000", month: endDateMonth ?? "00", day: endDateDay ?? "00") // 종료일 유효성
+
+        // 모든 조건이 충족되었는지 확인
         let isAllValid = isTitleFilled && isLocationFilled && isCompanionSelected && isStartDateValid && isEndDateValid
-        
+
+        // "다음" 버튼의 상태와 색상 업데이트
         nextButton.isEnabled = isAllValid
-        nextButton.backgroundColor = isAllValid ? UIColor(red: 0.459, green: 0.451, blue: 0.765, alpha: 1) : UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1)
-        nextButton.setTitleColor(isAllValid ? .white : .black, for: .normal)
+        nextButton.backgroundColor = isAllValid
+            ? UIColor(red: 0.459, green: 0.451, blue: 0.765, alpha: 1) // 활성화 색상
+            : UIColor(red: 0.91, green: 0.91, blue: 0.91, alpha: 1) // 비활성화 색상
+        nextButton.setTitleColor(isAllValid ? .white : UIColor(red: 0.541, green: 0.541, blue: 0.541, alpha: 1), for: .normal) // #8A8A8A
     }
     
     private func isValidDateField(_ text: String, type: String) -> Bool {
@@ -820,6 +960,53 @@ class CreateViewController: UIViewController, UITextFieldDelegate {
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true, completion: nil)
     }
+    
+    // MARK: - 키보드 나타날 때
+        @objc private func keyboardWillShow(_ notification: Notification) {
+            guard locationTextField.isFirstResponder,  // locationTextField가 활성화된 경우에만 작동
+                  let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+            let keyboardHeight = keyboardFrame.height
+            let bottomSafeArea = view.safeAreaInsets.bottom
+            let additionalOffset: CGFloat = 20 // 키보드와 텍스트필드 간격 추가
+
+            UIView.animate(withDuration: 0.3) {
+                self.view.transform = CGAffineTransform(translationX: 0, y: -(keyboardHeight - bottomSafeArea + additionalOffset))
+            }
+        }
+        
+        // MARK: - 키보드 사라질 때
+        @objc private func keyboardWillHide(_ notification: Notification) {
+            UIView.animate(withDuration: 0.3) {
+                self.view.transform = .identity // 화면을 원래 위치로 복구
+            }
+        }
+    
+    // MARK: - Setup Date Field Observers
+    private func setupDateFieldObservers() {
+        let dateFields = getAllDateFields()
+        dateFields.forEach { field in
+            field.addTarget(self, action: #selector(dateFieldEditingChanged(_:)), for: .editingChanged)
+        }
+    }
+
+    // MARK: - Date Field Editing Changed
+    @objc private func dateFieldEditingChanged(_ textField: UITextField) {
+        if let underline = textField.subviews.first(where: { $0 is UIView }) as? UIView {
+            let text = textField.text ?? ""
+            underline.backgroundColor = text.isEmpty
+                ? UIColor(red: 0.82, green: 0.82, blue: 0.82, alpha: 1) // 기본 색상
+                : UIColor(red: 0.82, green: 0.82, blue: 0.96, alpha: 1) // #D2D2F5
+        }
+    }
+
+    // MARK: - Helper to Get All Date Fields
+    private func getAllDateFields() -> [UITextField] {
+        var dateFields: [UITextField] = []
+        collectTextFields(from: startDateStackView, into: &dateFields)
+        collectTextFields(from: endDateStackView, into: &dateFields)
+        return dateFields
+    }
 
     
 }
@@ -845,7 +1032,7 @@ extension TravelRecordManager {
             return
         }
 
-        let serverURL = "http://172.17.208.113:8080/api/posts?userId=\(userId)"
+        let serverURL = "https://mugejunsim.store/api/posts?userId=\(userId)"
         let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]

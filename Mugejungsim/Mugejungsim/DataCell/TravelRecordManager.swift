@@ -21,7 +21,7 @@ struct TravelRecord: Codable {
     var endDate: String         // 여행 종료 날짜
     var location: String        // 여행지
     var companion : String      // 동행자
-    var bottle : String         // 유리병
+    var bottle : String         // 유리병 
     var photos: [PhotoData]     // `PhotoData` 사용
     var oneLine1: String        // local
     var oneLine2: String        // local

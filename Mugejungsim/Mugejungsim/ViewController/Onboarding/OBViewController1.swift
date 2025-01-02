@@ -13,18 +13,18 @@ class OBViewController1: UIViewController {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "기억하고 싶은 여행을\n기록해보세요!"
+        label.text = "추억하고 싶은 여행을\n간편하게 아카이빙 해보세요!" 
         label.textAlignment = .center
         label.font = UIFont.font(.pretendardBold, ofSize: 22)
         label.numberOfLines = 2
-        label.textColor = .black
+        label.textColor = #colorLiteral(red: 0.1411764706, green: 0.1411764706, blue: 0.1411764706, alpha: 1)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
     private let placeholderView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "OB2") // "OB2"라는 이미지 파일 추가
+        imageView.image = UIImage(named: "OB1") // "OB2"라는 이미지 파일 추가
         imageView.contentMode = .scaleAspectFit // 이미지 비율 유지하며 맞추기
         imageView.layer.cornerRadius = 10
         imageView.clipsToBounds = true // 이미지가 라운드 영역을 벗어나지 않도록
@@ -65,7 +65,7 @@ class OBViewController1: UIViewController {
             dotImageView.heightAnchor.constraint(equalToConstant: 10),
 
             // Title Label Constraints
-            titleLabel.topAnchor.constraint(equalTo: dotImageView.bottomAnchor, constant: 17),
+            titleLabel.topAnchor.constraint(equalTo: dotImageView.bottomAnchor, constant: 22),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16), // 화면 좌측 여백
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16), // 화면 우측 여백
 

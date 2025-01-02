@@ -28,11 +28,12 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         button.layer.masksToBounds = false // 그림자가 잘리지 않도록 false로 설정
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = UIColor(red: 0.46, green: 0.45, blue: 0.76, alpha: 1)
+        
         // 그림자 설정
-        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
-        button.layer.shadowOpacity = 1
-        button.layer.shadowRadius = 4 // 더 강하게 강조
-        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.25
+        button.layer.shadowRadius = 1
+        button.layer.shadowOffset = CGSize(width: 0.5, height: 0.5)
         return button
     }()
     
@@ -40,16 +41,17 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         let button = UIButton(type: .system)
         button.setTitle("저장하고 홈으로 돌아가기", for: .normal)
         button.titleLabel?.font = UIFont(name: "Pretendard-Medium", size: 16)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(UIColor(red: 85/255, green: 85/255, blue: 88/255, alpha: 1.0), for: .normal)
         button.layer.cornerRadius = 8
         button.layer.masksToBounds = false // 그림자가 잘리지 않도록 false로 설정
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = UIColor(hex: "#F4F5FB")
+        
         // 그림자 설정
-        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
-        button.layer.shadowOpacity = 1
-        button.layer.shadowRadius = 4 // 더 강하게 강조
-        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.25
+        button.layer.shadowRadius = 1
+        button.layer.shadowOffset = CGSize(width: 0.5, height: 0.5)
         return button
     }()
     
@@ -173,22 +175,21 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
             collectionView.reloadData() // UI 업데이트
         }
     
-    // MARK: - Collection View Setup
     func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-            
-        // Cell 크기 설정 (64.59)
-        layout.itemSize = CGSize(width: 64.59, height: 64.59)
-            
-        // Cell 간격 설정 (1.01)
+        
+        // 셀 크기를 컬렉션 뷰 너비를 기준으로 설정 (정사각형)
+        let cellWidth = (UIScreen.main.bounds.width - 48 - (4 * 1.01)) / 5 // 화면 너비 - 좌우 패딩 - 간격
+        layout.itemSize = CGSize(width: cellWidth, height: cellWidth)
+        
+        // 셀 간 간격
         layout.minimumLineSpacing = 1.01 // 줄 간격
         layout.minimumInteritemSpacing = 1.01 // 열 간격
-            
-        // Section Insets 설정 (좌우 여백)
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 24, bottom: 10, right: 24)
-            
-        // layout.sectionInset = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 24)
-        // CollectionView 생성
+        
+        // 컬렉션 뷰 여백
+        layout.sectionInset = UIEdgeInsets(top: 1.01, left: 24, bottom: 1.01, right: 24)
+        
+        // 컬렉션 뷰 생성
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -196,8 +197,8 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
         collectionView.backgroundColor = .white
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
-            
-        // CollectionView 제약조건 설정
+        
+        // 제약조건 설정
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -222,11 +223,11 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedData = savedData[indexPath.row]
         let detailVC = PhotoDetailViewController()
-        detailVC.selectedPhotoData = selectedData // 데이터 전달
+        detailVC.selectedPhotoData = selectedData // 선택된 데이터 전달
+        detailVC.allPhotoData = savedData // 전체 데이터 전달
+        detailVC.currentPhotoIndex = indexPath.row // 현재 인덱스 전달
         detailVC.modalPresentationStyle = .fullScreen
         present(detailVC, animated: true, completion: nil)
-        
-        
     }
     
     @objc private func goBack() {
@@ -287,3 +288,4 @@ class SavedPhotosViewController: UIViewController, UICollectionViewDelegate, UIC
     }
     
 }
+
